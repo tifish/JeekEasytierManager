@@ -15,8 +15,8 @@ if ($args.Count -eq 0) {
 
 # Get the first command line argument as the download URL
 $downloadUrl = $args[0]
-# Download .zip to system temp directory
-$packPath = "$env:TEMP\$appName.zip"
+# Download .7z to system temp directory
+$packPath = "$env:TEMP\$appName.7z"
 Invoke-WebRequest -Uri $downloadUrl -OutFile $packPath
 
 # Check if $packPath exists
@@ -29,8 +29,10 @@ if (-not (Test-Path $packPath)) {
 # Delete old Libs directory
 Remove-Item -Recurse -Force -Path "$PSScriptRoot\Libs"
 
-# Extract .zip in to $PSScriptRoot
-Expand-Archive -Path $packPath -DestinationPath $PSScriptRoot -Force
+# Extract .7z in to $PSScriptRoot
+& {
+    7Zip\7za.exe x $packPath -o"$PSScriptRoot" -y
+} -ErrorAction SilentlyContinue
 
 # Start .exe
 Start-Process -FilePath "$PSScriptRoot\$appName.exe"

@@ -28,10 +28,10 @@ jobs:
             - name: Build
               run: dotnet build --configuration Release ${{ env.PROJECT_NAME }}.sln
 
-            - name: Zip files
+            - name: Pack files
               run: |
                   cd bin
-                  powershell Compress-Archive -Path * -DestinationPath ..\${{ env.PROJECT_NAME }}.zip
+                  7Zip\7za.exe a -r ..\${{ env.PROJECT_NAME }}.7z *
                   cd ..
 
             - name: Delete release and tag
@@ -42,4 +42,4 @@ jobs:
               run: gh release create ${{ env.RELEASE_TAG }} --generate-notes
 
             - name: Upload pack
-              run: gh release upload ${{ env.RELEASE_TAG }} ${{ env.PROJECT_NAME }}.zip --clobber
+              run: gh release upload ${{ env.RELEASE_TAG }} ${{ env.PROJECT_NAME }}.7z --clobber
