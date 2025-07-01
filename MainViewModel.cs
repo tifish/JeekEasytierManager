@@ -24,6 +24,7 @@ public partial class MainViewModel : ObservableObject
     {
         await LoadConfigs();
         await UpdateServiceStatus();
+        CheckHasEasytier();
         await ShowPeers();
     }
 
@@ -65,6 +66,12 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task InstallService()
     {
+        if (!HasEasytier)
+        {
+            Messages = "Easytier is not installed";
+            return;
+        }
+
         foreach (var config in Configs)
         {
             if (!config.Enabled)
@@ -81,6 +88,12 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task UninstallService()
     {
+        if (!HasEasytier)
+        {
+            Messages = "Easytier is not installed";
+            return;
+        }
+
         await StopService();
         foreach (var config in Configs)
         {
@@ -95,6 +108,12 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task StartService()
     {
+        if (!HasEasytier)
+        {
+            Messages = "Easytier is not installed";
+            return;
+        }
+
         foreach (var config in Configs)
         {
             if (!config.Enabled)
@@ -108,6 +127,12 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task StopService()
     {
+        if (!HasEasytier)
+        {
+            Messages = "Easytier is not installed";
+            return;
+        }
+
         foreach (var config in Configs)
         {
             if (!config.Enabled)
@@ -145,36 +170,48 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task ShowPeers()
     {
+        if (!HasEasytier)
+        {
+            Messages = "Easytier is not installed";
+            return;
+        }
+
         Messages = "";
 
         foreach (var config in Configs)
         {
-            if (!config.Enabled)
+            if (config.Status != ServiceStatus.Running)
                 continue;
 
             var rpcPortal = GetRpcPortal(config.Name);
             var args = rpcPortal == "" ? "" : $"-p {rpcPortal}";
 
             var peers = await Nssm.RunWithOutput(Settings.EasytierCliPath, $"{args} peer", Encoding.UTF8);
-            Messages += $"{config}:\n{peers}\n\n";
+            Messages += $"{config.Name}:\n{peers}\n\n";
         }
     }
 
     [RelayCommand]
     public async Task ShowRoute()
     {
+        if (!HasEasytier)
+        {
+            Messages = "Easytier is not installed";
+            return;
+        }
+
         Messages = "";
 
         foreach (var config in Configs)
         {
-            if (!config.Enabled)
+            if (config.Status != ServiceStatus.Running)
                 continue;
 
             var rpcPortal = GetRpcPortal(config.Name);
             var args = rpcPortal == "" ? "" : $"-p {rpcPortal}";
 
             var route = await Nssm.RunWithOutput(Settings.EasytierCliPath, $"{args} route", Encoding.UTF8);
-            Messages += $"{config}:\n{route}\n\n";
+            Messages += $"{config.Name}:\n{route}\n\n";
         }
     }
 
@@ -190,6 +227,50 @@ public partial class MainViewModel : ObservableObject
 
             config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);
         }
+    }
+
+    [RelayCommand]
+    public async Task UpdateEasytier()
+    {
+        var hasUpdate = await EasytierUpdate.HasUpdate();
+
+        Messages = $"Local version is {EasytierUpdate.LocalVersion}, remote version is {EasytierUpdate.RemoteVersion}";
+
+        if (hasUpdate)
+        {
+            Messages += "\nUpdating easytier...";
+            await StopService();
+            await EasytierUpdate.Update();
+            CheckHasEasytier();
+            await StartService();
+            Messages += "\nUpdate completed.";
+        }
+        else
+        {
+            Messages += "\nNo update found.";
+        }
+    }
+
+    [RelayCommand]
+    public async Task UpdateJeekEasytierManager()
+    {
+        if (await AutoUpdate.HasUpdate())
+        {
+            Messages = "\nUpdating JeekEasytierManager...";
+            AutoUpdate.Update();
+        }
+        else
+        {
+            Messages = "\nNo update found.";
+        }
+    }
+
+    [ObservableProperty]
+    public partial bool HasEasytier { get; set; } = true;
+
+    private void CheckHasEasytier()
+    {
+        HasEasytier = File.Exists(Settings.EasytierCorePath) && File.Exists(Settings.EasytierCliPath);
     }
 }
 

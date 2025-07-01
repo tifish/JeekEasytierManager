@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:JeekEasytierManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="{Binding Title}"
-    Width="1200"
+    Width="1250"
     Height="730"
     MinWidth="750"
     MinHeight="460"
@@ -21,8 +21,9 @@
         <StackPanel
             Grid.Row="0"
             Orientation="Horizontal"
-            Spacing="10">
+            Spacing="20">
 
+            <!--  Configs  -->
             <StackPanel Orientation="Vertical" Spacing="10">
 
                 <Label
@@ -31,32 +32,64 @@
                     FontWeight="Bold" />
 
                 <local:ConfigListControl Configs="{Binding Configs}" EditCommand="{Binding EditConfigCommand}" />
+
             </StackPanel>
 
             <StackPanel
-                Margin="10,0,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Orientation="Vertical"
                 Spacing="10">
 
-                <Label
-                    Content="Service"
-                    FontSize="20"
-                    FontWeight="Bold" />
+                <!--  Service  -->
+                <StackPanel
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Orientation="Vertical"
+                    Spacing="10">
 
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <Button Command="{Binding InstallServiceCommand}" Content="Install" />
-                    <Button Command="{Binding UninstallServiceCommand}" Content="Uninstall" />
+                    <Label
+                        Content="Service"
+                        FontSize="20"
+                        FontWeight="Bold" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Command="{Binding InstallServiceCommand}" Content="Install" />
+                        <Button Command="{Binding UninstallServiceCommand}" Content="Uninstall" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Command="{Binding StartServiceCommand}" Content="(Re)start" />
+                        <Button Command="{Binding StopServiceCommand}" Content="Stop" />
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <Button Command="{Binding StartServiceCommand}" Content="(Re)start" />
-                    <Button Command="{Binding StopServiceCommand}" Content="Stop" />
+
+                <!--  Update  -->
+                <StackPanel
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Orientation="Vertical"
+                    Spacing="10">
+
+                    <Label
+                        Content="Update"
+                        FontSize="20"
+                        FontWeight="Bold" />
+
+                    <StackPanel Orientation="Vertical" Spacing="10">
+                        <Label
+                            Content="Easytier is not installed"
+                            Foreground="Red"
+                            IsVisible="{Binding !HasEasytier}" />
+                        <Button Command="{Binding UpdateEasytierCommand}" Content="Update Easytier" />
+                        <Button Command="{Binding UpdateJeekEasytierManagerCommand}" Content="Update JeekEasytierManager" />
+                    </StackPanel>
                 </StackPanel>
+
             </StackPanel>
 
         </StackPanel>
 
+        <!--  Info  -->
         <Grid
             Grid.Row="1"
             Margin="0,10,0,0"
@@ -92,6 +125,7 @@
 
             </ScrollViewer>
         </Grid>
+
     </Grid>
 
 </Window>
