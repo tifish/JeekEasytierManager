@@ -1,0 +1,12 @@
+/.idea
+/.vscode
+/obj
+/bin/Config
+/bin/Easytier
+/bin/Libs
+/bin/JeekEasytierManager.dll
+/bin/JeekEasytierManager.exe
+/bin/JeekEasytierManager.pdb
+/bin/JeekEasytierManager.deps.json
+/bin/JeekEasytierManager.runtimeconfig.json
+/bin/libloader.dll
