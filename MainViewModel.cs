@@ -252,11 +252,11 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task UpdateJeekEasytierManager()
+    public async Task UpdateMe()
     {
         if (await AutoUpdate.HasUpdate())
         {
-            Messages = "\nUpdating JeekEasytierManager...";
+            Messages = "\nUpdating Me...";
             AutoUpdate.Update();
         }
         else

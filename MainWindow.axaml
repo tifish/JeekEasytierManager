@@ -100,7 +100,7 @@
                                 Classes="Gray"
                                 Command="{Binding UpdateEasytierCommand}"
                                 Content="Update Easytier" />
-                            <Button Command="{Binding UpdateJeekEasytierManagerCommand}" Content="Update JeekEasytierManager" />
+                            <Button Command="{Binding UpdateMeCommand}" Content="Update Me" />
                         </StackPanel>
                     </StackPanel>
                 </Border>
