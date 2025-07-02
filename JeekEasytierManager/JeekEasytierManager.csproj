@@ -6,7 +6,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <OutDir>bin</OutDir>
+    <OutDir>..\bin</OutDir>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <LangVersion>preview</LangVersion>
@@ -32,6 +32,10 @@
 
   <ItemGroup>
     <AvaloniaResource Include="App.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JeekTools.NET\JeekTools.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

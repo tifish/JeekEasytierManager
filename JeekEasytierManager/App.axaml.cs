@@ -115,9 +115,12 @@ public partial class App : Application
         }
     }
 
-    private void ExitApplication()
+    public static void ExitApplication()
     {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        // Clean up resources
+        MainViewModel.Instance.Dispose();
+
+        if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.Shutdown();
         }

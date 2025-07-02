@@ -27,7 +27,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             await MessageBoxManager.GetMessageBoxStandard("Error", "Failed to initialize: " + ex.Message).ShowAsync();
-            Close();
+            App.ExitApplication();
         }
     }
 

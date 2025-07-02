@@ -1,7 +1,8 @@
+/.vs
 /.idea
 /.vscode
 /.cursor
-/obj
+obj
 /bin/Config
 /bin/Easytier
 /bin/Libs
@@ -11,3 +12,4 @@
 /bin/JeekEasytierManager.deps.json
 /bin/JeekEasytierManager.runtimeconfig.json
 /bin/libloader.dll
+/bin/Settings

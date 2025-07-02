@@ -22,7 +22,7 @@ public static class Nssm
 
     private static Process? CallNssm(string command)
     {
-        return Process.Start(new ProcessStartInfo(Settings.NssmPath, command)
+        return Process.Start(new ProcessStartInfo(AppSettings.NssmPath, command)
         {
             RedirectStandardOutput = true,
             UseShellExecute = false,
@@ -66,7 +66,7 @@ public static class Nssm
 
     public static async Task<ServiceStatus> GetServiceStatus(string serviceName)
     {
-        var statusString = (await RunWithOutput(Settings.NssmPath, $"""status "{serviceName}" """)).Trim();
+        var statusString = (await RunWithOutput(AppSettings.NssmPath, $"""status "{serviceName}" """)).Trim();
         return statusString switch
         {
             "" => ServiceStatus.None,

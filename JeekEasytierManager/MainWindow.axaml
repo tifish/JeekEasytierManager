@@ -125,6 +125,10 @@
                             Classes="Gray"
                             Command="{Binding SwitchThemeCommand}"
                             Content="Switch theme" />
+
+                        <ToggleSwitch Content="Start on boot" IsChecked="{Binding StartOnBoot}" />
+                        <ToggleSwitch Content="Auto update easytier" IsChecked="{Binding AutoUpdateEasytier}" />
+                        <ToggleSwitch Content="Auto update me" IsChecked="{Binding AutoUpdateMe}" />
                     </StackPanel>
                 </StackPanel>
             </Border>
