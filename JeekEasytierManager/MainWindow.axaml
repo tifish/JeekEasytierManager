@@ -51,7 +51,7 @@
                         Spacing="10">
 
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Classes="Title" Text="🧰" />
+                            <TextBlock Classes="Title" Text="🔧" />
                             <Label Classes="Title" Content="Service" />
                         </StackPanel>
 
