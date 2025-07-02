@@ -58,7 +58,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         // 获取系统服务列表，找到 ServicePrefix 开头的服务
-        var output = await Nssm.RunWithOutput("sc", "query state= all");
+        var output = await Executor.RunWithOutput("sc", "query state= all");
         var lines = output.Split('\n');
 
         foreach (var line in lines)
@@ -88,6 +88,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
+        await AddEasytierToFirewall();
+
         foreach (var config in Configs)
         {
             if (!config.Enabled)
@@ -99,6 +101,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         await RestartService();
         await UpdateServiceStatus();
+    }
+
+    private async Task AddEasytierToFirewall()
+    {
+        // Delete existing firewall rule
+        var deleteRuleArgs = $"""advfirewall firewall delete rule name="Easytier Core" """;
+        await Executor.RunAndWait("netsh", deleteRuleArgs, false, true);
+
+        // Add new firewall rule
+        var firewallArgs = $"""advfirewall firewall add rule name="Easytier Core" dir=in action=allow program="{AppSettings.EasytierCorePath}" enable=yes""";
+        await Executor.RunAndWait("netsh", firewallArgs, false, true);
     }
 
     [RelayCommand]
@@ -202,7 +215,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var rpcPortal = GetRpcPortal(config.Name);
             var args = rpcPortal == "" ? "" : $"-p {rpcPortal}";
 
-            var peers = await Nssm.RunWithOutput(AppSettings.EasytierCliPath, $"{args} peer", Encoding.UTF8);
+            var peers = await Executor.RunWithOutput(AppSettings.EasytierCliPath, $"{args} peer", Encoding.UTF8);
             Messages += $"{config.Name}:\n{peers}\n\n";
         }
     }
@@ -226,7 +239,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var rpcPortal = GetRpcPortal(config.Name);
             var args = rpcPortal == "" ? "" : $"-p {rpcPortal}";
 
-            var route = await Nssm.RunWithOutput(AppSettings.EasytierCliPath, $"{args} route", Encoding.UTF8);
+            var route = await Executor.RunWithOutput(AppSettings.EasytierCliPath, $"{args} route", Encoding.UTF8);
             Messages += $"{config.Name}:\n{route}\n\n";
         }
     }

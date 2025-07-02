@@ -2,6 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using JeekTools;
 
 namespace JeekEasytierManager;
 
@@ -22,7 +23,7 @@ public static class EasytierUpdate
             if (!File.Exists(AppSettings.EasytierCliPath))
                 return true;
 
-            var output = await Nssm.RunWithOutput(AppSettings.EasytierCliPath, "--version");
+            var output = await Executor.RunWithOutput(AppSettings.EasytierCliPath, "--version");
             // easytier-cli 2.3.2-42c98203
             LocalVersion = output.Split(' ')[1].Split('-')[0];
 

@@ -1,25 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
+using JeekTools;
 
 namespace JeekEasytierManager;
 
 public static class Nssm
 {
-    public static async Task<string> RunWithOutput(string fileName, string arguments, Encoding? encoding = null)
-    {
-        var process = Process.Start(new ProcessStartInfo(fileName, arguments)
-        {
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            StandardOutputEncoding = encoding ?? Encoding.Default,
-        });
-        if (process is null)
-            return "";
-        return await process.StandardOutput.ReadToEndAsync();
-    }
-
     private static Process? CallNssm(string command)
     {
         return Process.Start(new ProcessStartInfo(AppSettings.NssmPath, command)
@@ -66,7 +53,7 @@ public static class Nssm
 
     public static async Task<ServiceStatus> GetServiceStatus(string serviceName)
     {
-        var statusString = (await RunWithOutput(AppSettings.NssmPath, $"""status "{serviceName}" """)).Trim();
+        var statusString = (await Executor.RunWithOutput(AppSettings.NssmPath, $"""status "{serviceName}" """)).Trim();
         return statusString switch
         {
             "" => ServiceStatus.None,
