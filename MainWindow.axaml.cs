@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using MsBox.Avalonia;
@@ -14,6 +15,7 @@ public partial class MainWindow : Window
         DataContext = MainViewModel.Instance;
 
         Loaded += OnLoaded;
+        Closing += OnClosing;
     }
 
     private async void OnLoaded(object? sender, RoutedEventArgs e)
@@ -27,5 +29,12 @@ public partial class MainWindow : Window
             await MessageBoxManager.GetMessageBoxStandard("Error", "Failed to initialize: " + ex.Message).ShowAsync();
             Close();
         }
+    }
+
+    private void OnClosing(object? sender, CancelEventArgs e)
+    {
+        // Cancel the close event and hide the window instead
+        e.Cancel = true;
+        Hide();
     }
 }

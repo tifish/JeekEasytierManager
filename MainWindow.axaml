@@ -68,7 +68,7 @@
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Button
                                 Classes="Green"
-                                Command="{Binding StartServiceCommand}"
+                                Command="{Binding RestartServiceCommand}"
                                 Content="(Re)start" />
                             <Button
                                 Classes="Red"

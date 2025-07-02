@@ -81,7 +81,7 @@ public partial class MainViewModel : ObservableObject
             await Nssm.InstallService(ServicePrefix + config.Name, Settings.EasytierCorePath, $"-c \"{configPath}\"");
         }
 
-        await StartService();
+        await RestartService();
         await UpdateServiceStatus();
     }
 
@@ -106,7 +106,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task StartService()
+    public async Task RestartService()
     {
         if (!HasEasytier)
         {
@@ -242,7 +242,7 @@ public partial class MainViewModel : ObservableObject
             await StopService();
             await EasytierUpdate.Update();
             CheckHasEasytier();
-            await StartService();
+            await RestartService();
             Messages += "\nUpdate completed.";
         }
         else
