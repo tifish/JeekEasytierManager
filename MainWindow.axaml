@@ -51,7 +51,7 @@
                         Spacing="10">
 
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Classes="Title" Text="⚙️" />
+                            <TextBlock Classes="Title" Text="🧰" />
                             <Label Classes="Title" Content="Service" />
                         </StackPanel>
 
@@ -106,6 +106,28 @@
                 </Border>
 
             </StackPanel>
+
+            <!--  Settings  -->
+            <Border Classes="Card">
+                <StackPanel
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Orientation="Vertical"
+                    Spacing="10">
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Classes="Title" Text="⚙️" />
+                        <Label Classes="Title" Content="Settings" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Spacing="10">
+                        <Button
+                            Classes="Gray"
+                            Command="{Binding SwitchThemeCommand}"
+                            Content="Switch theme" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
 
         </StackPanel>
 

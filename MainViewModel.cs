@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Nett;
@@ -271,6 +273,28 @@ public partial class MainViewModel : ObservableObject
     private void CheckHasEasytier()
     {
         HasEasytier = File.Exists(Settings.EasytierCorePath) && File.Exists(Settings.EasytierCliPath);
+    }
+
+    [RelayCommand]
+    public void SwitchTheme()
+    {
+        if (Application.Current is null)
+            return;
+
+        // If the theme is default, switch to the opposite theme
+        var requestedTheme = Application.Current.RequestedThemeVariant;
+        if (requestedTheme == ThemeVariant.Default)
+        {
+            var actualTheme = Application.Current.ActualThemeVariant;
+            Application.Current.RequestedThemeVariant =
+                actualTheme == ThemeVariant.Dark
+                ? ThemeVariant.Light
+                : ThemeVariant.Dark;
+        }
+        else // If the theme is not default, switch to default
+        {
+            Application.Current.RequestedThemeVariant = ThemeVariant.Default;
+        }
     }
 }
 
