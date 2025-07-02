@@ -7,6 +7,10 @@ using System.Windows.Input;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Avalonia.Data;
+using Avalonia.Media;
+using Avalonia.Data.Converters;
+using System;
+using System.Globalization;
 
 namespace JeekEasytierManager;
 
@@ -23,9 +27,50 @@ public partial class ConfigInfo : ObservableObject
 
 }
 
+// Add status to color converter
+public class ServiceStatusToColorConverter : IValueConverter
+{
+    // Cache color brushes for performance
+    private static readonly Lazy<SolidColorBrush> _runningBrush = new(() => GetResourceColor("Green"));
+    private static readonly Lazy<SolidColorBrush> _stoppedBrush = new(() => GetResourceColor("Red"));
+    private static readonly Lazy<SolidColorBrush> _noneBrush = new(() => GetResourceColor("Gray"));
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is ServiceStatus status)
+        {
+            return status switch
+            {
+                ServiceStatus.Running => _runningBrush.Value,
+                ServiceStatus.Stopped => _stoppedBrush.Value,
+                ServiceStatus.None => _noneBrush.Value,
+                _ => _noneBrush.Value
+            };
+        }
+        return _noneBrush.Value;
+    }
+
+    private static SolidColorBrush GetResourceColor(string resourceKey)
+    {
+        if (Application.Current?.Resources.TryGetResource(resourceKey, null, out var resource) == true
+            && resource is Color color)
+        {
+            return new SolidColorBrush(color);
+        }
+        // Return default color if resource cannot be obtained
+        return new SolidColorBrush(Colors.Gray);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 public class ConfigListControl : UserControl
 {
     private readonly Grid _grid;
+    private readonly ServiceStatusToColorConverter _statusColorConverter;
 
     public ConfigListControl()
     {
@@ -39,12 +84,13 @@ public class ConfigListControl : UserControl
             ],
         };
         Content = _grid;
+        _statusColorConverter = new ServiceStatusToColorConverter();
     }
 
     [Content]
     public Controls Children => _grid.Children;
 
-    // 处理属性变化
+    // Handle property changes
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -125,6 +171,18 @@ public class ConfigListControl : UserControl
                 _grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
             }
 
+            // Add row background
+            var rowBackground = new Border
+            {
+                Background = row % 2 == 0 ?
+                    new SolidColorBrush(Color.FromArgb(50, 180, 180, 180)) : // More obvious light gray background
+                    new SolidColorBrush(Colors.Transparent), // Transparent background
+                Margin = new Thickness(0, 1)
+            };
+            _grid.Children.Add(rowBackground);
+            Grid.SetRow(rowBackground, row);
+            Grid.SetColumnSpan(rowBackground, 3); // Span all columns
+
             var checkBox = new CheckBox
             {
                 [!CheckBox.ContentProperty] = new Binding("Name") { Source = config },
@@ -139,8 +197,15 @@ public class ConfigListControl : UserControl
             var serviceStatusText = new TextBlock
             {
                 [!TextBlock.TextProperty] = new Binding("Status") { Source = config },
+                [!TextBlock.ForegroundProperty] = new Binding("Status")
+                {
+                    Source = config,
+                    Converter = _statusColorConverter
+                },
                 Margin = new Thickness(5, 0),
+                FontWeight = FontWeight.Bold,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
             };
             _grid.Children.Add(serviceStatusText);
             Grid.SetRow(serviceStatusText, row);
