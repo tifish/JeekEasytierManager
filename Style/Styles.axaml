@@ -11,108 +11,84 @@
     <Style Selector="Button.Red">
         <Setter Property="Background" Value="{StaticResource Red}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource RedDark1}" />
-        <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="Button.Red:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource RedDark1}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource RedDark2}" />
     </Style>
     <Style Selector="Button.Red:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource RedDark2}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource RedDark3}" />
     </Style>
 
     <!--  Green button  -->
     <Style Selector="Button.Green">
         <Setter Property="Background" Value="{StaticResource Green}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource GreenDark1}" />
-        <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="Button.Green:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource GreenDark1}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource GreenDark2}" />
     </Style>
     <Style Selector="Button.Green:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource GreenDark2}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource GreenDark3}" />
     </Style>
 
     <!--  Blue button  -->
     <Style Selector="Button.Blue">
         <Setter Property="Background" Value="{StaticResource Blue}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource BlueDark1}" />
-        <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="Button.Blue:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource BlueDark1}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource BlueDark2}" />
     </Style>
     <Style Selector="Button.Blue:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource BlueDark2}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource BlueDark3}" />
     </Style>
 
     <!--  Yellow button  -->
     <Style Selector="Button.Yellow">
         <Setter Property="Background" Value="{StaticResource Yellow}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource YellowDark1}" />
-        <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="Button.Yellow:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource YellowDark1}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource YellowDark2}" />
     </Style>
     <Style Selector="Button.Yellow:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource YellowDark2}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource YellowDark3}" />
     </Style>
 
     <!--  Brown button  -->
     <Style Selector="Button.Brown">
         <Setter Property="Background" Value="{StaticResource Brown}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource BrownDark1}" />
-        <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="Button.Brown:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource BrownDark1}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource BrownDark2}" />
     </Style>
     <Style Selector="Button.Brown:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource BrownDark2}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource BrownDark3}" />
     </Style>
 
     <!--  Gray button  -->
     <Style Selector="Button.Gray">
         <Setter Property="Background" Value="{StaticResource Gray}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource GrayDark1}" />
-        <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="Button.Gray:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource GrayDark1}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource GrayDark2}" />
     </Style>
     <Style Selector="Button.Gray:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource GrayDark2}" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="{StaticResource GrayDark3}" />
     </Style>
 
     <!--  Card border  -->
