@@ -357,20 +357,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private const string RunKeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
     private const string RunValueName = "JeekEasytierManager";
+    private static readonly string RunValue = $"\"{AppSettings.ExePath}\" /hide";
 
     [ObservableProperty]
     public partial bool StartOnBoot { get; set; } =
-        (string?)Registry.GetValue(RunKeyPath, RunValueName, "") == AppSettings.ExePath;
+        (string?)Registry.GetValue(RunKeyPath, RunValueName, "") == RunValue;
 
     partial void OnStartOnBootChanged(bool value)
     {
         try
         {
-
             if (value)
             {
                 // Add to registry startup
-                RegistryHelper.SetValue(RunKeyPath, RunValueName, AppSettings.ExePath);
+                RegistryHelper.SetValue(RunKeyPath, RunValueName, RunValue);
             }
             else
             {

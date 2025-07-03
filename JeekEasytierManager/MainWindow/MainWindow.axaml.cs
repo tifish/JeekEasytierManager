@@ -20,6 +20,11 @@ public partial class MainWindow : Window
 
     private async void OnLoaded(object? sender, RoutedEventArgs e)
     {
+        if (Program.StartHidden)
+        {
+            Hide();
+        }
+
         try
         {
             await MainViewModel.Instance.Init();

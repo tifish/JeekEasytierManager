@@ -22,6 +22,9 @@ class Program
     private static NamedPipeServerStream? _pipeServer;
     private static CancellationTokenSource? _cancellationTokenSource;
 
+    // Property to track if the application should start hidden
+    public static bool StartHidden { get; private set; } = false;
+
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -43,6 +46,12 @@ class Program
         {
             // Start the IPC server to listen for show window messages
             StartIPCServer();
+
+            // Check if the application should start hidden
+            if (args.Length > 0 && args[0] == "/hide")
+            {
+                StartHidden = true;
+            }
 
             BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);
