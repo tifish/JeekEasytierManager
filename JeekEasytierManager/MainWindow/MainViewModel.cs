@@ -188,7 +188,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!File.Exists(configFile))
             return "";
 
-        const string defaultRpcSocket = "127.0.0.1:15888";
+        const string defaultIp = "127.0.0.1";
+        const string defaultPort = "15888";
+        const string defaultRpcSocket = $"{defaultIp}:{defaultPort}";
 
         var toml = Toml.ReadFile(configFile);
         var rpcPortal = toml.TryGetValue("rpc_portal");
@@ -206,12 +208,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (parts[0] == "0")
                 return defaultRpcSocket;
             else
-                return $"127.0.0.1:{parts[0]}";
+                return $"{defaultIp}:{parts[0]}";
         }
         else if (parts.Length == 2)
         {
             if (parts[0] == "0.0.0.0")
-                return $"127.0.0.1:{parts[1]}";
+                return $"{defaultIp}:{parts[1]}";
             else
                 return rpcPortalString;
         }
