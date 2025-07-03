@@ -444,5 +444,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _autoUpdateTimer?.Stop();
+
+        GC.SuppressFinalize(this);
     }
 }
