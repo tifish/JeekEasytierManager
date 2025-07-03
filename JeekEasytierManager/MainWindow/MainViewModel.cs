@@ -23,9 +23,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public static MainViewModel Instance { get; private set; } = new();
 
     [ObservableProperty]
-    public partial string Title { get; set; } = "Jeek Easytier Manager";
-
-    [ObservableProperty]
     public partial ObservableCollection<ConfigInfo> Configs { get; set; } = [];
 
     public async Task Init()
