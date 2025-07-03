@@ -13,7 +13,7 @@
     d:DesignHeight="480"
     d:DesignWidth="680"
     x:DataType="local:MainViewModel"
-    Icon="App.ico"
+    Icon="avares://JeekEasytierManager/App.ico"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
