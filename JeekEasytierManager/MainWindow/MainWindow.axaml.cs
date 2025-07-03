@@ -42,4 +42,13 @@ public partial class MainWindow : Window
         e.Cancel = true;
         Hide();
     }
+
+    private void DialogTextBox_Loaded(object? sender, RoutedEventArgs e)
+    {
+        if (sender is TextBox textBox)
+        {
+            textBox.Focus();
+            textBox.SelectAll();
+        }
+    }
 }

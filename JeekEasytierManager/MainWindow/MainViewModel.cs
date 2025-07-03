@@ -12,6 +12,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JeekTools;
 using Microsoft.Win32;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using Nett;
 
 namespace JeekEasytierManager;
@@ -173,13 +175,113 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    public void EditConfig(string configName)
+    public void EditConfig(ConfigInfo config)
     {
-        var configFile = Path.Combine(AppSettings.ConfigDirectory, configName + ".toml");
+        var configFile = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
         if (!File.Exists(configFile))
             return;
 
         Process.Start(new ProcessStartInfo("explorer.exe", configFile) { UseShellExecute = true });
+    }
+
+    [ObservableProperty]
+    public partial bool RenameConfigDialogIsOpen { get; set; } = false;
+
+    [ObservableProperty]
+    public partial string RenameConfigDialogText { get; set; } = "";
+
+    private ConfigInfo? _renameConfigDialogOldConfig = null;
+
+    [RelayCommand]
+    public void RenameConfig(ConfigInfo config)
+    {
+        RenameConfigDialogIsOpen = true;
+        RenameConfigDialogText = config.Name;
+        _renameConfigDialogOldConfig = config;
+    }
+
+    [RelayCommand]
+    public void RenameConfigDialogCancel()
+    {
+        RenameConfigDialogIsOpen = false;
+    }
+
+    [RelayCommand]
+    public void RenameConfigDialogSave()
+    {
+        RenameConfigDialogIsOpen = false;
+
+        if (_renameConfigDialogOldConfig is null)
+            return;
+
+        var newName = RenameConfigDialogText;
+
+        if (string.IsNullOrWhiteSpace(newName) || newName == _renameConfigDialogOldConfig.Name)
+            return;
+
+        var oldConfigFile = Path.Combine(AppSettings.ConfigDirectory, _renameConfigDialogOldConfig.Name + ".toml");
+        var newConfigFile = Path.Combine(AppSettings.ConfigDirectory, newName + ".toml");
+
+        if (File.Exists(newConfigFile))
+        {
+            Messages = $"Config file '{newName}.toml' already exists.";
+            return;
+        }
+
+        try
+        {
+            File.Move(oldConfigFile, newConfigFile);
+
+            _renameConfigDialogOldConfig.Name = newName;
+            _renameConfigDialogOldConfig = null;
+        }
+        catch (Exception ex)
+        {
+            Messages = $"Failed to rename config: {ex.Message}";
+        }
+    }
+
+    [ObservableProperty]
+    public partial bool AddConfigDialogIsOpen { get; set; } = false;
+
+    [ObservableProperty]
+    public partial string AddConfigDialogText { get; set; } = "";
+
+    [RelayCommand]
+    public void AddConfigDialogCancel()
+    {
+        AddConfigDialogIsOpen = false;
+    }
+
+    [RelayCommand]
+    public void AddConfigDialogAdd()
+    {
+        AddConfigDialogIsOpen = false;
+
+        var newName = AddConfigDialogText;
+        if (string.IsNullOrWhiteSpace(newName))
+            return;
+
+        var configFile = Path.Combine(AppSettings.ConfigDirectory, newName + ".toml");
+        if (File.Exists(configFile))
+            return;
+
+        File.Create(configFile).Close();
+        Configs.Add(new ConfigInfo { Name = newName });
+    }
+
+    [RelayCommand]
+    public async Task DeleteConfig(ConfigInfo config)
+    {
+        var result = await MessageBoxManager.GetMessageBoxStandard("Delete Config", "Are you sure you want to delete this config?", ButtonEnum.YesNo).ShowAsync();
+        if (result != ButtonResult.Yes)
+            return;
+
+        var configFile = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
+        if (File.Exists(configFile))
+            File.Delete(configFile);
+
+        Configs.Remove(config);
     }
 
     private static string GetRpcSocket(string configName)
@@ -446,5 +548,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _autoUpdateTimer?.Stop();
 
         GC.SuppressFinalize(this);
+    }
+
+    [RelayCommand]
+    public void EditSelectedConfig()
+    {
+    }
+
+    [RelayCommand]
+    public void AddConfig()
+    {
+        AddConfigDialogIsOpen = true;
     }
 }

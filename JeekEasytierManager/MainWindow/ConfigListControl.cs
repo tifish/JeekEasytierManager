@@ -11,6 +11,7 @@ using Avalonia.Media;
 using Avalonia.Data.Converters;
 using System;
 using System.Globalization;
+using Avalonia.Layout;
 
 namespace JeekEasytierManager;
 
@@ -103,6 +104,14 @@ public class ConfigListControl : UserControl
         {
             OnEditCommandChanged(change.OldValue as ICommand, change.NewValue as ICommand);
         }
+        else if (change.Property == RenameCommandProperty)
+        {
+            OnRenameCommandChanged(change.OldValue as ICommand, change.NewValue as ICommand);
+        }
+        else if (change.Property == DeleteCommandProperty)
+        {
+            OnDeleteCommandChanged(change.OldValue as ICommand, change.NewValue as ICommand);
+        }
     }
 
     public static readonly StyledProperty<IEnumerable<ConfigInfo>?> ConfigsProperty =
@@ -143,16 +152,50 @@ public class ConfigListControl : UserControl
         set => SetValue(EditCommandProperty, value);
     }
 
-    private void OnEditCommandChanged(ICommand? oldValue, ICommand? newValue)
+    public static readonly StyledProperty<ICommand?> RenameCommandProperty =
+        AvaloniaProperty.Register<ConfigListControl, ICommand?>(nameof(RenameCommand));
+
+    public ICommand? RenameCommand
     {
-        UpdateEditCommand();
+        get => GetValue(RenameCommandProperty);
+        set => SetValue(RenameCommandProperty, value);
     }
 
-    private void UpdateEditCommand()
+    public static readonly StyledProperty<ICommand?> DeleteCommandProperty =
+        AvaloniaProperty.Register<ConfigListControl, ICommand?>(nameof(DeleteCommand));
+
+    public ICommand? DeleteCommand
     {
-        foreach (var button in _grid.Children.OfType<Button>())
+        get => GetValue(DeleteCommandProperty);
+        set => SetValue(DeleteCommandProperty, value);
+    }
+
+    private void OnEditCommandChanged(ICommand? oldValue, ICommand? newValue)
+    {
+        UpdateCommands();
+    }
+
+    private void OnRenameCommandChanged(ICommand? oldValue, ICommand? newValue)
+    {
+        UpdateCommands();
+    }
+
+    private void OnDeleteCommandChanged(ICommand? oldValue, ICommand? newValue)
+    {
+        UpdateCommands();
+    }
+
+    private void UpdateCommands()
+    {
+        foreach (var stackPanel in _grid.Children.OfType<StackPanel>())
         {
-            button.Command = EditCommand;
+            var buttons = stackPanel.Children.OfType<Button>().ToArray();
+            if (buttons.Length >= 3)
+            {
+                buttons[0].Command = EditCommand; // Edit button
+                buttons[1].Command = RenameCommand; // Rename button
+                buttons[2].Command = DeleteCommand; // Delete button
+            }
         }
     }
 
@@ -177,7 +220,6 @@ public class ConfigListControl : UserControl
                 Background = row % 2 == 0 ?
                     new SolidColorBrush(Color.FromArgb(50, 180, 180, 180)) : // More obvious light gray background
                     new SolidColorBrush(Colors.Transparent), // Transparent background
-                Margin = new Thickness(0, 1)
             };
             _grid.Children.Add(rowBackground);
             Grid.SetRow(rowBackground, row);
@@ -202,7 +244,7 @@ public class ConfigListControl : UserControl
                     Source = config,
                     Converter = _statusColorConverter
                 },
-                Margin = new Thickness(5, 0),
+                Margin = new Thickness(10, 0, 0, 0),
                 FontWeight = FontWeight.Bold,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
                 HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
@@ -211,17 +253,44 @@ public class ConfigListControl : UserControl
             Grid.SetRow(serviceStatusText, row);
             Grid.SetColumn(serviceStatusText, 1);
 
-            var editButton = new Button
+            // Create StackPanel to hold buttons
+            var buttonPanel = new StackPanel
             {
-                Content = "Edit",
-                Command = EditCommand,
-                CommandParameter = config.Name,
-                Margin = new Thickness(5, 0),
+                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(10, 0, 0, 0),
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
-            _grid.Children.Add(editButton);
-            Grid.SetRow(editButton, row);
-            Grid.SetColumn(editButton, 2);
+
+            var editButton = new Button
+            {
+                Content = "✏️",
+                Command = EditCommand,
+                CommandParameter = config,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+            };
+            buttonPanel.Children.Add(editButton);
+
+            var renameButton = new Button
+            {
+                Content = "📝",
+                Command = RenameCommand,
+                CommandParameter = config,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+            };
+            buttonPanel.Children.Add(renameButton);
+
+            var deleteButton = new Button
+            {
+                Content = "🗑️",
+                Command = DeleteCommand,
+                CommandParameter = config,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+            };
+            buttonPanel.Children.Add(deleteButton);
+
+            _grid.Children.Add(buttonPanel);
+            Grid.SetRow(buttonPanel, row);
+            Grid.SetColumn(buttonPanel, 2);
 
             row++;
         }

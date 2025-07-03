@@ -2,6 +2,7 @@
     x:Class="JeekEasytierManager.App"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
     RequestedThemeVariant="Default">
     <!--
         "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available
@@ -18,6 +19,7 @@
 
     <Application.Styles>
         <FluentTheme />
+        <dialogHost:DialogHostStyles />
         <StyleInclude Source="Style/Styles.axaml" />
     </Application.Styles>
 </Application>
