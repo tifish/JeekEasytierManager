@@ -80,19 +80,7 @@ public partial class App : Application
 
         _trayIcon.Clicked += (sender, e) =>
         {
-            if (_mainWindow != null)
-            {
-                if (_mainWindow.IsVisible)
-                {
-                    _mainWindow.Hide();
-                }
-                else
-                {
-                    _mainWindow.Show();
-                    _mainWindow.Activate();
-                    _mainWindow.BringIntoView();
-                }
-            }
+            ToggleMainWindow();
         };
 
         _trayIcons = [_trayIcon];
