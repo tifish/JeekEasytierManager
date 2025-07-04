@@ -3,6 +3,7 @@
 # Wait for .exe to exit
 $process = Get-Process -Name $appName -ErrorAction SilentlyContinue
 if ($process) {
+    Write-Host "Waiting for $appName to exit..."
     $process.WaitForExit()
 }
 
@@ -17,7 +18,16 @@ if ($args.Count -eq 0) {
 $downloadUrl = $args[0]
 # Download .7z to system temp directory
 $packPath = "$env:TEMP\$appName.7z"
-Invoke-WebRequest -Uri $downloadUrl -OutFile $packPath
+
+Write-Host "Downloading update from $downloadUrl..."
+try {
+    Invoke-WebRequest -Uri $downloadUrl -OutFile $packPath
+}
+catch {
+    Write-Host "Failed to download $downloadUrl. Error: $($_.Exception.Message)"
+    Pause
+    Exit
+}
 
 # Check if $packPath exists
 if (-not (Test-Path $packPath)) {
@@ -29,15 +39,22 @@ if (-not (Test-Path $packPath)) {
 # Delete old Libs directory
 Remove-Item -Recurse -Force -Path "$PSScriptRoot\Libs"
 
-# Extract .7z in to $PSScriptRoot
-& {
-    7Zip\7za.exe x $packPath -o"$PSScriptRoot" -x!7Zip -x!Nssm -y
-} -ErrorAction SilentlyContinue
+# Copy 7za.exe to temporary directory
+$sevenZipTmp = "$env:TEMP\7za.exe"
+Copy-Item -Path "$PSScriptRoot\7Zip\7za.exe" -Destination $sevenZipTmp -Force
 
-# Delete pack file
+# Extract .7z in to $PSScriptRoot
+& "$sevenZipTmp" x $packPath -o"$PSScriptRoot" -x!Nssm -y
+
+# Remove 7za.exe from temporary directory
+Remove-Item -Force -Path $sevenZipTmp
+
+# Delete downloaded pack file
+Write-Host "Cleaning up temporary files..."
 Remove-Item -Force -Path $packPath
 
 # Start .exe
+Write-Host "Starting $appName..."
 if ($args.Count -gt 1) {
     Start-Process -FilePath "$PSScriptRoot\$appName.exe" -ArgumentList $args[1..$args.Length]
 }
