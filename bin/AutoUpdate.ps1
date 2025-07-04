@@ -52,8 +52,12 @@ if (-not (Test-Path $packPath)) {
     Exit
 }
 
-# Delete old Libs directory
+# Delete old binaries
 Remove-Item -Recurse -Force -Path "$PSScriptRoot\Libs"
+Remove-Item -Force -Path "$PSScriptRoot\*.dll"
+Remove-Item -Force -Path "$PSScriptRoot\*.pdb"
+Remove-Item -Force -Path "$PSScriptRoot\*.deps.json"
+Remove-Item -Force -Path "$PSScriptRoot\*.runtimeconfig.json"
 
 # Copy 7za.exe to temporary directory
 $sevenZipTmp = "$env:TEMP\7za.exe"
