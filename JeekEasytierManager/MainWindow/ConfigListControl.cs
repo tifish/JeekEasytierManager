@@ -12,6 +12,7 @@ using Avalonia.Data.Converters;
 using System;
 using System.Globalization;
 using Avalonia.Layout;
+using JeekTools;
 
 namespace JeekEasytierManager;
 
