@@ -27,7 +27,7 @@ public static class AutoUpdate
         }
     }
 
-    public static bool Update()
+    public static bool Update(bool hideMainWindow)
     {
         try
         {
@@ -35,7 +35,7 @@ public static class AutoUpdate
             {
                 FileName = "powershell.exe",
                 Arguments = $"""
-                        -ExecutionPolicy Bypass -File "AutoUpdate.ps1" "{AppSettings.JeekEasytierManagerZipUrl}"
+                        -ExecutionPolicy Bypass -File "AutoUpdate.ps1" "{AppSettings.JeekEasytierManagerZipUrl}" {(hideMainWindow ? "/hide" : "")}
                         """,
                 WorkingDirectory = AppSettings.AppDirectory,
                 UseShellExecute = true,

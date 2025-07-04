@@ -421,7 +421,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void ForceUpdateMe()
     {
         Messages = "\nUpdating Me...";
-        AutoUpdate.Update();
+        AutoUpdate.Update(!_mainWindow!.IsVisible);
     }
 
     [ObservableProperty]
@@ -556,5 +556,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public void AddConfig()
     {
         AddConfigDialogIsOpen = true;
+    }
+
+    private MainWindow? _mainWindow;
+
+    public void SetMainWindow(MainWindow mainWindow)
+    {
+        _mainWindow = mainWindow;
     }
 }

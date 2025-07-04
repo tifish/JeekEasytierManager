@@ -31,8 +31,8 @@ Remove-Item -Recurse -Force -Path "$PSScriptRoot\Libs"
 
 # Extract .7z in to $PSScriptRoot
 & {
-    7Zip\7za.exe x $packPath -o"$PSScriptRoot" -y
+    7Zip\7za.exe x $packPath -o"$PSScriptRoot" -x!7Zip -y
 } -ErrorAction SilentlyContinue
 
 # Start .exe
-Start-Process -FilePath "$PSScriptRoot\$appName.exe"
+Start-Process -FilePath "$PSScriptRoot\$appName.exe" -ArgumentList $args[1..$args.Length]

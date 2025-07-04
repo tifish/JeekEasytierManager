@@ -12,6 +12,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        MainViewModel.Instance.SetMainWindow(this);
         DataContext = MainViewModel.Instance;
 
         Loaded += OnLoaded;
