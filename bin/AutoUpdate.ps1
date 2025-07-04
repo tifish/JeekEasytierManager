@@ -34,6 +34,9 @@ Remove-Item -Recurse -Force -Path "$PSScriptRoot\Libs"
     7Zip\7za.exe x $packPath -o"$PSScriptRoot" -x!7Zip -x!Nssm -y
 } -ErrorAction SilentlyContinue
 
+# Delete pack file
+Remove-Item -Force -Path $packPath
+
 # Start .exe
 if ($args.Count -gt 1) {
     Start-Process -FilePath "$PSScriptRoot\$appName.exe" -ArgumentList $args[1..$args.Length]
