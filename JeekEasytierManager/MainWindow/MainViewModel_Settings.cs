@@ -15,6 +15,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         Application.Current!.RequestedThemeVariant = Settings.ThemeVariant;
 
+        StartOnBoot = RegistryHelper.GetValue(RunKeyPath, RunValueName, "") == RunValue;
+
         _autoUpdateTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromHours(1)
@@ -56,8 +58,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private static readonly string RunValue = $"\"{AppSettings.ExePath}\" /hide";
 
     [ObservableProperty]
-    public partial bool StartOnBoot { get; set; } =
-        RegistryHelper.GetValue(RunKeyPath, RunValueName, "") == RunValue;
+    public partial bool StartOnBoot { get; set; }
 
     partial void OnStartOnBootChanged(bool value)
     {
