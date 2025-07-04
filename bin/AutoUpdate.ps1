@@ -22,8 +22,8 @@ $packPath = "$env:TEMP\$appName.7z"
 # Try to download from multiple mirrors
 $mirrors = @(
     $downloadUrl,
-    $downloadUrl -replace "^https://github.com/", "https://ghfast.top/https://github.com/",
-    $downloadUrl -replace "^https://github.com/", "https://gh-proxy.com/github.com/"
+    ($downloadUrl -replace "^https://github.com/", "https://ghfast.top/https://github.com/"),
+    ($downloadUrl -replace "^https://github.com/", "https://gh-proxy.com/github.com/")
 )
 
 $downloaded = $false
