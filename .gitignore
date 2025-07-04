@@ -6,10 +6,9 @@ obj
 /bin/Config
 /bin/Easytier
 /bin/Libs
-/bin/JeekEasytierManager.dll
-/bin/JeekEasytierManager.exe
-/bin/JeekEasytierManager.pdb
-/bin/JeekEasytierManager.deps.json
-/bin/JeekEasytierManager.runtimeconfig.json
-/bin/libloader.dll
+/bin/*.dll
+/bin/*.exe
+/bin/*.pdb
+/bin/*.deps.json
+/bin/*.runtimeconfig.json
 /bin/Settings
