@@ -116,20 +116,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             if (AutoUpdateEasytier)
             {
-                if (await EasytierUpdate.HasUpdate())
-                {
-                    Messages = $"Auto update Easytier: New version {EasytierUpdate.RemoteVersion} available, updating...";
-                    await ForceUpdateEasytier();
-                }
+                await UpdateEasytier();
             }
 
             if (AutoUpdateMe)
             {
-                if (await AutoUpdate.HasUpdate())
-                {
-                    Messages = "Auto update me: New version available, updating...";
-                    ForceUpdateMe();
-                }
+                await UpdateMe();
             }
         }
         catch (Exception ex)

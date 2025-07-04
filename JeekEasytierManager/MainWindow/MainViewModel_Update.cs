@@ -3,6 +3,8 @@ using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 
 namespace JeekEasytierManager;
 
@@ -17,6 +19,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (hasUpdate)
         {
+            if (_mainWindow!.IsVisible)
+            {
+                var result = await MessageBoxManager.GetMessageBoxStandard(
+                    "Update Easytier", $"Do you want to update easytier to {EasytierUpdate.RemoteVersion}?",
+                    ButtonEnum.YesNo, Icon.Question)
+                    .ShowAsync();
+                if (result == ButtonResult.No)
+                    return;
+            }
+
             await ForceUpdateEasytier();
         }
         else
@@ -27,7 +39,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private async Task ForceUpdateEasytier()
     {
-        Messages += "\nUpdating easytier...";
+        Messages += $"\nUpdating easytier to {EasytierUpdate.RemoteVersion}...";
         await StopService();
         await EasytierUpdate.Update();
         CheckHasEasytier();
@@ -40,6 +52,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (await AutoUpdate.HasUpdate())
         {
+            if (_mainWindow!.IsVisible)
+            {
+                var result = await MessageBoxManager.GetMessageBoxStandard(
+                    "Update Me", $"Do you want to update me?",
+                    ButtonEnum.YesNo, Icon.Question)
+                    .ShowAsync();
+                if (result == ButtonResult.No)
+                    return;
+            }
+
             ForceUpdateMe();
         }
         else
