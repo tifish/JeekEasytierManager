@@ -31,7 +31,7 @@ Remove-Item -Recurse -Force -Path "$PSScriptRoot\Libs"
 
 # Extract .7z in to $PSScriptRoot
 & {
-    7Zip\7za.exe x $packPath -o"$PSScriptRoot" -x!7Zip -y
+    7Zip\7za.exe x $packPath -o"$PSScriptRoot" -x!7Zip -x!Nssm -y
 } -ErrorAction SilentlyContinue
 
 # Start .exe
