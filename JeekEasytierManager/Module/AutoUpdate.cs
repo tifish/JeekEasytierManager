@@ -7,19 +7,43 @@ namespace JeekEasytierManager;
 
 public static class AutoUpdate
 {
+    private static string _downloadUrl = "";
+    public static DateTime? RemoteTime { get; private set; } = null;
+    public static DateTime? LocalTime { get; private set; } = null;
+
     public static async Task<bool> HasUpdate()
     {
         try
         {
-            var headers = await HttpHelper.GetHeaders(AppSettings.JeekEasytierManagerZipUrl);
+            _downloadUrl = "";
+            RemoteTime = null;
+            LocalTime = null;
 
-            var updateTime = headers?.LastModified;
-            if (updateTime == null)
+            // Try to get the headers from the mirrors
+            var mirrors = GitHubMirrors.GetMirrors(AppSettings.JeekEasytierManagerZipUrl);
+            HttpHelper.HttpHeaders? headers = null;
+
+            foreach (var mirror in mirrors)
+            {
+                headers = await HttpHelper.GetHeaders(mirror);
+                if (headers != null)
+                {
+                    _downloadUrl = mirror;
+                    break;
+                }
+            }
+
+            if (headers == null)
                 return false;
 
-            var exeTime = File.GetLastWriteTime(AppSettings.ExePath);
+            // Get the update time
+            RemoteTime = headers?.LastModified;
+            if (RemoteTime == null)
+                return false;
 
-            return updateTime - exeTime > TimeSpan.FromMinutes(1);
+            LocalTime = File.GetLastWriteTime(AppSettings.ExePath);
+
+            return RemoteTime - LocalTime > TimeSpan.FromMinutes(1);
         }
         catch
         {
@@ -31,11 +55,14 @@ public static class AutoUpdate
     {
         try
         {
+            if (_downloadUrl == "")
+                return false;
+
             Process.Start(new ProcessStartInfo
             {
                 FileName = "powershell.exe",
                 Arguments = $"""
-                        -ExecutionPolicy Bypass -File "AutoUpdate.ps1" "{AppSettings.JeekEasytierManagerZipUrl}" {(hideMainWindow ? "/hide" : "")}
+                        -ExecutionPolicy Bypass -File "AutoUpdate.ps1" "{_downloadUrl}" {(hideMainWindow ? "/hide" : "")}
                         """,
                 WorkingDirectory = AppSettings.AppDirectory,
                 UseShellExecute = true,

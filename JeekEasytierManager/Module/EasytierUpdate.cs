@@ -8,6 +8,7 @@ namespace JeekEasytierManager;
 
 public static class EasytierUpdate
 {
+    private static int _mirrorIndex = 0;
     public static string RemoteVersion { get; private set; } = "";
     public static string LocalVersion { get; private set; } = "";
 
@@ -35,10 +36,26 @@ public static class EasytierUpdate
         }
     }
 
-    public static async Task<string> GetLastestVersion()
+    private static async Task<string> GetLastestVersion()
     {
         var web = new HtmlWeb();
-        var doc = await web.LoadFromWebAsync(AppSettings.EasytierLatestReleasePageUrl);
+        var mirrors = GitHubMirrors.GetMirrors(AppSettings.EasytierLatestReleasePageUrl);
+        HtmlDocument? doc = null;
+        _mirrorIndex = 0;
+
+        for (var i = 0; i < mirrors.Length; i++)
+        {
+            doc = await web.LoadFromWebAsync(mirrors[i]);
+            if (doc != null)
+            {
+                _mirrorIndex = i;
+                break;
+            }
+        }
+
+        if (doc == null)
+            return "";
+
         var link = doc.DocumentNode.SelectSingleNode("//a[contains(@href, '/EasyTier/EasyTier/releases/tag/')]");
         if (link == null)
             return "";
@@ -50,27 +67,31 @@ public static class EasytierUpdate
         return href.Split('/')[^1].TrimStart('v');
     }
 
-    public static async Task<string> GetLastestZipUrl()
+    public static string GetLastestDownloadUrl()
     {
-        RemoteVersion = await GetLastestVersion();
         if (RemoteVersion == "")
             return "";
 
         // https://github.com/EasyTier/EasyTier/releases/download/v2.3.2/easytier-windows-x86_64-v2.3.2.zip
-        return $"https://github.com/EasyTier/EasyTier/releases/download/v{RemoteVersion}/easytier-windows-x86_64-v{RemoteVersion}.zip";
+        var downloadUrl = $"https://github.com/EasyTier/EasyTier/releases/download/v{RemoteVersion}/easytier-windows-x86_64-v{RemoteVersion}.zip";
+        var mirrors = GitHubMirrors.GetMirrors(downloadUrl);
+        return mirrors[_mirrorIndex];
     }
 
     public static async Task<bool> Update()
     {
         try
         {
-            var zipUrl = await GetLastestZipUrl();
-            var zipPath = await HttpHelper.DownloadFile(zipUrl, Path.GetTempPath());
+            var downloadUrl = GetLastestDownloadUrl();
+            if (downloadUrl == "")
+                return false;
+
+            var downloadPath = await HttpHelper.DownloadFile(downloadUrl, Path.GetTempPath());
 
             if (Directory.Exists(AppSettings.EasytierDirectory))
                 Directory.Delete(AppSettings.EasytierDirectory, true);
 
-            ZipFile.ExtractToDirectory(zipPath, AppSettings.AppDirectory);
+            ZipFile.ExtractToDirectory(downloadPath, AppSettings.AppDirectory);
 
             // Rename easytier-windows-x86_64\ to Easytier\
             var easytierDirectory = Path.Join(AppSettings.AppDirectory, "easytier-windows-x86_64");

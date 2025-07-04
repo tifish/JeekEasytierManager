@@ -18,7 +18,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         var hasUpdate = await EasytierUpdate.HasUpdate();
 
-        Messages += $"Local version is {EasytierUpdate.LocalVersion}, remote version is {EasytierUpdate.RemoteVersion}";
+        Messages += $"\nEasytier local version is {EasytierUpdate.LocalVersion}, remote version is {EasytierUpdate.RemoteVersion}";
 
         if (hasUpdate)
         {
@@ -51,12 +51,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (clearMessages)
             Messages = "";
 
-        if (await AutoUpdate.HasUpdate())
+        var hasUpdate = await AutoUpdate.HasUpdate();
+
+        Messages += $"\nMy local version is {AutoUpdate.LocalTime}, remote version is {AutoUpdate.RemoteTime}";
+
+        if (hasUpdate)
         {
             if (_mainWindow!.IsVisible)
             {
                 var result = await MessageBoxManager.GetMessageBoxStandard(
-                    "Update Me", $"Do you want to update me?",
+                    "Update Me", $"Do you want to update me to {AutoUpdate.RemoteTime}?",
                     ButtonEnum.YesNo, Icon.Question)
                     .ShowAsync();
                 if (result == ButtonResult.No)
