@@ -11,11 +11,14 @@ namespace JeekEasytierManager;
 public partial class MainViewModel : ObservableObject, IDisposable
 {
     [RelayCommand]
-    public async Task UpdateEasytier()
+    public async Task UpdateEasytier(bool clearMessages)
     {
+        if (clearMessages)
+            Messages = "";
+
         var hasUpdate = await EasytierUpdate.HasUpdate();
 
-        Messages = $"Local version is {EasytierUpdate.LocalVersion}, remote version is {EasytierUpdate.RemoteVersion}";
+        Messages += $"Local version is {EasytierUpdate.LocalVersion}, remote version is {EasytierUpdate.RemoteVersion}";
 
         if (hasUpdate)
         {
@@ -29,27 +32,25 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     return;
             }
 
-            await ForceUpdateEasytier();
+            Messages += $"\nUpdating Easytier to {EasytierUpdate.RemoteVersion}...";
+            await StopService();
+            await EasytierUpdate.Update();
+            CheckHasEasytier();
+            await RestartService();
+            Messages += "\nUpdate completed.";
         }
         else
         {
-            Messages += "\nNo update found.";
+            Messages += "\nNo update of Easytier found.";
         }
     }
 
-    private async Task ForceUpdateEasytier()
-    {
-        Messages += $"\nUpdating easytier to {EasytierUpdate.RemoteVersion}...";
-        await StopService();
-        await EasytierUpdate.Update();
-        CheckHasEasytier();
-        await RestartService();
-        Messages += "\nUpdate completed.";
-    }
-
     [RelayCommand]
-    public async Task UpdateMe()
+    public async Task UpdateMe(bool clearMessages)
     {
+        if (clearMessages)
+            Messages = "";
+
         if (await AutoUpdate.HasUpdate())
         {
             if (_mainWindow!.IsVisible)
@@ -62,18 +63,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     return;
             }
 
-            ForceUpdateMe();
+            Messages += "\nUpdating me...";
+            AutoUpdate.Update(!_mainWindow!.IsVisible);
         }
         else
         {
-            Messages = "\nNo update found.";
+            Messages += "\nNo update of me found.";
         }
-    }
-
-    private void ForceUpdateMe()
-    {
-        Messages = "\nUpdating Me...";
-        AutoUpdate.Update(!_mainWindow!.IsVisible);
     }
 
     [ObservableProperty]

@@ -11,7 +11,7 @@ namespace JeekEasytierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    private void LoadSettings()
+    private async Task LoadSettings()
     {
         Application.Current!.RequestedThemeVariant = Settings.ThemeVariant;
 
@@ -23,8 +23,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         };
         _autoUpdateTimer.Tick += OnAutoUpdateMeTimerElapsed;
 
+        // The timer will be updated
         AutoUpdateMe = Settings.AutoUpdateMe;
         AutoUpdateEasytier = Settings.AutoUpdateEasytier;
+
+        // Check for updates when start
+        await CheckForUpdates();
     }
 
     [RelayCommand]
@@ -114,15 +118,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         try
         {
-            if (AutoUpdateEasytier)
-            {
-                await UpdateEasytier();
-            }
-
-            if (AutoUpdateMe)
-            {
-                await UpdateMe();
-            }
+            await CheckForUpdates();
         }
         catch (Exception ex)
         {
@@ -130,4 +126,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+    private async Task CheckForUpdates()
+    {
+        if (AutoUpdateEasytier)
+        {
+            await UpdateEasytier(false);
+        }
+
+        if (AutoUpdateMe)
+        {
+            await UpdateMe(false);
+        }
+    }
 }

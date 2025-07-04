@@ -22,10 +22,12 @@
                 <Button
                     Classes="Gray MinWidth"
                     Command="{Binding UpdateEasytierCommand}"
+                    CommandParameter="{x:True}"
                     Content="Update Easytier" />
                 <Button
                     Classes="Gray MinWidth"
                     Command="{Binding UpdateMeCommand}"
+                    CommandParameter="{x:True}"
                     Content="Update Me" />
             </StackPanel>
         </StackPanel>
