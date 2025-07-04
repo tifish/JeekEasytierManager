@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Styling;
 using JeekTools;
 
 namespace JeekEasytierManager;
@@ -44,7 +45,24 @@ public class AppSettings
         await _settingsFile.Save(Settings);
     }
 
-    public bool AutoUpdateMe { get; set; } = true;
+    public string Theme { get; set; } = "Default";
+
+    public ThemeVariant ThemeVariant
+    {
+        get
+        {
+            return Theme switch
+            {
+                "Default" => ThemeVariant.Default,
+                "Light" => ThemeVariant.Light,
+                "Dark" => ThemeVariant.Dark,
+                _ => ThemeVariant.Default
+            };
+        }
+    }
+
+    public bool AutoUpdateMe
+    { get; set; } = true;
     public bool AutoUpdateEasytier { get; set; } = false;
 }
 

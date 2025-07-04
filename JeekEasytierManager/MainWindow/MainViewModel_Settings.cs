@@ -11,26 +11,44 @@ namespace JeekEasytierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
+    private void LoadSettings()
+    {
+        Application.Current!.RequestedThemeVariant = Settings.ThemeVariant;
+
+        _autoUpdateTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromHours(1)
+        };
+        _autoUpdateTimer.Tick += OnAutoUpdateMeTimerElapsed;
+
+        AutoUpdateMe = Settings.AutoUpdateMe;
+        AutoUpdateEasytier = Settings.AutoUpdateEasytier;
+    }
+
     [RelayCommand]
-    public void SwitchTheme()
+    public async Task SwitchTheme()
     {
         if (Application.Current is null)
             return;
+
+        string theme;
 
         // If the theme is default, switch to the opposite theme
         var requestedTheme = Application.Current.RequestedThemeVariant;
         if (requestedTheme == ThemeVariant.Default)
         {
             var actualTheme = Application.Current.ActualThemeVariant;
-            Application.Current.RequestedThemeVariant =
-                actualTheme == ThemeVariant.Dark
-                ? ThemeVariant.Light
-                : ThemeVariant.Dark;
+            theme = actualTheme == ThemeVariant.Dark ? "Light" : "Dark";
         }
         else // If the theme is not default, switch to default
         {
-            Application.Current.RequestedThemeVariant = ThemeVariant.Default;
+            theme = "Default";
         }
+
+        Settings.Theme = theme;
+        Application.Current.RequestedThemeVariant = Settings.ThemeVariant;
+
+        await AppSettings.Save();
     }
 
     private const string RunKeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run";

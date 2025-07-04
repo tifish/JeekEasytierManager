@@ -21,15 +21,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await UpdateServiceStatus();
         CheckHasEasytier();
         await ShowPeers();
-
-        _autoUpdateTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromHours(1)
-        };
-        _autoUpdateTimer.Tick += OnAutoUpdateMeTimerElapsed;
-
-        AutoUpdateMe = Settings.AutoUpdateMe;
-        AutoUpdateEasytier = Settings.AutoUpdateEasytier;
+        LoadSettings();
     }
 
     public void Dispose()
