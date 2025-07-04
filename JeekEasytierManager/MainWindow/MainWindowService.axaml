@@ -1,0 +1,39 @@
+<UserControl
+    x:Class="JeekEasytierManager.MainWindowService"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:JeekEasytierManager"
+    x:DataType="local:MainViewModel">
+    <Border Classes="Card">
+        <StackPanel
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Orientation="Vertical"
+            Spacing="10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Classes="Title" Text="🔧" />
+                <Label Classes="Title" Content="Service" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button
+                    Classes="Blue MinWidth"
+                    Command="{Binding InstallServiceCommand}"
+                    Content="Install" />
+                <Button
+                    Classes="Gray MinWidth"
+                    Command="{Binding UninstallServiceCommand}"
+                    Content="Uninstall" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button
+                    Classes="Green MinWidth"
+                    Command="{Binding RestartServiceCommand}"
+                    Content="(Re)start" />
+                <Button
+                    Classes="Red MinWidth"
+                    Command="{Binding StopServiceCommand}"
+                    Content="Stop" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

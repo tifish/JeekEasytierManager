@@ -1,0 +1,40 @@
+<UserControl
+    x:Class="JeekEasytierManager.MainWindowGrid"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:JeekEasytierManager"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="local:MainViewModel"
+    mc:Ignorable="d">
+
+    <Grid Margin="20" RowDefinitions="Auto,*">
+        <StackPanel
+            Grid.Row="0"
+            Orientation="Horizontal"
+            Spacing="20">
+
+            <local:MainWindowConfigs />
+
+            <StackPanel
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Orientation="Vertical"
+                Spacing="10">
+
+                <local:MainWindowService />
+
+                <local:MainWindowUpdate />
+
+            </StackPanel>
+
+            <local:MainWindowSettings />
+
+        </StackPanel>
+
+        <local:MainWindowInfo Grid.Row="1" />
+    </Grid>
+
+</UserControl>

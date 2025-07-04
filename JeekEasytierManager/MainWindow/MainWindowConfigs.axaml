@@ -1,0 +1,33 @@
+<UserControl
+    x:Class="JeekEasytierManager.MainWindowConfigs"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:JeekEasytierManager"
+    x:DataType="local:MainViewModel">
+    <Border Classes="Card">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Classes="Title" Text="📝" />
+                <Label Classes="Title" Content="Configs" />
+            </StackPanel>
+            <local:ConfigListControl
+                Configs="{Binding Configs}"
+                DeleteCommand="{Binding DeleteConfigCommand}"
+                EditCommand="{Binding EditConfigCommand}"
+                RenameCommand="{Binding RenameConfigCommand}" />
+            <StackPanel
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Spacing="10">
+                <Button
+                    Classes="Blue"
+                    Command="{Binding EditSelectedConfigCommand}"
+                    Content="Edit selected" />
+                <Button
+                    Classes="Green"
+                    Command="{Binding AddConfigCommand}"
+                    Content="Add" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

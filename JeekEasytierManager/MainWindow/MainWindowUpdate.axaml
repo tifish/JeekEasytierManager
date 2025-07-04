@@ -1,0 +1,33 @@
+<UserControl
+    x:Class="JeekEasytierManager.MainWindowUpdate"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:JeekEasytierManager"
+    x:DataType="local:MainViewModel">
+    <Border Classes="Card">
+        <StackPanel
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Orientation="Vertical"
+            Spacing="10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Classes="Title" Text="🔃" />
+                <Label Classes="Title" Content="Update" />
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Spacing="10">
+                <Label
+                    Content="Easytier is not installed"
+                    Foreground="Red"
+                    IsVisible="{Binding !HasEasytier}" />
+                <Button
+                    Classes="Gray MinWidth"
+                    Command="{Binding UpdateEasytierCommand}"
+                    Content="Update Easytier" />
+                <Button
+                    Classes="Gray MinWidth"
+                    Command="{Binding UpdateMeCommand}"
+                    Content="Update Me" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -1,0 +1,13 @@
+using Avalonia.Controls;
+
+namespace JeekEasytierManager;
+
+public partial class MainWindowGrid : UserControl
+{
+    public MainWindowGrid()
+    {
+        InitializeComponent();
+
+        DataContext = MainViewModel.Instance;
+    }
+}
