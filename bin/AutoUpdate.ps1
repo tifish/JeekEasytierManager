@@ -35,4 +35,9 @@ Remove-Item -Recurse -Force -Path "$PSScriptRoot\Libs"
 } -ErrorAction SilentlyContinue
 
 # Start .exe
-Start-Process -FilePath "$PSScriptRoot\$appName.exe" -ArgumentList $args[1..$args.Length]
+if ($args.Count -gt 1) {
+    Start-Process -FilePath "$PSScriptRoot\$appName.exe" -ArgumentList $args[1..$args.Length]
+}
+else {
+    Start-Process -FilePath "$PSScriptRoot\$appName.exe"
+}
