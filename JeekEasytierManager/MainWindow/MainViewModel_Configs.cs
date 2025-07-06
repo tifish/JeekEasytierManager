@@ -7,6 +7,7 @@ using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using JeekTools;
 using System.Linq;
+using Avalonia.Controls;
 
 namespace JeekEasytierManager;
 
@@ -138,6 +139,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial bool IsEditingConfigs { get; set; } = false;
+    public Grid MainGrid { get; internal set; } = null!;
 
     [RelayCommand]
     public void EditSelectedConfigs()
@@ -145,6 +147,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (Configs.ToArray().All(c => !c.IsSelected))
             return;
 
+        MainGrid.RowDefinitions[0].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
+        MainGrid.RowDefinitions[1].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
         IsEditingConfigs = true;
 
         LoadConfig(Configs.First(c => c.IsSelected).Name);

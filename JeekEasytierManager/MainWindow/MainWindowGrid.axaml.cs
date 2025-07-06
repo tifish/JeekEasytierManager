@@ -9,5 +9,7 @@ public partial class MainWindowGrid : UserControl
         InitializeComponent();
 
         DataContext = MainViewModel.Instance;
+
+        MainViewModel.Instance.MainGrid = MainGrid;
     }
 }

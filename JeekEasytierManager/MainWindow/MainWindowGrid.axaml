@@ -10,7 +10,11 @@
     x:DataType="local:MainViewModel"
     mc:Ignorable="d">
 
-    <Grid Margin="20" RowDefinitions="Auto,*">
+    <Grid
+        x:Name="MainGrid"
+        Margin="20"
+        RowDefinitions="Auto,*">
+
         <StackPanel
             Grid.Row="0"
             Orientation="Horizontal"
@@ -18,17 +22,18 @@
 
             <local:MainWindowConfigs />
 
+            <local:MainWindowEditConfigs IsVisible="{Binding IsEditingConfigs}" />
+
             <StackPanel
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
+                IsVisible="{Binding !IsEditingConfigs}"
                 Orientation="Vertical"
                 Spacing="10">
 
-                <local:MainWindowService IsVisible="{Binding !IsEditingConfigs}" />
+                <local:MainWindowService />
 
-                <local:MainWindowUpdate IsVisible="{Binding !IsEditingConfigs}" />
-
-                <local:MainWindowEditConfigs IsVisible="{Binding IsEditingConfigs}" />
+                <local:MainWindowUpdate />
 
             </StackPanel>
 
