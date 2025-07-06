@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JeekTools;
-using Nett;
+using Tomlyn;
 
 namespace JeekEasytierManager;
 
@@ -21,17 +21,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         const string defaultPort = "15888";
         const string defaultRpcSocket = $"{defaultIp}:{defaultPort}";
 
-        var toml = Toml.ReadFile(configFile);
-        var rpcPortal = toml.TryGetValue("rpc_portal");
-        if (rpcPortal is null)
+        var toml = Toml.Parse(File.ReadAllText(configFile)).ToModel();
+        if (!toml.TryGetValue("rpc_portal", out var rpcPortalValue))
             return defaultRpcSocket;
 
-        var rpcPortalString = rpcPortal.Get<string>().Trim();
+        var rpcPortal = ((string)rpcPortalValue).Trim();
 
-        if (rpcPortalString == "")
+        if (rpcPortal == "")
             return defaultRpcSocket;
 
-        var parts = rpcPortalString.Split(':');
+        var parts = rpcPortal.Split(':');
         if (parts.Length == 1)
         {
             if (parts[0] == "0")
@@ -44,7 +43,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (parts[0] == "0.0.0.0")
                 return $"{defaultIp}:{parts[1]}";
             else
-                return rpcPortalString;
+                return rpcPortal;
         }
 
         return defaultRpcSocket;

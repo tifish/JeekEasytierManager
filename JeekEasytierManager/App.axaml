@@ -19,7 +19,13 @@
 
     <Application.Styles>
         <FluentTheme />
+
         <dialogHost:DialogHostStyles />
+
         <StyleInclude Source="Style/Styles.axaml" />
+
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="Microsoft YaHei" />
+        </Style>
     </Application.Styles>
 </Application>

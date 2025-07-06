@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using JeekTools;
+using System.Linq;
 
 namespace JeekEasytierManager;
 
@@ -135,9 +136,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Configs.Remove(config);
     }
 
+    [ObservableProperty]
+    public partial bool IsEditingConfigs { get; set; } = false;
+
     [RelayCommand]
-    public void EditSelectedConfig()
+    public void EditSelectedConfigs()
     {
+        if (Configs.ToArray().All(c => !c.IsSelected))
+            return;
+
+        IsEditingConfigs = true;
+
+        LoadConfig(Configs.First(c => c.IsSelected).Name);
     }
 
     [RelayCommand]

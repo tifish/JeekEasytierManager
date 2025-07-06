@@ -26,7 +26,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     var configName = serviceName[ServicePrefix.Length..];
                     var config = Configs.FirstOrDefault(c => c.Name == configName);
                     if (config != null)
-                        config.Enabled = true;
+                        config.IsSelected = true;
                 }
             }
         }
@@ -47,7 +47,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var config in Configs)
         {
-            if (!config.Enabled)
+            if (!config.IsSelected)
                 continue;
 
             var configPath = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
@@ -81,7 +81,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await StopService();
         foreach (var config in Configs)
         {
-            if (!config.Enabled)
+            if (!config.IsSelected)
                 continue;
 
             await Nssm.UninstallService(ServicePrefix + config.Name);
@@ -100,7 +100,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var config in Configs)
         {
-            if (!config.Enabled)
+            if (!config.IsSelected)
                 continue;
 
             await Nssm.RestartService(ServicePrefix + config.Name);
@@ -119,7 +119,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var config in Configs)
         {
-            if (!config.Enabled)
+            if (!config.IsSelected)
                 continue;
 
             await Nssm.StopService(ServicePrefix + config.Name);
@@ -131,7 +131,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         foreach (var config in Configs)
         {
-            if (!config.Enabled)
+            if (!config.IsSelected)
                 continue;
 
             config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);

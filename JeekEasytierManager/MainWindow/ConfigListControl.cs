@@ -22,7 +22,7 @@ public partial class ConfigInfo : ObservableObject
     public partial string Name { get; set; } = "";
 
     [ObservableProperty]
-    public partial bool Enabled { get; set; } = false;
+    public partial bool IsSelected { get; set; } = false;
 
     [ObservableProperty]
     public partial ServiceStatus Status { get; set; } = ServiceStatus.None;
@@ -228,8 +228,8 @@ public class ConfigListControl : UserControl
 
             var checkBox = new CheckBox
             {
-                [!CheckBox.ContentProperty] = new Binding("Name") { Source = config },
-                [!CheckBox.IsCheckedProperty] = new Binding("Enabled") { Source = config },
+                [!CheckBox.ContentProperty] = new Binding(nameof(ConfigInfo.Name)) { Source = config },
+                [!CheckBox.IsCheckedProperty] = new Binding(nameof(ConfigInfo.IsSelected)) { Source = config },
                 Margin = new Thickness(5, 0),
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
@@ -239,8 +239,8 @@ public class ConfigListControl : UserControl
 
             var serviceStatusText = new TextBlock
             {
-                [!TextBlock.TextProperty] = new Binding("Status") { Source = config },
-                [!TextBlock.ForegroundProperty] = new Binding("Status")
+                [!TextBlock.TextProperty] = new Binding(nameof(ConfigInfo.Status)) { Source = config },
+                [!TextBlock.ForegroundProperty] = new Binding(nameof(ConfigInfo.Status))
                 {
                     Source = config,
                     Converter = _statusColorConverter

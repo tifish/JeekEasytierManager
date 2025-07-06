@@ -1,0 +1,191 @@
+<UserControl
+    x:Class="JeekEasytierManager.MainWindowEditConfigs"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:JeekEasytierManager"
+    x:DataType="local:MainViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="MinWidth" Value="100" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border Classes="Card">
+        <StackPanel Orientation="Vertical" Spacing="10">
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Classes="Title" Text="📝" />
+                <Label Classes="Title" Content="Edit Config(s)" />
+            </StackPanel>
+
+            <Border Classes="Card">
+                <StackPanel Orientation="Vertical" Spacing="10">
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <TextBlock Text="名称" />
+                            <TextBox IsReadOnly="True" Text="{Binding InstanceName}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <TextBlock Text="唯一 ID" />
+                            <TextBox IsReadOnly="True" Text="{Binding InstanceId}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <TextBlock Text="网络名称" />
+                            <TextBox Text="{Binding NetworkName}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <TextBlock Text="网络密码" />
+                            <TextBox Text="{Binding NetworkSecret}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <CheckBox Content="虚拟 IPv4 地址" IsChecked="{Binding EditIpAddress}" />
+                        <CheckBox
+                            Content="DHCP"
+                            IsChecked="{Binding Dhcp}"
+                            IsEnabled="{Binding EditIpAddress}" />
+                    </StackPanel>
+                    <TextBox IsEnabled="{Binding EditIpAddress}" Text="{Binding Ipv4}" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <CheckBox Content="连接服务器" IsChecked="{Binding EditPeers}" />
+                            <TextBox
+                                AcceptsReturn="True"
+                                IsEnabled="{Binding EditPeers}"
+                                Text="{Binding Peers}" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <CheckBox Content="监听地址" IsChecked="{Binding EditListeners}" />
+                            <TextBox
+                                AcceptsReturn="True"
+                                IsEnabled="{Binding EditListeners}"
+                                Text="{Binding Listeners}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Spacing="10">
+                        <CheckBox Content="信息监听地址端口" IsChecked="{Binding EditRpcPortal}" />
+                        <TextBox IsEnabled="{Binding EditRpcPortal}" Text="{Binding RpcPortal}" />
+                    </StackPanel>
+
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer>
+                <Border Classes="Card">
+                    <Grid ColumnDefinitions="Auto,20,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                        <CheckBox
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Content="开启延迟优先模式"
+                            IsChecked="{Binding LatencyFirst}" />
+                        <CheckBox
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            Content="使用用户态协议栈"
+                            IsChecked="{Binding UseSmoltcp}" />
+                        <CheckBox
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Content="启用 KCP 代理"
+                            IsChecked="{Binding EnableKcpProxy}" />
+                        <CheckBox
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            Content="禁用 KCP 输入"
+                            IsChecked="{Binding DisableKcpInput}" />
+                        <CheckBox
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Content="启用 QUIC 代理"
+                            IsChecked="{Binding EnableQuicProxy}" />
+                        <CheckBox
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Content="禁用 QUIC 输入"
+                            IsChecked="{Binding DisableQuicInput}" />
+                        <CheckBox
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Content="禁用 P2P"
+                            IsChecked="{Binding DisableP2p}" />
+                        <CheckBox
+                            Grid.Row="3"
+                            Grid.Column="2"
+                            Content="仅使用物理网卡"
+                            IsChecked="{Binding NotBindDevice}" />
+                        <CheckBox
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            Content="无 TUN 模式"
+                            IsChecked="{Binding NoTun}" />
+                        <CheckBox
+                            Grid.Row="4"
+                            Grid.Column="2"
+                            Content="启用出口节点"
+                            IsChecked="{Binding EnableExitNode}" />
+                        <CheckBox
+                            Grid.Row="5"
+                            Grid.Column="0"
+                            Content="转发 RPC 包"
+                            IsChecked="{Binding RelayAllPeerRpc}" />
+                        <CheckBox
+                            Grid.Row="5"
+                            Grid.Column="2"
+                            Content="启用多线程"
+                            IsChecked="{Binding MultiThread}" />
+                        <CheckBox
+                            Grid.Row="6"
+                            Grid.Column="0"
+                            Content="系统转发"
+                            IsChecked="{Binding ProxyForwardBySystem}" />
+                        <CheckBox
+                            Grid.Row="6"
+                            Grid.Column="2"
+                            Content="禁用加密"
+                            IsChecked="{Binding DisableEncryption}" />
+                        <CheckBox
+                            Grid.Row="7"
+                            Grid.Column="0"
+                            Content="禁用 UDP 打洞"
+                            IsChecked="{Binding DisableUdpHolePunching}" />
+                        <CheckBox
+                            Grid.Row="7"
+                            Grid.Column="2"
+                            Content="启用魔法 DNS"
+                            IsChecked="{Binding AcceptDns}" />
+                        <CheckBox
+                            Grid.Row="8"
+                            Grid.Column="0"
+                            Content="启用私有模式"
+                            IsChecked="{Binding PrivateMode}" />
+                    </Grid>
+                </Border>
+            </ScrollViewer>
+
+            <StackPanel
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Spacing="10">
+                <Button
+                    Classes="Green"
+                    Command="{Binding SaveEditConfigs}"
+                    Content="保存" />
+                <Button
+                    Classes="Gray"
+                    Command="{Binding CloseEditConfigs}"
+                    Content="关闭" />
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+
+</UserControl>

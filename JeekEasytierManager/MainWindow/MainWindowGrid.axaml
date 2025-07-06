@@ -24,17 +24,19 @@
                 Orientation="Vertical"
                 Spacing="10">
 
-                <local:MainWindowService />
+                <local:MainWindowService IsVisible="{Binding !IsEditingConfigs}" />
 
-                <local:MainWindowUpdate />
+                <local:MainWindowUpdate IsVisible="{Binding !IsEditingConfigs}" />
+
+                <local:MainWindowEditConfigs IsVisible="{Binding IsEditingConfigs}" />
 
             </StackPanel>
 
-            <local:MainWindowSettings />
+            <local:MainWindowSettings IsVisible="{Binding !IsEditingConfigs}" />
 
         </StackPanel>
 
-        <local:MainWindowInfo Grid.Row="1" />
+        <local:MainWindowInfo Grid.Row="1" IsVisible="{Binding !IsEditingConfigs}" />
     </Grid>
 
 </UserControl>
