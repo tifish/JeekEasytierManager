@@ -43,6 +43,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public partial string RpcPortal { get; set; }
 
     [ObservableProperty]
+    public partial bool EditProxyNetworks { get; set; }
+    [ObservableProperty]
+    public partial string ProxyNetworks { get; set; }
+
+    [ObservableProperty]
     public partial bool LatencyFirst { get; set; }
 
     [ObservableProperty]
@@ -113,10 +118,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (configData.TryGetValue("ipv4", out var ipv4))
             Ipv4 = (string)ipv4;
 
-        if (configData.TryGetValue("peers", out var peers))
+        if (configData.TryGetValue("peer", out var peers))
         {
-            var peersArray = (TomlArray)peers;
-            Peers = string.Join("\n", peersArray.Select(peer => (string)peer!));
+            var peersArray = (TomlTableArray)peers;
+            Peers = string.Join("\n", peersArray.Select(peer => (string)peer["uri"]));
         }
         if (configData.TryGetValue("listeners", out var listeners))
         {
@@ -126,6 +131,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (configData.TryGetValue("rpc_portal", out var rpcPortal))
             RpcPortal = (string)rpcPortal;
+
+        if (configData.TryGetValue("proxy_network", out var proxyNetworks))
+        {
+            var proxyNetworksArray = (TomlTableArray)proxyNetworks;
+            ProxyNetworks = string.Join("\n", proxyNetworksArray.Select(proxyNetwork => (string)proxyNetwork["cidr"]));
+        }
 
         var flags = (TomlTable)configData["flags"];
         if (flags.TryGetValue("latency_first", out var latencyFirst))
@@ -193,10 +204,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (EditPeers)
             {
                 var peersArray = Peers.Split('\n').Select(peer => peer.Trim()).Where(peer => !string.IsNullOrEmpty(peer)).ToArray();
-                var tomlArray = new TomlArray(peersArray.Length);
+                var tomlArray = new TomlTableArray();
                 foreach (var peer in peersArray)
-                    tomlArray.Add(peer);
-                configData["peers"] = tomlArray;
+                {
+                    tomlArray.Add(new TomlTable { ["uri"] = peer, });
+                }
+
+                configData["peer"] = tomlArray;
             }
 
             if (EditListeners)
@@ -210,6 +224,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             if (EditRpcPortal)
                 configData["rpc_portal"] = RpcPortal;
+
+            if (EditProxyNetworks)
+            {
+                var proxyNetworksArray = ProxyNetworks.Split('\n').Select(proxyNetwork => proxyNetwork.Trim()).Where(proxyNetwork => !string.IsNullOrEmpty(proxyNetwork)).ToArray();
+                var tomlArray = new TomlTableArray();
+                foreach (var proxyNetwork in proxyNetworksArray)
+                {
+                    tomlArray.Add(new TomlTable { ["cidr"] = proxyNetwork });
+                }
+                configData["proxy_network"] = tomlArray;
+            }
 
             var flags = (TomlTable)configData["flags"];
             SetFlag(flags, LatencyFirst, "latency_first", true);

@@ -79,6 +79,14 @@
                                 <TextBox IsEnabled="{Binding EditRpcPortal}" Text="{Binding RpcPortal}" />
                             </StackPanel>
 
+                            <StackPanel Orientation="Vertical" Spacing="10">
+                                <CheckBox Content="子网代理" IsChecked="{Binding EditProxyNetworks}" />
+                                <TextBox
+                                    AcceptsReturn="True"
+                                    IsEnabled="{Binding EditProxyNetworks}"
+                                    Text="{Binding ProxyNetworks}" />
+                            </StackPanel>
+
                         </StackPanel>
                     </Border>
 
