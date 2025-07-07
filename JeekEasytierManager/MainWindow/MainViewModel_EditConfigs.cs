@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
@@ -107,11 +108,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (configData.TryGetValue("instance_id", out var instanceId))
             InstanceId = (string)instanceId;
 
-        var networkIdentity = (TomlTable)configData["network_identity"];
-        if (networkIdentity.TryGetValue("network_name", out var networkName))
-            NetworkName = (string)networkName;
-        if (networkIdentity.TryGetValue("network_secret", out var networkSecret))
-            NetworkSecret = (string)networkSecret;
+        if (configData.TryGetValue("network_identity", out var networkIdentityObj))
+        {
+            var networkIdentity = (TomlTable)networkIdentityObj;
+            if (networkIdentity.TryGetValue("network_name", out var networkName))
+                NetworkName = (string)networkName;
+            if (networkIdentity.TryGetValue("network_secret", out var networkSecret))
+                NetworkSecret = (string)networkSecret;
+        }
 
         if (configData.TryGetValue("dhcp", out var dhcp))
             Dhcp = (bool)dhcp;
@@ -138,47 +142,50 @@ public partial class MainViewModel : ObservableObject, IDisposable
             ProxyNetworks = string.Join("\n", proxyNetworksArray.Select(proxyNetwork => (string)proxyNetwork["cidr"]));
         }
 
-        var flags = (TomlTable)configData["flags"];
-        if (flags.TryGetValue("latency_first", out var latencyFirst))
-            LatencyFirst = (bool)latencyFirst;
-        if (flags.TryGetValue("use_smoltcp", out var useSmoltcp))
-            UseSmoltcp = (bool)useSmoltcp;
-        if (flags.TryGetValue("enable_kcp_proxy", out var enableKcpProxy))
-            EnableKcpProxy = (bool)enableKcpProxy;
-        if (flags.TryGetValue("disable_kcp_input", out var disableKcpInput))
-            DisableKcpInput = (bool)disableKcpInput;
-        if (flags.TryGetValue("enable_quic_proxy", out var enableQuicProxy))
-            EnableQuicProxy = (bool)enableQuicProxy;
-        if (flags.TryGetValue("disable_quic_input", out var disableQuicInput))
-            DisableQuicInput = (bool)disableQuicInput;
-        if (flags.TryGetValue("disable_p2p", out var disableP2p))
-            DisableP2p = (bool)disableP2p;
-        if (flags.TryGetValue("bind_device", out var bindDevice))
-            NotBindDevice = !(bool)bindDevice;
-        if (flags.TryGetValue("no_tun", out var noTun))
-            NoTun = (bool)noTun;
-        if (flags.TryGetValue("enable_exit_node", out var enableExitNode))
-            EnableExitNode = (bool)enableExitNode;
-        if (flags.TryGetValue("relay_all_peer_rpc", out var relayAllPeerRpc))
-            RelayAllPeerRpc = (bool)relayAllPeerRpc;
-        if (flags.TryGetValue("multi_thread", out var multiThread))
-            MultiThread = !(bool)multiThread;
-        if (flags.TryGetValue("proxy_forward_by_system", out var proxyForwardBySystem))
-            ProxyForwardBySystem = (bool)proxyForwardBySystem;
-        if (flags.TryGetValue("enable_encryption", out var enableEncryption))
-            DisableEncryption = !(bool)enableEncryption;
-        if (flags.TryGetValue("disable_udp_hole_punching", out var disableUdpHolePunching))
-            DisableUdpHolePunching = (bool)disableUdpHolePunching;
-        if (flags.TryGetValue("accept_dns", out var acceptDns))
-            AcceptDns = (bool)acceptDns;
-        if (flags.TryGetValue("private_mode", out var privateMode))
-            PrivateMode = (bool)privateMode;
+        if (configData.TryGetValue("flags", out var flagsObj))
+        {
+            var flags = (TomlTable)flagsObj;
+            if (flags.TryGetValue("latency_first", out var latencyFirst))
+                LatencyFirst = (bool)latencyFirst;
+            if (flags.TryGetValue("use_smoltcp", out var useSmoltcp))
+                UseSmoltcp = (bool)useSmoltcp;
+            if (flags.TryGetValue("enable_kcp_proxy", out var enableKcpProxy))
+                EnableKcpProxy = (bool)enableKcpProxy;
+            if (flags.TryGetValue("disable_kcp_input", out var disableKcpInput))
+                DisableKcpInput = (bool)disableKcpInput;
+            if (flags.TryGetValue("enable_quic_proxy", out var enableQuicProxy))
+                EnableQuicProxy = (bool)enableQuicProxy;
+            if (flags.TryGetValue("disable_quic_input", out var disableQuicInput))
+                DisableQuicInput = (bool)disableQuicInput;
+            if (flags.TryGetValue("disable_p2p", out var disableP2p))
+                DisableP2p = (bool)disableP2p;
+            if (flags.TryGetValue("bind_device", out var bindDevice))
+                NotBindDevice = !(bool)bindDevice;
+            if (flags.TryGetValue("no_tun", out var noTun))
+                NoTun = (bool)noTun;
+            if (flags.TryGetValue("enable_exit_node", out var enableExitNode))
+                EnableExitNode = (bool)enableExitNode;
+            if (flags.TryGetValue("relay_all_peer_rpc", out var relayAllPeerRpc))
+                RelayAllPeerRpc = (bool)relayAllPeerRpc;
+            if (flags.TryGetValue("multi_thread", out var multiThread))
+                MultiThread = !(bool)multiThread;
+            if (flags.TryGetValue("proxy_forward_by_system", out var proxyForwardBySystem))
+                ProxyForwardBySystem = (bool)proxyForwardBySystem;
+            if (flags.TryGetValue("enable_encryption", out var enableEncryption))
+                DisableEncryption = !(bool)enableEncryption;
+            if (flags.TryGetValue("disable_udp_hole_punching", out var disableUdpHolePunching))
+                DisableUdpHolePunching = (bool)disableUdpHolePunching;
+            if (flags.TryGetValue("accept_dns", out var acceptDns))
+                AcceptDns = (bool)acceptDns;
+            if (flags.TryGetValue("private_mode", out var privateMode))
+                PrivateMode = (bool)privateMode;
+        }
     }
 
     [RelayCommand]
     public void SaveEditConfigs()
     {
-        foreach (var config in MainViewModel.Instance.Configs.ToArray())
+        foreach (var config in Configs.ToArray())
         {
             if (!config.IsSelected)
                 continue;
@@ -191,9 +198,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (!configData.TryGetValue("instance_id", out var instanceId)) // Add new instance_id if not exist
                 configData["instance_id"] = Guid.NewGuid().ToString();
 
-            var networkIdentity = (TomlTable)configData["network_identity"];
-            networkIdentity["network_name"] = NetworkName;
-            networkIdentity["network_secret"] = NetworkSecret;
+            configData.Remove("network_identity");
+            configData.Add("network_identity", new TomlTable
+            {
+                ["network_name"] = NetworkName,
+                ["network_secret"] = NetworkSecret
+            });
 
             if (EditIpAddress)
             {
@@ -236,7 +246,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 configData["proxy_network"] = tomlArray;
             }
 
-            var flags = (TomlTable)configData["flags"];
+            var flags = new TomlTable();
+            configData["flags"] = flags;
             SetFlag(flags, LatencyFirst, "latency_first", true);
             SetFlag(flags, UseSmoltcp, "use_smoltcp", true);
             SetFlag(flags, EnableKcpProxy, "enable_kcp_proxy", true);

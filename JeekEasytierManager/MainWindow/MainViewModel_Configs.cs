@@ -18,12 +18,26 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!Directory.Exists(AppSettings.ConfigDirectory))
             return;
 
-        // 获取配置文件列表
+        // Save selected config
+        var selectedConfigNames = Configs.Where(c => c.IsSelected).Select(c => c.Name).ToList();
+
+        // Clear configs
+        Configs.Clear();
+
+        // Get config files
         var configFiles = Directory.GetFiles(AppSettings.ConfigDirectory, "*.toml");
         foreach (var configFile in configFiles)
         {
             var fileName = Path.GetFileNameWithoutExtension(configFile);
             Configs.Add(new ConfigInfo { Name = fileName });
+        }
+
+        // Restore selected config
+        foreach (var configName in selectedConfigNames)
+        {
+            var config = Configs.FirstOrDefault(c => c.Name == configName);
+            if (config != null)
+                config.IsSelected = true;
         }
     }
 

@@ -11,7 +11,7 @@ namespace JeekEasytierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    private async Task LoadSettings()
+    private async Task ApplySettings()
     {
         Application.Current!.RequestedThemeVariant = Settings.ThemeVariant;
 
@@ -26,6 +26,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // The timer will be updated
         AutoUpdateMe = Settings.AutoUpdateMe;
         AutoUpdateEasytier = Settings.AutoUpdateEasytier;
+
+        SyncPassword = Settings.SyncPassword;
 
         // Check for updates when start
         await CheckForUpdates();
@@ -142,4 +144,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await UpdateMe(false);
         }
     }
+
+    [ObservableProperty]
+    public partial string SyncPassword { get; set; }
+
+    partial void OnSyncPasswordChanged(string value)
+    {
+        Settings.SyncPassword = value;
+        _ = AppSettings.Save();
+    }
+
+    [ObservableProperty]
+    public partial bool ShowSyncPassword { get; set; }
 }

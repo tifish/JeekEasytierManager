@@ -21,6 +21,10 @@
                 Orientation="Horizontal"
                 Spacing="10">
                 <Button
+                    Classes="Red"
+                    Command="{Binding SyncConfigs}"
+                    Content="Sync" />
+                <Button
                     Classes="Yellow"
                     Command="{Binding RefreshConfigs}"
                     Content="Refresh" />

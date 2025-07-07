@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using JeekTools;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Text;
 
@@ -44,6 +46,9 @@ class Program
         });
 
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        // Start sync server
+        RemoteCall.StartServer("http://0.0.0.0:16666");
 
         // Check if the application should start hidden
         if (args.Length > 0 && args[0] == "/hide")

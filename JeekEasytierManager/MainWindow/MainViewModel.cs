@@ -20,7 +20,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await UpdateServiceStatus();
         CheckHasEasytier();
         await ShowPeers();
-        await LoadSettings();
+        await ApplySettings();
     }
 
     public void Dispose()
