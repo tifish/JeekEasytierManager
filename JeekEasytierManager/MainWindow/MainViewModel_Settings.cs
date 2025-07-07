@@ -118,6 +118,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         try
         {
+            // Only check for update when user do not open the main window
+            if (_mainWindow!.IsVisible)
+                return;
+
             await CheckForUpdates();
         }
         catch (Exception ex)
