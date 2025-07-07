@@ -153,6 +153,15 @@ public class ConfigListControl : UserControl
         set => SetValue(EditCommandProperty, value);
     }
 
+    public static readonly StyledProperty<ICommand?> EditFileCommandProperty =
+        AvaloniaProperty.Register<ConfigListControl, ICommand?>(nameof(EditFileCommand));
+
+    public ICommand? EditFileCommand
+    {
+        get => GetValue(EditFileCommandProperty);
+        set => SetValue(EditFileCommandProperty, value);
+    }
+
     public static readonly StyledProperty<ICommand?> RenameCommandProperty =
         AvaloniaProperty.Register<ConfigListControl, ICommand?>(nameof(RenameCommand));
 
@@ -176,6 +185,11 @@ public class ConfigListControl : UserControl
         UpdateCommands();
     }
 
+    private void OnEditFileCommandChanged(ICommand? oldValue, ICommand? newValue)
+    {
+        UpdateCommands();
+    }
+
     private void OnRenameCommandChanged(ICommand? oldValue, ICommand? newValue)
     {
         UpdateCommands();
@@ -191,11 +205,12 @@ public class ConfigListControl : UserControl
         foreach (var stackPanel in _grid.Children.OfType<StackPanel>())
         {
             var buttons = stackPanel.Children.OfType<Button>().ToArray();
-            if (buttons.Length >= 3)
+            if (buttons.Length == 4)
             {
                 buttons[0].Command = EditCommand; // Edit button
-                buttons[1].Command = RenameCommand; // Rename button
-                buttons[2].Command = DeleteCommand; // Delete button
+                buttons[1].Command = EditFileCommand; // Edit file button
+                buttons[2].Command = RenameCommand; // Rename button
+                buttons[3].Command = DeleteCommand; // Delete button
             }
         }
     }
@@ -271,9 +286,18 @@ public class ConfigListControl : UserControl
             };
             buttonPanel.Children.Add(editButton);
 
-            var renameButton = new Button
+            var editFileButton = new Button
             {
                 Content = "📝",
+                Command = EditFileCommand,
+                CommandParameter = config,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+            };
+            buttonPanel.Children.Add(editFileButton);
+
+            var renameButton = new Button
+            {
+                Content = "⛏️",
                 Command = RenameCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,

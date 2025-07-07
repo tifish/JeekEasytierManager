@@ -44,6 +44,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public void EditConfig(ConfigInfo config)
     {
+        foreach (var c in Configs)
+        {
+            c.IsSelected = c == config;
+        }
+
+        EditSelectedConfigs();
+    }
+
+    [RelayCommand]
+    public void EditConfigFile(ConfigInfo config)
+    {
         var configFile = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
         if (!File.Exists(configFile))
             return;
@@ -170,6 +181,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         MainGrid.RowDefinitions[0].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
         MainGrid.RowDefinitions[1].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
         IsEditingConfigs = true;
+
+        var isSingleConfig = Configs.ToArray().Count(c => c.IsSelected) == 1;
+        EditIpAddress = isSingleConfig;
+        EditPeers = isSingleConfig;
+        EditListeners = isSingleConfig;
+        EditRpcPortal = isSingleConfig;
+        EditProxyNetworks = isSingleConfig;
 
         LoadConfig(Configs.First(c => c.IsSelected).Name);
     }

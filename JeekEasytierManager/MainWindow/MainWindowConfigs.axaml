@@ -15,6 +15,7 @@
                 Configs="{Binding Configs}"
                 DeleteCommand="{Binding DeleteConfig}"
                 EditCommand="{Binding EditConfig}"
+                EditFileCommand="{Binding EditConfigFile}"
                 RenameCommand="{Binding RenameConfig}" />
             <StackPanel
                 HorizontalAlignment="Right"
@@ -25,13 +26,13 @@
                     Command="{Binding SyncConfigs}"
                     Content="Sync" />
                 <Button
-                    Classes="Yellow"
-                    Command="{Binding RefreshConfigs}"
-                    Content="Refresh" />
-                <Button
                     Classes="Blue"
                     Command="{Binding EditSelectedConfigs}"
                     Content="Edit selected" />
+                <Button
+                    Classes="Yellow"
+                    Command="{Binding RefreshConfigs}"
+                    Content="Refresh" />
                 <Button
                     Classes="Green"
                     Command="{Binding AddConfig}"
