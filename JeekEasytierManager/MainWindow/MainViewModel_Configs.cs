@@ -137,6 +137,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Configs.Remove(config);
     }
 
+    [RelayCommand]
+    public async Task RefreshConfigs()
+    {
+        await UpdateServiceStatus();
+    }
+
     [ObservableProperty]
     public partial bool IsEditingConfigs { get; set; } = false;
     public Grid MainGrid { get; internal set; } = null!;

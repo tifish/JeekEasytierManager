@@ -21,6 +21,10 @@
                 Orientation="Horizontal"
                 Spacing="10">
                 <Button
+                    Classes="Yellow"
+                    Command="{Binding RefreshConfigs}"
+                    Content="Refresh" />
+                <Button
                     Classes="Blue"
                     Command="{Binding EditSelectedConfigs}"
                     Content="Edit selected" />
