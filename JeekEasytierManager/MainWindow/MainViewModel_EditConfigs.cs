@@ -198,8 +198,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (!configData.TryGetValue("instance_id", out var instanceId)) // Add new instance_id if not exist
                 configData["instance_id"] = Guid.NewGuid().ToString();
 
-            configData.Remove("network_identity");
-            configData.Add("network_identity", new TomlTable
+            configData.Set("network_identity", new TomlTable
             {
                 ["network_name"] = NetworkName,
                 ["network_secret"] = NetworkSecret
