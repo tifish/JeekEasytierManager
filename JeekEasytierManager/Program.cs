@@ -3,14 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using JeekTools;
-using MsBox.Avalonia;
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Pipes;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Text;
 
 namespace JeekEasytierManager;
 
@@ -48,6 +42,8 @@ class Program
                 });
             }
         });
+
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         // Check if the application should start hidden
         if (args.Length > 0 && args[0] == "/hide")

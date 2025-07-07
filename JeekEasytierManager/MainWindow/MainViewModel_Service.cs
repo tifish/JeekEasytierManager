@@ -51,7 +51,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 continue;
 
             var configPath = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
-            await Nssm.InstallService(ServicePrefix + config.Name, AppSettings.EasytierCorePath, $"-c \"{configPath}\"");
+            if (!await Nssm.InstallService(ServicePrefix + config.Name, AppSettings.EasytierCorePath, $"-c \"{configPath}\""))
+            {
+                Messages = $"Failed to install service {ServicePrefix + config.Name}\n{Nssm.LastError}";
+                return;
+            }
         }
 
         await RestartService();
@@ -84,7 +88,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (!config.IsSelected)
                 continue;
 
-            await Nssm.UninstallService(ServicePrefix + config.Name);
+            if (!await Nssm.UninstallService(ServicePrefix + config.Name))
+            {
+                Messages = $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
+                return;
+            }
         }
         await UpdateServiceStatus();
     }
@@ -103,7 +111,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (!config.IsSelected)
                 continue;
 
-            await Nssm.RestartService(ServicePrefix + config.Name);
+            if (!await Nssm.RestartService(ServicePrefix + config.Name))
+            {
+                Messages = $"Failed to restart service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
+                return;
+            }
         }
         await UpdateServiceStatus();
     }
@@ -122,7 +134,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (!config.IsSelected)
                 continue;
 
-            await Nssm.StopService(ServicePrefix + config.Name);
+            if (!await Nssm.StopService(ServicePrefix + config.Name))
+            {
+                Messages = $"Failed to stop service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
+                return;
+            }
         }
         await UpdateServiceStatus();
     }
