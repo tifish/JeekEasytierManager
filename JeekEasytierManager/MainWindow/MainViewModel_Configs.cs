@@ -8,12 +8,13 @@ using MsBox.Avalonia.Enums;
 using JeekTools;
 using System.Linq;
 using Avalonia.Controls;
+using System.Collections.Generic;
 
 namespace JeekEasytierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    private void LoadConfigs()
+    private async Task LoadConfigs()
     {
         if (!Directory.Exists(AppSettings.ConfigDirectory))
             return;
@@ -25,11 +26,27 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Configs.Clear();
 
         // Get config files
+        var configNames = new List<string>();
         var configFiles = Directory.GetFiles(AppSettings.ConfigDirectory, "*.toml");
+
         foreach (var configFile in configFiles)
         {
             var fileName = Path.GetFileNameWithoutExtension(configFile);
-            Configs.Add(new ConfigInfo { Name = fileName });
+            configNames.Add(fileName);
+        }
+
+        // If configs are the same, do nothing
+        if (configNames.Count == Configs.Count
+            && configNames.All(c => Configs.Any(c2 => c2.Name == c)))
+        {
+            return;
+        }
+
+        // Add new configs
+        Configs.Clear();
+        foreach (var configName in configNames)
+        {
+            Configs.Add(new ConfigInfo { Name = configName });
         }
 
         // Restore selected config
@@ -39,6 +56,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (config != null)
                 config.IsSelected = true;
         }
+
+        // Update service status
+        await UpdateServiceStatus();
     }
 
     [RelayCommand]
@@ -165,7 +185,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task RefreshConfigs()
     {
-        await UpdateServiceStatus();
+        await LoadConfigs();
     }
 
     [ObservableProperty]

@@ -145,11 +145,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public async Task UpdateServiceStatus()
     {
-        foreach (var config in Configs)
+        foreach (var config in Configs.ToArray())
         {
-            if (!config.IsSelected)
-                continue;
-
             config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);
         }
     }
