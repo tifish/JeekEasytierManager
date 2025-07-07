@@ -19,11 +19,11 @@
                 Spacing="10">
                 <Button
                     Classes="Brown MinWidth"
-                    Command="{Binding ShowPeersCommand}"
+                    Command="{Binding ShowPeers}"
                     Content="Show peers" />
                 <Button
                     Classes="Yellow MinWidth"
-                    Command="{Binding ShowRouteCommand}"
+                    Command="{Binding ShowRoute}"
                     Content="Show route" />
             </StackPanel>
 

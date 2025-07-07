@@ -17,21 +17,21 @@
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button
                     Classes="Blue MinWidth"
-                    Command="{Binding InstallServiceCommand}"
+                    Command="{Binding InstallService}"
                     Content="Install" />
                 <Button
                     Classes="Gray MinWidth"
-                    Command="{Binding UninstallServiceCommand}"
+                    Command="{Binding UninstallService}"
                     Content="Uninstall" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button
                     Classes="Green MinWidth"
-                    Command="{Binding RestartServiceCommand}"
+                    Command="{Binding RestartService}"
                     Content="(Re)start" />
                 <Button
                     Classes="Red MinWidth"
-                    Command="{Binding StopServiceCommand}"
+                    Command="{Binding StopService}"
                     Content="Stop" />
             </StackPanel>
         </StackPanel>

@@ -18,7 +18,7 @@
             <StackPanel Orientation="Vertical" Spacing="10">
                 <Button
                     Classes="Gray MinWidth"
-                    Command="{Binding SwitchThemeCommand}"
+                    Command="{Binding SwitchTheme}"
                     Content="Switch theme" />
                 <ToggleSwitch Content="Start on boot" IsChecked="{Binding StartOnBoot}" />
                 <ToggleSwitch Content="Auto update easytier" IsChecked="{Binding AutoUpdateEasytier}" />
