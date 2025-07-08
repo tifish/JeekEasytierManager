@@ -13,8 +13,26 @@ using System;
 using System.Globalization;
 using Avalonia.Layout;
 using JeekTools;
+using System.IO;
+using Tomlyn;
+using System.Runtime.Serialization;
 
 namespace JeekEasytierManager;
+
+public class EasytierConfig
+{
+    [DataMember(Name = "flags")]
+    public EasytierConfigFlags? Flags { get; set; } = new();
+}
+
+public class EasytierConfigFlags
+{
+    [DataMember(Name = "dev_name")]
+    public string? DevName { get; set; } = "";
+
+    [DataMember(Name = "no_tun")]
+    public bool NoTun { get; set; } = false;
+}
 
 public partial class ConfigInfo : ObservableObject
 {
@@ -27,6 +45,19 @@ public partial class ConfigInfo : ObservableObject
     [ObservableProperty]
     public partial ServiceStatus Status { get; set; } = ServiceStatus.None;
 
+    public string GetConfigPath()
+    {
+        return Path.Join(AppSettings.ConfigDirectory, Name + ".toml");
+    }
+
+    public EasytierConfig GetConfig()
+    {
+        return Toml.ToModel<EasytierConfig>(
+            File.ReadAllText(GetConfigPath()), null, new TomlModelOptions()
+            {
+                IgnoreMissingProperties = true,
+            });
+    }
 }
 
 // Add status to color converter

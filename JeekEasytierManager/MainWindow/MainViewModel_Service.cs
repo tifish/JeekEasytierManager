@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JeekTools;
@@ -118,6 +119,27 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 return;
             }
         }
+
+        // Wait 3 seconds to make sure the tun device is ready
+        DispatcherTimer.RunOnce(async () =>
+        {
+            // Since the interface seems to be private, but not really private, we need to set it to private again.
+            foreach (var config in Configs)
+            {
+                if (!config.IsSelected)
+                    continue;
+
+                var configData = config.GetConfig();
+                if (configData.Flags?.NoTun ?? false)
+                    continue;
+
+                if (string.IsNullOrEmpty(configData.Flags?.DevName))
+                    continue;
+
+                await Executor.RunAndWait("powershell.exe", $"-ex bypass -command Set-NetConnectionProfile -InterfaceAlias \"{configData.Flags.DevName}\" -NetworkCategory Private", false, true);
+            }
+        }, TimeSpan.FromSeconds(3));
+
         await UpdateServiceStatus();
     }
 

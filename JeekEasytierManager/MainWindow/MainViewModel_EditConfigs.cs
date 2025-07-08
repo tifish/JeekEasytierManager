@@ -145,6 +145,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (configData.TryGetValue("flags", out var flagsObj))
         {
             var flags = (TomlTable)flagsObj;
+
             if (flags.TryGetValue("latency_first", out var latencyFirst))
                 LatencyFirst = (bool)latencyFirst;
             if (flags.TryGetValue("use_smoltcp", out var useSmoltcp))
@@ -182,7 +183,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    [RelayCommand(CanExecute = nameof(HasSelectedConfigs))]
+    [RelayCommand]
     public void SaveEditConfigs()
     {
         foreach (var config in Configs.ToArray())
@@ -247,6 +248,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             var flags = new TomlTable();
             configData["flags"] = flags;
+
+            flags["dev_name"] = config.Name;
+
             SetFlag(flags, LatencyFirst, "latency_first", true);
             SetFlag(flags, UseSmoltcp, "use_smoltcp", true);
             SetFlag(flags, EnableKcpProxy, "enable_kcp_proxy", true);

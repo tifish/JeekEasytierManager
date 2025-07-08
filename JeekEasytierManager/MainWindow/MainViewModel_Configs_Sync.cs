@@ -28,6 +28,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         // Get all rpc clients
         var rpcClients = await GetAllRpcClients();
+        if (rpcClients.Count == 0)
+            return;
 
         // Get all file info list from all rpc clients
         var clientFileInfoLists = new List<List<ConfigFileInfo>>();
