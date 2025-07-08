@@ -28,9 +28,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
             config.PropertyChanged -= OnConfigPropertyChanged;
         }
 
-        // Clear configs
-        Configs.Clear();
-
         // Get config files
         var configNames = new List<string>();
         var configFiles = Directory.GetFiles(AppSettings.ConfigDirectory, "*.toml");
@@ -41,31 +38,40 @@ public partial class MainViewModel : ObservableObject, IDisposable
             configNames.Add(fileName);
         }
 
-        // If configs are the same, do nothing
+        // If configs are the same, only update service status
         if (configNames.Count == Configs.Count
             && configNames.All(c => Configs.Any(c2 => c2.Name == c)))
         {
-            return;
+            await UpdateServiceStatus();
         }
-
-        // Add new configs
-        foreach (var configName in configNames)
+        else
         {
-            var config = new ConfigInfo { Name = configName };
-            config.PropertyChanged += OnConfigPropertyChanged;
-            Configs.Add(config);
-        }
+            var newConfigs = new List<ConfigInfo>();
 
-        // Restore selected config
-        foreach (var configName in selectedConfigNames)
-        {
-            var config = Configs.FirstOrDefault(c => c.Name == configName);
-            if (config != null)
-                config.IsSelected = true;
-        }
+            // Add new configs
+            foreach (var configName in configNames)
+            {
+                var config = new ConfigInfo { Name = configName };
+                config.PropertyChanged += OnConfigPropertyChanged;
+                newConfigs.Add(config);
+            }
 
-        // Update service status
-        await UpdateServiceStatus();
+            // Restore selected config
+            foreach (var configName in selectedConfigNames)
+            {
+                var config = Configs.FirstOrDefault(c => c.Name == configName);
+                if (config != null)
+                    config.IsSelected = true;
+            }
+
+            // Update service status
+            await UpdateServiceStatus(newConfigs);
+
+            // Update Configs at once, to avoid unnecessary Status changes on UI.
+            Configs.Clear();
+            foreach (var config in newConfigs)
+                Configs.Add(config);
+        }
     }
 
     [RelayCommand]

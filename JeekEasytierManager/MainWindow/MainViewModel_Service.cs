@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -146,9 +147,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial bool HasRunningService { get; set; }
 
-    public async Task UpdateServiceStatus()
+    public async Task UpdateServiceStatus(List<ConfigInfo>? configs = null)
     {
-        foreach (var config in Configs.ToArray())
+        var configsToUpdate = configs ?? [.. Configs];
+
+        foreach (var config in configsToUpdate)
         {
             config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);
         }
