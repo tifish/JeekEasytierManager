@@ -201,6 +201,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // Remove property change listener before removing from collection
         config.PropertyChanged -= OnConfigPropertyChanged;
         Configs.Remove(config);
+
+        UpdateHasSelectedConfigs();
     }
 
     [RelayCommand]
@@ -216,12 +218,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial bool HasSelectedConfigs { get; set; }
 
+    private void UpdateHasSelectedConfigs()
+    {
+        HasSelectedConfigs = Configs.Any(c => c.IsSelected);
+    }
+
     // Handle property changes in ConfigInfo objects
     private void OnConfigPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ConfigInfo.IsSelected))
         {
-            HasSelectedConfigs = Configs.Any(c => c.IsSelected);
+            UpdateHasSelectedConfigs();
         }
     }
 

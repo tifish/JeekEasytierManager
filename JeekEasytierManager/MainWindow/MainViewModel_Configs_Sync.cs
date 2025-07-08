@@ -227,6 +227,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public void DeleteExtraConfigs(List<string> fileNames)
     {
         var configList = Configs.ToList();
+        var isSelectedChanged = false;
 
         foreach (var fileName in fileNames)
         {
@@ -237,7 +238,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var configName = Path.GetFileNameWithoutExtension(fileName);
             var configIndex = configList.FindIndex(config => config.Name == configName);
             if (configIndex != -1)
+            {
+                if (configList[configIndex].IsSelected)
+                    isSelectedChanged = true;
+
                 Configs.RemoveAt(configIndex);
+            }
+        }
+
+        if (isSelectedChanged)
+        {
+            UpdateHasSelectedConfigs();
         }
     }
+
 }
