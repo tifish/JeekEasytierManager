@@ -182,7 +182,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasSelectedConfigs))]
     public void SaveEditConfigs()
     {
         foreach (var config in Configs.ToArray())
@@ -267,6 +267,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             File.WriteAllText(configPath, Toml.FromModel(configData));
         }
+
+        CloseEditConfigs();
     }
 
     private static void SetFlag(TomlTable flags, bool condition, string key, bool value)

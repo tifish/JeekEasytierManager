@@ -194,12 +194,13 @@
 
                 <Button
                     Classes="Green"
-                    Command="{Binding SaveEditConfigs}"
-                    Content="保存" />
+                    Command="{Binding SaveEditConfigsCommand}"
+                    Content="保存到选中的配置"
+                    IsEnabled="{Binding HasSelectedConfigs}" />
                 <Button
                     Classes="Gray"
                     Command="{Binding CloseEditConfigs}"
-                    Content="关闭" />
+                    Content="取消" />
 
             </StackPanel>
 

@@ -22,6 +22,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // Save selected config
         var selectedConfigNames = Configs.Where(c => c.IsSelected).Select(c => c.Name).ToList();
 
+        // Remove property change listeners from existing configs
+        foreach (var config in Configs)
+        {
+            config.PropertyChanged -= OnConfigPropertyChanged;
+        }
+
         // Clear configs
         Configs.Clear();
 
@@ -43,10 +49,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         // Add new configs
-        Configs.Clear();
         foreach (var configName in configNames)
         {
-            Configs.Add(new ConfigInfo { Name = configName });
+            var config = new ConfigInfo { Name = configName };
+            config.PropertyChanged += OnConfigPropertyChanged;
+            Configs.Add(config);
         }
 
         // Restore selected config
@@ -132,6 +139,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             _renameConfigDialogOldConfig.Name = newName;
             _renameConfigDialogOldConfig = null;
+
+            // Notify that HasSelectedConfigs might have changed
+            OnPropertyChanged(nameof(HasSelectedConfigs));
+            EditSelectedConfigsCommand.NotifyCanExecuteChanged();
         }
         catch (Exception ex)
         {
@@ -165,7 +176,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
 
         File.Create(configFile).Close();
-        Configs.Add(new ConfigInfo { Name = newName });
+        var config = new ConfigInfo { Name = newName };
+        config.PropertyChanged += OnConfigPropertyChanged;
+        Configs.Add(config);
     }
 
     [RelayCommand]
@@ -179,6 +192,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (File.Exists(configFile))
             File.Delete(configFile);
 
+        // Remove property change listener before removing from collection
+        config.PropertyChanged -= OnConfigPropertyChanged;
         Configs.Remove(config);
     }
 
@@ -191,6 +206,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial bool IsEditingConfigs { get; set; } = false;
     public Grid MainGrid { get; internal set; } = null!;
+
+    [ObservableProperty]
+    public partial bool HasSelectedConfigs { get; set; }
+
+    // Handle property changes in ConfigInfo objects
+    private void OnConfigPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ConfigInfo.IsSelected))
+        {
+            HasSelectedConfigs = Configs.Any(c => c.IsSelected);
+        }
+    }
 
     [RelayCommand]
     public void EditSelectedConfigs()

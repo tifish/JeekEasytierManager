@@ -27,8 +27,9 @@
                     Content="Sync" />
                 <Button
                     Classes="Blue"
-                    Command="{Binding EditSelectedConfigs}"
-                    Content="Edit selected" />
+                    Command="{Binding EditSelectedConfigsCommand}"
+                    Content="Edit selected"
+                    IsEnabled="{Binding HasSelectedConfigs}" />
                 <Button
                     Classes="Yellow"
                     Command="{Binding RefreshConfigs}"

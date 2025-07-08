@@ -20,11 +20,13 @@
                 <Button
                     Classes="Brown MinWidth"
                     Command="{Binding ShowPeers}"
-                    Content="Show peers" />
+                    Content="Show peers"
+                    IsEnabled="{Binding HasRunningService}" />
                 <Button
                     Classes="Yellow MinWidth"
                     Command="{Binding ShowRoute}"
-                    Content="Show route" />
+                    Content="Show route"
+                    IsEnabled="{Binding HasRunningService}" />
             </StackPanel>
 
             <ScrollViewer

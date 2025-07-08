@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace JeekEasytierManager;
@@ -15,12 +16,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public async Task Init()
     {
         await AppSettings.Load();
-        LoadConfigs();
+        await LoadConfigs();
         await LoadEnabledServices();
         await UpdateServiceStatus();
         CheckHasEasytier();
         await ShowPeers();
         await ApplySettings();
+
+
     }
 
     public void Dispose()

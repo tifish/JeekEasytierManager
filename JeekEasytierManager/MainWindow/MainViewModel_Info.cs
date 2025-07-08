@@ -96,5 +96,4 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial string Messages { get; set; } = "";
 
-
 }

@@ -143,12 +143,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await UpdateServiceStatus();
     }
 
+    [ObservableProperty]
+    public partial bool HasRunningService { get; set; }
+
     public async Task UpdateServiceStatus()
     {
         foreach (var config in Configs.ToArray())
         {
             config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);
         }
+
+        HasRunningService = Configs.Any(c => c.Status == ServiceStatus.Running);
     }
 
 }
