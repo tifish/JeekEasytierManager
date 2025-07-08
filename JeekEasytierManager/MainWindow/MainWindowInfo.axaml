@@ -19,12 +19,12 @@
                 Spacing="10">
                 <Button
                     Classes="Brown MinWidth"
-                    Command="{Binding ShowPeers}"
+                    Command="{Binding ShowPeersCommand}"
                     Content="Show peers"
                     IsEnabled="{Binding HasRunningService}" />
                 <Button
                     Classes="Yellow MinWidth"
-                    Command="{Binding ShowRoute}"
+                    Command="{Binding ShowRouteCommand}"
                     Content="Show route"
                     IsEnabled="{Binding HasRunningService}" />
             </StackPanel>

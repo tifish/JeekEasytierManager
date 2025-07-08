@@ -199,7 +199,7 @@
                     IsEnabled="{Binding HasSelectedConfigs}" />
                 <Button
                     Classes="Gray"
-                    Command="{Binding CloseEditConfigs}"
+                    Command="{Binding CloseEditConfigsCommand}"
                     Content="取消" />
 
             </StackPanel>

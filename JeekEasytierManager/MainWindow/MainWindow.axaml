@@ -33,8 +33,8 @@
                     Text="{Binding RenameConfigDialogText}"
                     Watermark="Enter new name here...">
                     <TextBox.KeyBindings>
-                        <KeyBinding Command="{Binding RenameConfigDialogSave}" Gesture="Enter" />
-                        <KeyBinding Command="{Binding RenameConfigDialogCancel}" Gesture="Escape" />
+                        <KeyBinding Command="{Binding RenameConfigDialogSaveCommand}" Gesture="Enter" />
+                        <KeyBinding Command="{Binding RenameConfigDialogCancelCommand}" Gesture="Escape" />
                     </TextBox.KeyBindings>
                 </TextBox>
 
@@ -44,11 +44,11 @@
                     Spacing="10">
                     <Button
                         Classes="Secondary"
-                        Command="{Binding RenameConfigDialogCancel}"
+                        Command="{Binding RenameConfigDialogCancelCommand}"
                         Content="Cancel" />
                     <Button
                         Classes="Primary"
-                        Command="{Binding RenameConfigDialogSave}"
+                        Command="{Binding RenameConfigDialogSaveCommand}"
                         Content="Save" />
                 </StackPanel>
             </StackPanel>
@@ -70,8 +70,8 @@
                         Text="{Binding AddConfigDialogText}"
                         Watermark="Enter new name here...">
                         <TextBox.KeyBindings>
-                            <KeyBinding Command="{Binding AddConfigDialogAdd}" Gesture="Enter" />
-                            <KeyBinding Command="{Binding AddConfigDialogCancel}" Gesture="Escape" />
+                            <KeyBinding Command="{Binding AddConfigDialogAddCommand}" Gesture="Enter" />
+                            <KeyBinding Command="{Binding AddConfigDialogCancelCommand}" Gesture="Escape" />
                         </TextBox.KeyBindings>
                     </TextBox>
 
@@ -81,11 +81,11 @@
                         Spacing="10">
                         <Button
                             Classes="Secondary"
-                            Command="{Binding AddConfigDialogCancel}"
+                            Command="{Binding AddConfigDialogCancelCommand}"
                             Content="Cancel" />
                         <Button
                             Classes="Primary"
-                            Command="{Binding AddConfigDialogAdd}"
+                            Command="{Binding AddConfigDialogAddCommand}"
                             Content="Save" />
                     </StackPanel>
                 </StackPanel>

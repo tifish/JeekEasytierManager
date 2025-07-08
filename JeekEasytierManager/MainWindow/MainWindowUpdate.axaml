@@ -21,12 +21,12 @@
                     IsVisible="{Binding !HasEasytier}" />
                 <Button
                     Classes="Gray MinWidth"
-                    Command="{Binding UpdateEasytier}"
+                    Command="{Binding UpdateEasytierCommand}"
                     CommandParameter="{x:True}"
                     Content="Update Easytier" />
                 <Button
                     Classes="Gray MinWidth"
-                    Command="{Binding UpdateMe}"
+                    Command="{Binding UpdateMeCommand}"
                     CommandParameter="{x:True}"
                     Content="Update Me" />
             </StackPanel>

@@ -21,7 +21,7 @@
 
                 <Button
                     Classes="Gray MinWidth"
-                    Command="{Binding SwitchTheme}"
+                    Command="{Binding SwitchThemeCommand}"
                     Content="Switch theme" />
 
                 <ToggleSwitch Content="Start on boot" IsChecked="{Binding StartOnBoot}" />

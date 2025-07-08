@@ -13,17 +13,17 @@
             </StackPanel>
             <local:ConfigListControl
                 Configs="{Binding Configs}"
-                DeleteCommand="{Binding DeleteConfig}"
-                EditCommand="{Binding EditConfig}"
-                EditFileCommand="{Binding EditConfigFile}"
-                RenameCommand="{Binding RenameConfig}" />
+                DeleteCommand="{Binding DeleteConfigCommand}"
+                EditCommand="{Binding EditConfigCommand}"
+                EditFileCommand="{Binding EditConfigFileCommand}"
+                RenameCommand="{Binding RenameConfigCommand}" />
             <StackPanel
                 HorizontalAlignment="Right"
                 Orientation="Horizontal"
                 Spacing="10">
                 <Button
                     Classes="Red"
-                    Command="{Binding SyncConfigs}"
+                    Command="{Binding SyncConfigsCommand}"
                     Content="Sync" />
                 <Button
                     Classes="Blue"
@@ -32,11 +32,11 @@
                     IsEnabled="{Binding HasSelectedConfigs}" />
                 <Button
                     Classes="Yellow"
-                    Command="{Binding RefreshConfigs}"
+                    Command="{Binding RefreshConfigsCommand}"
                     Content="Refresh" />
                 <Button
                     Classes="Green"
-                    Command="{Binding AddConfig}"
+                    Command="{Binding AddConfigCommand}"
                     Content="Add" />
             </StackPanel>
         </StackPanel>
