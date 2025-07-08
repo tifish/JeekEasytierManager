@@ -30,23 +30,52 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var rpcClients = await GetAllRpcClients();
 
         // Get all file info list from all rpc clients
-        var clientFileInfoList = new List<List<ConfigFileInfo>>();
+        var clientFileInfoLists = new List<List<ConfigFileInfo>>();
 
         foreach (var rpcClient in rpcClients)
         {
-            clientFileInfoList.Add(await rpcClient.GetConfigFileInfoList());
+            clientFileInfoLists.Add(await rpcClient.GetConfigFileInfoList());
         }
 
-        // Get local file info list, and add it to the last of clientFileInfoList
+        // Get local file info list
         var localFileInfoList = GetConfigFileInfoList();
-        clientFileInfoList.Add(localFileInfoList);
+        var localFileNames = localFileInfoList.Select(fileInfo => fileInfo.FileName).ToHashSet();
+
+        // Delete extra configs on other nodes
+        if (DeleteExtraConfigsOnOtherNodesWhenNextSync)
+        {
+            var fileNamesToDelete = new List<string>();
+
+            for (var i = 0; i < clientFileInfoLists.Count; i++)
+            {
+                var clientFileInfoList = clientFileInfoLists[i];
+                fileNamesToDelete.Clear();
+
+                for (var j = clientFileInfoList.Count - 1; j >= 0; j--)
+                {
+                    if (!localFileNames.Contains(clientFileInfoList[j].FileName))
+                    {
+                        fileNamesToDelete.Add(clientFileInfoList[j].FileName);
+                        clientFileInfoList.RemoveAt(j);
+                    }
+                }
+
+                if (fileNamesToDelete.Count > 0)
+                    await rpcClients[i].DeleteExtraConfigs(fileNamesToDelete);
+            }
+
+            DeleteExtraConfigsOnOtherNodesWhenNextSync = false;
+        }
+
+        // Add local file info list to the last of clientFileInfoList, to find latest file later.
+        clientFileInfoLists.Add(localFileInfoList);
 
         // Find latest file info
         var latestFileInfoDict = new Dictionary<string, LatestFileInfo>();
 
-        for (int i = 0; i < clientFileInfoList.Count; i++)
+        for (int i = 0; i < clientFileInfoLists.Count; i++)
         {
-            foreach (var fileInfo in clientFileInfoList[i])
+            foreach (var fileInfo in clientFileInfoLists[i])
             {
                 if (latestFileInfoDict.TryGetValue(fileInfo.FileName, out var latestFileInfo))
                 {
@@ -80,7 +109,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
 
         var lastestFilesInLocal = latestFileInfoList
-            .Where(fileInfo => fileInfo.RpcClientIndex == clientFileInfoList.Count - 1)
+            .Where(fileInfo => fileInfo.RpcClientIndex == clientFileInfoLists.Count - 1)
             .Select(fileInfo => fileInfo.FileName)
             .ToList();
         var latestFileContentListInLocal = await GetConfigFileContent(lastestFilesInLocal);
@@ -195,4 +224,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+    public void DeleteExtraConfigs(List<string> fileNames)
+    {
+        var configList = Configs.ToList();
+
+        foreach (var fileName in fileNames)
+        {
+            var filePath = Path.Join(AppSettings.ConfigDirectory, fileName);
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+
+            var configName = Path.GetFileNameWithoutExtension(fileName);
+            var configIndex = configList.FindIndex(config => config.Name == configName);
+            if (configIndex != -1)
+                Configs.RemoveAt(configIndex);
+        }
+    }
 }

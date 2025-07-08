@@ -156,4 +156,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial bool ShowSyncPassword { get; set; }
+
+    [ObservableProperty]
+    public partial bool DeleteExtraConfigsOnOtherNodesWhenNextSync { get; set; }
 }

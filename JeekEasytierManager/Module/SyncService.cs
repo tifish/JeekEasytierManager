@@ -14,6 +14,7 @@ public interface ISyncService : IService<ISyncService>
     UnaryResult<List<ConfigFileInfo>> GetConfigFileInfoList();
     UnaryResult<List<ConfigFileInfo>> GetConfigFileContent(List<string> fileNames);
     UnaryResult SendConfigFileContent(List<ConfigFileInfo> fileContentList);
+    UnaryResult DeleteExtraConfigs(List<string> fileNames);
 }
 
 [MessagePackObject]
@@ -62,5 +63,12 @@ public class SyncService : ServiceBase<ISyncService>, ISyncService
     {
         EnsureAuthorized();
         await MainViewModel.Instance.WriteConfigFileContent(fileContentList);
+    }
+
+    public UnaryResult DeleteExtraConfigs(List<string> fileNames)
+    {
+        EnsureAuthorized();
+        MainViewModel.Instance.DeleteExtraConfigs(fileNames);
+        return UnaryResult.CompletedResult;
     }
 }

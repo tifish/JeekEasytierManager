@@ -11,18 +11,23 @@
             VerticalAlignment="Top"
             Orientation="Vertical"
             Spacing="10">
+
             <StackPanel Orientation="Horizontal">
                 <TextBlock Classes="Title" Text="⚙️" />
                 <Label Classes="Title" Content="Settings" />
             </StackPanel>
+
             <StackPanel Orientation="Vertical" Spacing="10">
+
                 <Button
                     Classes="Gray MinWidth"
                     Command="{Binding SwitchTheme}"
                     Content="Switch theme" />
+
                 <ToggleSwitch Content="Start on boot" IsChecked="{Binding StartOnBoot}" />
                 <ToggleSwitch Content="Auto update easytier" IsChecked="{Binding AutoUpdateEasytier}" />
                 <ToggleSwitch Content="Auto update me" IsChecked="{Binding AutoUpdateMe}" />
+
                 <TextBlock Text="Sync password" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <TextBox
@@ -36,7 +41,11 @@
                         Text="{Binding SyncPassword}" />
                     <ToggleButton Content="👁️" IsChecked="{Binding ShowSyncPassword}" />
                 </StackPanel>
+
+                <ToggleSwitch Content="下次同步删除其他节点的多余配置" IsChecked="{Binding DeleteExtraConfigsOnOtherNodesWhenNextSync}" />
+
             </StackPanel>
+
         </StackPanel>
     </Border>
 
