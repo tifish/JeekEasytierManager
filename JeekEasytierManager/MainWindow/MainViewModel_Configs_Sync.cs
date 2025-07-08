@@ -132,7 +132,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         // Refresh configs
-        await LoadConfigs();
+        await LoadConfigs(false);
     }
 
     private async Task<List<ISyncService>> GetAllRpcClients()

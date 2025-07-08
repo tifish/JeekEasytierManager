@@ -14,7 +14,7 @@ namespace JeekEasytierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    private async Task LoadConfigs()
+    private async Task LoadConfigs(bool isInitial)
     {
         if (!Directory.Exists(AppSettings.ConfigDirectory))
             return;
@@ -42,6 +42,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (configNames.Count == Configs.Count
             && configNames.All(c => Configs.Any(c2 => c2.Name == c)))
         {
+            await LoadInstalledServices();
             await UpdateServiceStatus();
         }
         else
@@ -52,25 +53,56 @@ public partial class MainViewModel : ObservableObject, IDisposable
             foreach (var configName in configNames)
             {
                 var config = new ConfigInfo { Name = configName };
-                config.PropertyChanged += OnConfigPropertyChanged;
                 newConfigs.Add(config);
             }
 
-            // Restore selected config
-            foreach (var configName in selectedConfigNames)
+            // Update as soon as possible when initial loading
+            if (isInitial)
             {
-                var config = Configs.FirstOrDefault(c => c.Name == configName);
-                if (config != null)
-                    config.IsSelected = true;
+                Configs.Clear();
+                foreach (var config in newConfigs)
+                {
+                    config.PropertyChanged += OnConfigPropertyChanged;
+                    Configs.Add(config);
+                }
             }
 
             // Update service status
+            await LoadInstalledServices(newConfigs);
             await UpdateServiceStatus(newConfigs);
 
+            if (isInitial)
+            {
+                // Select installed configs
+                foreach (var config in newConfigs)
+                {
+                    if (config.Status != ServiceStatus.None)
+                        config.IsSelected = true;
+                }
+            }
+            else
+            {
+                // Restore selected config
+                foreach (var configName in selectedConfigNames)
+                {
+                    var config = Configs.FirstOrDefault(c => c.Name == configName);
+                    if (config != null)
+                        config.IsSelected = true;
+                }
+            }
+
             // Update Configs at once, to avoid unnecessary Status changes on UI.
-            Configs.Clear();
-            foreach (var config in newConfigs)
-                Configs.Add(config);
+            if (!isInitial)
+            {
+                Configs.Clear();
+                foreach (var config in newConfigs)
+                {
+                    config.PropertyChanged += OnConfigPropertyChanged;
+                    Configs.Add(config);
+                }
+            }
+
+            UpdateHasSelectedConfigs();
         }
     }
 
@@ -208,7 +240,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task RefreshConfigs()
     {
-        await LoadConfigs();
+        await LoadConfigs(false);
     }
 
     [ObservableProperty]

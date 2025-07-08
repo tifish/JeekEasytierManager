@@ -45,6 +45,8 @@ public partial class ConfigInfo : ObservableObject
     [ObservableProperty]
     public partial ServiceStatus Status { get; set; } = ServiceStatus.None;
 
+    public bool IsInstalled { get; set; } = false;
+
     public string GetConfigPath()
     {
         return Path.Join(AppSettings.ConfigDirectory, Name + ".toml");

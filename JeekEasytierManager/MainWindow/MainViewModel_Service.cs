@@ -12,11 +12,14 @@ namespace JeekEasytierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    private async Task LoadEnabledServices()
+    private async Task LoadInstalledServices(List<ConfigInfo>? configs = null)
     {
-        // 获取系统服务列表，找到 ServicePrefix 开头的服务
+        var configsToUpdate = configs ?? [.. Configs];
+
+        // Get installed services
         var output = await Executor.RunWithOutput("sc", "query state= all");
         var lines = output.Split('\n');
+        var installedServices = new HashSet<string>();
 
         foreach (var line in lines)
         {
@@ -26,11 +29,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 if (serviceName.StartsWith(ServicePrefix))
                 {
                     var configName = serviceName[ServicePrefix.Length..];
-                    var config = Configs.FirstOrDefault(c => c.Name == configName);
-                    if (config != null)
-                        config.IsSelected = true;
+                    installedServices.Add(configName);
                 }
             }
+        }
+
+        foreach (var config in configsToUpdate)
+        {
+            config.IsInstalled = installedServices.Contains(config.Name);
         }
     }
 
@@ -58,6 +64,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 Messages = $"Failed to install service {ServicePrefix + config.Name}\n{Nssm.LastError}";
                 return;
             }
+
+            config.IsInstalled = true;
         }
 
         await RestartService();
@@ -85,6 +93,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         await StopService();
+
         foreach (var config in Configs)
         {
             if (!config.IsSelected)
@@ -95,7 +104,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 Messages = $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
                 return;
             }
+
+            config.IsInstalled = false;
         }
+
         await UpdateServiceStatus();
     }
 
@@ -110,7 +122,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var config in Configs)
         {
-            if (!config.IsSelected)
+            if (!config.IsSelected || !config.IsInstalled)
                 continue;
 
             if (!await Nssm.RestartService(ServicePrefix + config.Name))
@@ -154,7 +166,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var config in Configs)
         {
-            if (!config.IsSelected)
+            if (!config.IsSelected || !config.IsInstalled)
                 continue;
 
             if (!await Nssm.StopService(ServicePrefix + config.Name))
@@ -175,10 +187,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var config in configsToUpdate)
         {
-            config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);
+            if (config.IsInstalled)
+            {
+                config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);
+            }
+            else
+            {
+                config.Status = ServiceStatus.None;
+            }
         }
 
-        HasRunningService = Configs.Any(c => c.Status == ServiceStatus.Running);
+        HasRunningService = configsToUpdate.Any(c => c.Status == ServiceStatus.Running);
     }
 
 }

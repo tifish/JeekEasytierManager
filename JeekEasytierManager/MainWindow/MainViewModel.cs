@@ -16,14 +16,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public async Task Init()
     {
         await AppSettings.Load();
-        await LoadConfigs();
-        await LoadEnabledServices();
-        await UpdateServiceStatus();
+        await LoadConfigs(true);
         CheckHasEasytier();
         await ShowPeers();
         await ApplySettings();
-
-
     }
 
     public void Dispose()
