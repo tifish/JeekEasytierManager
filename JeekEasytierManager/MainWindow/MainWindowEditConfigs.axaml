@@ -31,8 +31,8 @@
                                     <TextBox IsReadOnly="True" Text="{Binding InstanceName}" />
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical" Spacing="10">
-                                    <TextBlock Text="唯一 ID" />
-                                    <TextBox IsReadOnly="True" Text="{Binding InstanceId}" />
+                                    <TextBlock Text="主机名称" />
+                                    <TextBox IsReadOnly="True" Text="{Binding HostName}" />
                                 </StackPanel>
                             </StackPanel>
 
@@ -134,7 +134,7 @@
                                 Grid.Row="3"
                                 Grid.Column="1"
                                 Content="仅使用物理网卡"
-                                IsChecked="{Binding NotBindDevice}" />
+                                IsChecked="{Binding BindDevice}" />
                             <CheckBox
                                 Grid.Row="4"
                                 Grid.Column="0"
