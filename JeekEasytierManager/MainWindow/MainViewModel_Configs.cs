@@ -43,7 +43,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             && configNames.All(c => Configs.Any(c2 => c2.Name == c)))
         {
             await LoadInstalledServices();
-            await UpdateServiceStatus();
+            await UpdateAllServicesStatus();
         }
         else
         {
@@ -69,7 +69,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             // Update service status
             await LoadInstalledServices(newConfigs);
-            await UpdateServiceStatus(newConfigs);
+            await UpdateAllServicesStatus(newConfigs);
 
             if (isInitial)
             {

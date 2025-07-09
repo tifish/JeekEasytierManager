@@ -17,24 +17,24 @@
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button
                     Classes="Blue MinWidth"
-                    Command="{Binding InstallServiceCommand}"
+                    Command="{Binding InstallSelectedServicesCommand}"
                     Content="Install"
                     IsEnabled="{Binding HasSelectedConfigs}" />
                 <Button
                     Classes="Gray MinWidth"
-                    Command="{Binding UninstallServiceCommand}"
+                    Command="{Binding UninstallSelectedServicesCommand}"
                     Content="Uninstall"
                     IsEnabled="{Binding HasSelectedConfigs}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button
                     Classes="Green MinWidth"
-                    Command="{Binding RestartServiceCommand}"
+                    Command="{Binding RestartSelectedServicesCommand}"
                     Content="(Re)start"
                     IsEnabled="{Binding HasSelectedConfigs}" />
                 <Button
                     Classes="Red MinWidth"
-                    Command="{Binding StopServiceCommand}"
+                    Command="{Binding StopSelectedServicesCommand}"
                     Content="Stop"
                     IsEnabled="{Binding HasSelectedConfigs}" />
             </StackPanel>

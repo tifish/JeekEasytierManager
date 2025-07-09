@@ -43,7 +43,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private const string ServicePrefix = "Easytier ";
 
     [RelayCommand]
-    public async Task InstallService()
+    public async Task InstallSelectedServices()
     {
         if (!HasEasytier)
         {
@@ -68,8 +68,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             config.IsInstalled = true;
         }
 
-        await RestartService();
-        await UpdateServiceStatus();
+        await LoadInstalledServices();
+        await RestartSelectedServices();
+        await UpdateAllServicesStatus();
     }
 
     private async Task AddEasytierToFirewall()
@@ -84,7 +85,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    public async Task UninstallService()
+    public async Task UninstallSelectedServices()
     {
         if (!HasEasytier)
         {
@@ -92,27 +93,40 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        await StopService();
-
         foreach (var config in Configs)
         {
             if (!config.IsSelected)
                 continue;
 
-            if (!await Nssm.UninstallService(ServicePrefix + config.Name))
-            {
-                Messages = $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
-                return;
-            }
-
-            config.IsInstalled = false;
+            await UninstallService(config);
         }
 
-        await UpdateServiceStatus();
+        await LoadInstalledServices();
+        await UpdateAllServicesStatus();
+    }
+
+    private async Task<bool> UninstallService(ConfigInfo config)
+    {
+        if (!config.IsInstalled)
+            return true;
+
+        if (!await StopService(config))
+            return false;
+
+        if (await Nssm.UninstallService(ServicePrefix + config.Name))
+        {
+            config.IsInstalled = false;
+            return true;
+        }
+        else
+        {
+            Messages = $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
+            return false;
+        }
     }
 
     [RelayCommand]
-    public async Task RestartService()
+    public async Task RestartSelectedServices()
     {
         if (!HasEasytier)
         {
@@ -125,11 +139,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (!config.IsSelected || !config.IsInstalled)
                 continue;
 
-            if (!await Nssm.RestartService(ServicePrefix + config.Name))
-            {
-                Messages = $"Failed to restart service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
-                return;
-            }
+            await RestartService(config);
+            await UpdateServiceStatus(config);
         }
 
         // Wait 3 seconds to make sure the tun device is ready
@@ -151,12 +162,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 await Executor.RunAndWait("powershell.exe", $"-ex bypass -command Set-NetConnectionProfile -InterfaceAlias \"{configData.Flags.DevName}\" -NetworkCategory Private", false, true);
             }
         }, TimeSpan.FromSeconds(3));
+    }
 
-        await UpdateServiceStatus();
+    public async Task<bool> RestartService(ConfigInfo config)
+    {
+        if (!config.IsInstalled)
+            return false;
+
+        if (!await Nssm.RestartService(ServicePrefix + config.Name))
+        {
+            Messages = $"Failed to restart service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
+            return false;
+        }
+
+        return true;
     }
 
     [RelayCommand]
-    public async Task StopService()
+    public async Task StopSelectedServices()
     {
         if (!HasEasytier)
         {
@@ -166,35 +189,82 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var config in Configs)
         {
-            if (!config.IsSelected || !config.IsInstalled)
+            if (!config.IsSelected)
                 continue;
 
-            if (!await Nssm.StopService(ServicePrefix + config.Name))
+            await StopService(config);
+            await UpdateServiceStatus(config);
+        }
+    }
+
+    public async Task<bool> StopService(ConfigInfo config)
+    {
+        if (config.Status != ServiceStatus.Running)
+            return true;
+
+        if (!await Nssm.StopService(ServicePrefix + config.Name))
+        {
+            Messages = $"Failed to stop service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
+            return false;
+        }
+
+        return true;
+    }
+
+    private readonly List<string> _stoppedConfigNames = [];
+
+    private async Task StopAllServices()
+    {
+        _stoppedConfigNames.Clear();
+
+        foreach (var config in Configs)
+        {
+            if (config.Status == ServiceStatus.Running)
             {
-                Messages = $"Failed to stop service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
-                return;
+                await StopService(config);
+                await UpdateServiceStatus(config);
+                _stoppedConfigNames.Add(config.Name);
             }
         }
-        await UpdateServiceStatus();
+    }
+
+    private async Task RestoreAllServices()
+    {
+        foreach (var configName in _stoppedConfigNames)
+        {
+            var config = Configs.FirstOrDefault(c => c.Name == configName);
+            if (config == null)
+                continue;
+
+            await RestartService(config);
+            await UpdateServiceStatus(config);
+        }
+
+        _stoppedConfigNames.Clear();
     }
 
     [ObservableProperty]
     public partial bool HasRunningService { get; set; }
 
-    public async Task UpdateServiceStatus(List<ConfigInfo>? configs = null)
+    public async Task UpdateServiceStatus(ConfigInfo config)
+    {
+        if (config.IsInstalled)
+        {
+            config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);
+        }
+        else
+        {
+            config.Status = ServiceStatus.None;
+        }
+    }
+
+    public async Task UpdateAllServicesStatus(List<ConfigInfo>? configs = null)
     {
         var configsToUpdate = configs ?? [.. Configs];
 
         foreach (var config in configsToUpdate)
         {
-            if (config.IsInstalled)
-            {
-                config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);
-            }
-            else
-            {
-                config.Status = ServiceStatus.None;
-            }
+            await UpdateServiceStatus(config);
         }
 
         HasRunningService = configsToUpdate.Any(c => c.Status == ServiceStatus.Running);

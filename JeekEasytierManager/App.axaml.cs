@@ -59,14 +59,16 @@ public partial class App : Application
         menu.Add(new NativeMenuItemSeparator());
 
         // Start service
-        var startServiceMenuItem = new NativeMenuItem("(_Re)start Service");
-        startServiceMenuItem.Command = MainViewModel.Instance.RestartServiceCommand;
-        menu.Add(startServiceMenuItem);
+        menu.Add(new NativeMenuItem("(_Re)start Service")
+        {
+            Command = MainViewModel.Instance.RestartSelectedServicesCommand
+        });
 
         // Stop service
-        var stopServiceMenuItem = new NativeMenuItem("_Stop Service");
-        stopServiceMenuItem.Command = MainViewModel.Instance.StopServiceCommand;
-        menu.Add(stopServiceMenuItem);
+        menu.Add(new NativeMenuItem("_Stop Service")
+        {
+            Command = MainViewModel.Instance.StopSelectedServicesCommand
+        });
 
         // Separator
         menu.Add(new NativeMenuItemSeparator());

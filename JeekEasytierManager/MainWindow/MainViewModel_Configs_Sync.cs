@@ -25,7 +25,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task SyncConfigs()
     {
-        await UpdateServiceStatus();
+        await UpdateAllServicesStatus();
 
         // Get all rpc clients
         var rpcClients = await GetAllRpcClients();
@@ -215,18 +215,30 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public async Task WriteConfigFileContent(List<ConfigFileInfo> fileContentList)
     {
-        // Can run on any thread
         foreach (var fileContent in fileContentList)
         {
             var filePath = Path.Join(AppSettings.ConfigDirectory, fileContent.FileName);
             await File.WriteAllTextAsync(filePath, fileContent.Content);
             File.SetLastWriteTimeUtc(filePath, fileContent.FileTimeUtc);
         }
+
+        foreach (var fileContent in fileContentList)
+        {
+            var configName = Path.GetFileNameWithoutExtension(fileContent.FileName);
+            var config = Configs.FirstOrDefault(config => config.Name == configName);
+            if (config != null)
+            {
+                if (config.Status == ServiceStatus.Running)
+                {
+                    await RestartService(config);
+                    await UpdateServiceStatus(config);
+                }
+            }
+        }
     }
 
-    public void DeleteExtraConfigs(List<string> fileNames)
+    public async Task DeleteExtraConfigs(List<string> fileNames)
     {
-        // Must run on UI thread
         var isSelectedChanged = false;
 
         foreach (var fileName in fileNames)
@@ -239,10 +251,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var configIndex = Configs.ToList().FindIndex(config => config.Name == configName);
             if (configIndex != -1)
             {
-                if (Configs[configIndex].IsSelected)
+                var config = Configs[configIndex];
+
+                if (config.IsSelected)
                     isSelectedChanged = true;
 
-                Configs[configIndex].PropertyChanged -= OnConfigPropertyChanged;
+                await UninstallService(config);
+
+                config.PropertyChanged -= OnConfigPropertyChanged;
+
                 Configs.RemoveAt(configIndex);
             }
         }
