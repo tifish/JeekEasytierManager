@@ -43,7 +43,7 @@ public partial class App : Application
         _trayIcon = new TrayIcon()
         {
             Icon = new WindowIcon(new Bitmap(AssetLoader.Open(new Uri("avares://JeekEasytierManager/App.ico")))),
-            ToolTipText = "Jeek Easytier Manager",
+            ToolTipText = "Jeek Easytier 管理器",
             IsVisible = true
         };
 
@@ -51,7 +51,7 @@ public partial class App : Application
         var menu = new NativeMenu();
 
         // Show/Hide main window
-        var showHideMenuItem = new NativeMenuItem("Show/Hide Jeek Easytier Manager");
+        var showHideMenuItem = new NativeMenuItem("显示/隐藏 Jeek Easytier 管理器");
         showHideMenuItem.Click += (sender, e) => ToggleMainWindow();
         menu.Add(showHideMenuItem);
 
@@ -59,13 +59,13 @@ public partial class App : Application
         menu.Add(new NativeMenuItemSeparator());
 
         // Start service
-        menu.Add(new NativeMenuItem("(_Re)start Service")
+        menu.Add(new NativeMenuItem("重启服务")
         {
             Command = MainViewModel.Instance.RestartSelectedServicesCommand
         });
 
         // Stop service
-        menu.Add(new NativeMenuItem("_Stop Service")
+        menu.Add(new NativeMenuItem("停止服务")
         {
             Command = MainViewModel.Instance.StopSelectedServicesCommand
         });
@@ -74,7 +74,7 @@ public partial class App : Application
         menu.Add(new NativeMenuItemSeparator());
 
         // Exit application
-        var exitMenuItem = new NativeMenuItem("E_xit");
+        var exitMenuItem = new NativeMenuItem("退出");
         exitMenuItem.Click += (sender, e) => ExitApplication();
         menu.Add(exitMenuItem);
 
