@@ -53,10 +53,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
 
             // Find local only files
-            var localOnlyFileInfos = localFileInfoList.Where(fileInfo => !remoteFileNameIndexDict.ContainsKey(fileInfo.FileName)).ToList();
+            var localOnlyFileInfos = localFileInfoList
+                .Where(fileInfo => !remoteFileNameIndexDict.ContainsKey(fileInfo.FileName)).ToList();
 
             // Find remote only files
-            var remoteOnlyFileInfos = remoteFileInfoList.Where(fileInfo => !localFileNameIndexDict.ContainsKey(fileInfo.FileName)).ToList();
+            var remoteOnlyFileInfos = remoteFileInfoList
+                .Where(fileInfo => !localFileNameIndexDict.ContainsKey(fileInfo.FileName)).ToList();
 
             // Find local newer files (files that exist on both local and remote, but local version is newer)
             var localNewerFileInfos = new List<ConfigFileInfo>();
@@ -87,7 +89,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // Send local only files and local newer files to remote
             if (localOnlyFileInfos.Count > 0 || localNewerFileInfos.Count > 0)
             {
-                var fileNames = localOnlyFileInfos.Concat(localNewerFileInfos).Select(f => f.FileName).ToList();
+                var fileNames = localOnlyFileInfos.Concat(localNewerFileInfos)
+                    .Select(f => f.FileName).ToList();
                 var fileContentList = await GetConfigFileContent(fileNames);
                 await rpcClient.SendConfigFileContent(fileContentList);
                 remoteNeedRefresh = localOnlyFileInfos.Count > 0;
