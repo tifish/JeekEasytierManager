@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
@@ -41,24 +40,23 @@ public class RemoteCall
 
     public static async Task<ISyncService?> GetClient(string url)
     {
-        if (_cachedClients.TryGetValue(url, out var client))
-            return client;
-
         // Ping to check if the server is running
-        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
         try
         {
-            var channel = GrpcChannel.ForAddress(url);
-            var invoker = channel.Intercept(new AuthInterceptor());
-            var newClient = MagicOnionClient.Create<ISyncService>(invoker);
+            if (!_cachedClients.TryGetValue(url, out var client))
+            {
+                var channel = GrpcChannel.ForAddress(url);
+                var invoker = channel.Intercept(new AuthInterceptor());
+                client = MagicOnionClient.Create<ISyncService>(invoker);
+            }
 
-            var result = await newClient.WithCancellationToken(cts.Token).Ping();
+            var result = await client.WithDeadline(DateTime.UtcNow.AddSeconds(1)).Ping();
             if (!result)
                 return null;
 
-            _cachedClients.Add(url, newClient);
+            _cachedClients.Add(url, client);
 
-            return newClient;
+            return client;
         }
         catch
         {
@@ -79,7 +77,12 @@ public class RemoteCall
             var newContext = new ClientInterceptorContext<TRequest, TResponse>(
                 context.Method,
                 context.Host,
-                new CallOptions(headers));
+                new CallOptions(headers,
+                    context.Options.Deadline,
+                    context.Options.CancellationToken,
+                    context.Options.WriteOptions,
+                    context.Options.PropagationToken,
+                    context.Options.Credentials));
 
             return base.AsyncUnaryCall(request, newContext, continuation);
         }
