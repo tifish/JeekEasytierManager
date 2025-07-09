@@ -87,7 +87,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // Send local only files and local newer files to remote
             if (localOnlyFileInfos.Count > 0 || localNewerFileInfos.Count > 0)
             {
-                await rpcClient.SendConfigFileContent(localOnlyFileInfos.Concat(localNewerFileInfos).ToList());
+                var fileNames = localOnlyFileInfos.Concat(localNewerFileInfos).Select(f => f.FileName).ToList();
+                var fileContentList = await GetConfigFileContent(fileNames);
+                await rpcClient.SendConfigFileContent(fileContentList);
                 remoteNeedRefresh = localOnlyFileInfos.Count > 0;
             }
 
@@ -96,14 +98,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 // Get remote newer files from remote
                 if (remoteNewerFileInfos.Count > 0)
                 {
-                    var remoteFileContentList = await rpcClient.GetConfigFileContent(remoteNewerFileInfos.Select(fileInfo => fileInfo.FileName).ToList());
+                    var fileNames = remoteNewerFileInfos.Select(fileInfo => fileInfo.FileName).ToList();
+                    var remoteFileContentList = await rpcClient.GetConfigFileContent(fileNames);
                     await WriteConfigFileContent(remoteFileContentList);
                 }
 
                 // Delete remote only files on other nodes
                 if (remoteOnlyFileInfos.Count > 0)
                 {
-                    await rpcClient.DeleteExtraConfigs(remoteOnlyFileInfos.Select(fileInfo => fileInfo.FileName).ToList());
+                    var fileNames = remoteOnlyFileInfos.Select(fileInfo => fileInfo.FileName).ToList();
+                    await rpcClient.DeleteExtraConfigs(fileNames);
                     remoteNeedRefresh = true;
                 }
 
@@ -114,7 +118,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 // Get remote only files and remote newer files from remote
                 if (remoteOnlyFileInfos.Count > 0 || remoteNewerFileInfos.Count > 0)
                 {
-                    var remoteFileContentList = await rpcClient.GetConfigFileContent(remoteOnlyFileInfos.Concat(remoteNewerFileInfos).Select(fileInfo => fileInfo.FileName).ToList());
+                    var fileNames = remoteOnlyFileInfos.Concat(remoteNewerFileInfos)
+                        .Select(fileInfo => fileInfo.FileName).ToList();
+                    var remoteFileContentList = await rpcClient.GetConfigFileContent(fileNames);
                     await WriteConfigFileContent(remoteFileContentList);
                     localNeedRefresh = remoteOnlyFileInfos.Count > 0;
                 }
