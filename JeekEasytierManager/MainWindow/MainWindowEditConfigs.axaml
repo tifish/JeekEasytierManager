@@ -32,7 +32,7 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical" Spacing="10">
                                     <TextBlock Text="主机名称" />
-                                    <TextBox IsReadOnly="True" Text="{Binding HostName}" />
+                                    <TextBox Text="{Binding HostName}" />
                                 </StackPanel>
                             </StackPanel>
 
