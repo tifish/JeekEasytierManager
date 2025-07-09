@@ -11,8 +11,8 @@ namespace JeekEasytierManager;
 public partial class App : Application
 {
     private static MainWindow? _mainWindow;
-    private TrayIcons? _trayIcons;
-    private TrayIcon? _trayIcon;
+    private static TrayIcons? _trayIcons;
+    private static TrayIcon? _trayIcon;
 
     public static MainWindow? MainWindow => _mainWindow;
 
@@ -107,6 +107,7 @@ public partial class App : Application
 
     public static void ExitApplication()
     {
+        _trayIcon?.IsVisible = false;
         // Clean up resources
         MainViewModel.Instance.Dispose();
 
