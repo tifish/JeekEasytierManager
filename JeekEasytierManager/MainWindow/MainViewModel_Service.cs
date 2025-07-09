@@ -17,7 +17,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var configsToUpdate = configs ?? [.. Configs];
 
         // Get installed services
-        var output = await Executor.RunWithOutput("sc", "query state= all");
+        var output = await Executor.RunWithOutput("sc", "query type= service state= all");
         var lines = output.Split('\n');
         var installedServices = new HashSet<string>();
 
@@ -58,19 +58,49 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (!config.IsSelected)
                 continue;
 
-            var configPath = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
-            if (!await Nssm.InstallService(ServicePrefix + config.Name, AppSettings.EasytierCorePath, $"-c \"{configPath}\""))
-            {
-                Messages = $"Failed to install service {ServicePrefix + config.Name}\n{Nssm.LastError}";
-                return;
-            }
-
-            config.IsInstalled = true;
+            await InstallService(config);
         }
 
         await LoadInstalledServices();
-        await RestartSelectedServices();
-        await UpdateAllServicesStatus();
+
+        foreach (var config in Configs)
+        {
+            if (!config.IsSelected || !config.IsInstalled)
+                continue;
+
+            await RestartService(config);
+            await UpdateServiceStatus(config);
+        }
+    }
+
+    [RelayCommand]
+    public async Task InstallSingleService(ConfigInfo config)
+    {
+        if (!HasEasytier)
+        {
+            Messages = "Easytier is not installed";
+            return;
+        }
+
+        await AddEasytierToFirewall();
+
+        await InstallService(config);
+
+        await LoadInstalledServices();
+        await RestartService(config);
+        await UpdateServiceStatus(config);
+    }
+
+    private async Task InstallService(ConfigInfo config)
+    {
+        var configPath = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
+        if (!await Nssm.InstallService(ServicePrefix + config.Name, AppSettings.EasytierCorePath, $"-c \"{configPath}\""))
+        {
+            Messages = $"Failed to install service {ServicePrefix + config.Name}\n{Nssm.LastError}";
+            return;
+        }
+
+        config.IsInstalled = true;
     }
 
     private async Task AddEasytierToFirewall()
@@ -102,7 +132,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         await LoadInstalledServices();
-        await UpdateAllServicesStatus();
+
+        foreach (var config in Configs)
+        {
+            if (!config.IsSelected)
+                continue;
+
+            await UpdateServiceStatus(config);
+        }
+    }
+
+    [RelayCommand]
+    public async Task UninstallSingleService(ConfigInfo config)
+    {
+        if (!HasEasytier)
+        {
+            Messages = "Easytier is not installed";
+            return;
+        }
+
+        await UninstallService(config);
+
+        await LoadInstalledServices();
+        await UpdateServiceStatus(config);
     }
 
     private async Task<bool> UninstallService(ConfigInfo config)
@@ -141,26 +193,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await RestartService(config);
             await UpdateServiceStatus(config);
         }
-
-        // Wait 3 seconds to make sure the tun device is ready
-        DispatcherTimer.RunOnce(async () =>
-        {
-            // Since the interface seems to be private, but not really private, we need to set it to private again.
-            foreach (var config in Configs)
-            {
-                if (!config.IsSelected)
-                    continue;
-
-                var configData = config.GetConfig();
-                if (configData.Flags?.NoTun ?? false)
-                    continue;
-
-                if (string.IsNullOrEmpty(configData.Flags?.DevName))
-                    continue;
-
-                await Executor.RunAndWait("powershell.exe", $"-ex bypass -command Set-NetConnectionProfile -InterfaceAlias \"{configData.Flags.DevName}\" -NetworkCategory Private", false, true);
-            }
-        }, TimeSpan.FromSeconds(3));
     }
 
     [RelayCommand]
@@ -168,6 +200,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         await RestartService(config);
         await UpdateServiceStatus(config);
+
+        // Wait 3 seconds to make sure the tun device is ready
+        DispatcherTimer.RunOnce(async () =>
+        {
+            // Since the interface seems to be private, but not really private, we need to set it to private again.
+            var configData = config.GetConfig();
+            if (configData.Flags?.NoTun ?? false)
+                return;
+
+            if (string.IsNullOrEmpty(configData.Flags?.DevName))
+                return;
+
+            await Executor.RunAndWait("powershell.exe", $"-ex bypass -command Set-NetConnectionProfile -InterfaceAlias \"{configData.Flags.DevName}\" -NetworkCategory Private", false, true);
+        }, TimeSpan.FromSeconds(3));
     }
 
     public async Task RestartService(ConfigInfo config)

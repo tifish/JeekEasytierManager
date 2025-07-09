@@ -291,4 +291,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         AddConfigDialogIsOpen = true;
     }
 
+    [ObservableProperty]
+    public partial bool ShowMoreConfigActions { get; set; } = false;
 }

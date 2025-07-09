@@ -227,6 +227,28 @@ public class ConfigListControl : UserControl
 
             var button = new Button
             {
+                Content = "➕",
+                Command = MainViewModel.Instance.InstallSingleServiceCommand,
+                CommandParameter = config,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                [!Button.IsVisibleProperty] = new Binding(nameof(MainViewModel.Instance.ShowMoreConfigActions)) { Source = MainViewModel.Instance },
+            };
+            buttonPanel.Children.Add(button);
+            ToolTip.SetTip(button, "安装服务");
+
+            button = new Button
+            {
+                Content = "➖",
+                Command = MainViewModel.Instance.UninstallSingleServiceCommand,
+                CommandParameter = config,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                [!Button.IsVisibleProperty] = new Binding(nameof(MainViewModel.Instance.ShowMoreConfigActions)) { Source = MainViewModel.Instance },
+            };
+            buttonPanel.Children.Add(button);
+            ToolTip.SetTip(button, "卸载服务");
+
+            button = new Button
+            {
                 Content = "▶️",
                 Command = MainViewModel.Instance.RestartSingleServiceCommand,
                 CommandParameter = config,
@@ -261,6 +283,7 @@ public class ConfigListControl : UserControl
                 Command = MainViewModel.Instance.EditConfigFileCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                [!Button.IsVisibleProperty] = new Binding(nameof(MainViewModel.Instance.ShowMoreConfigActions)) { Source = MainViewModel.Instance },
             };
             buttonPanel.Children.Add(button);
             ToolTip.SetTip(button, "编辑配置文件");
@@ -271,6 +294,7 @@ public class ConfigListControl : UserControl
                 Command = MainViewModel.Instance.RenameConfigCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                [!Button.IsVisibleProperty] = new Binding(nameof(MainViewModel.Instance.ShowMoreConfigActions)) { Source = MainViewModel.Instance },
             };
             buttonPanel.Children.Add(button);
             ToolTip.SetTip(button, "重命名");
@@ -281,6 +305,7 @@ public class ConfigListControl : UserControl
                 Command = MainViewModel.Instance.DeleteConfigCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                [!Button.IsVisibleProperty] = new Binding(nameof(MainViewModel.Instance.ShowMoreConfigActions)) { Source = MainViewModel.Instance },
             };
             buttonPanel.Children.Add(button);
             ToolTip.SetTip(button, "删除");

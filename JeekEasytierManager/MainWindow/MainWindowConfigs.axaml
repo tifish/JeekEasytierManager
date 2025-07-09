@@ -8,10 +8,18 @@
     <Border Classes="Card">
         <StackPanel Orientation="Vertical" Spacing="10">
 
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Classes="Title" Text="📝" />
-                <Label Classes="Title" Content="Easytier 配置" />
-            </StackPanel>
+            <Grid ColumnDefinitions="Auto,*">
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Classes="Title" Text="📝" />
+                    <Label Classes="Title" Content="Easytier 配置" />
+                </StackPanel>
+
+                <ToggleButton
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Content="更多功能"
+                    IsChecked="{Binding ShowMoreConfigActions}" />
+            </Grid>
 
             <local:ConfigListControl Configs="{Binding Configs}" />
 
