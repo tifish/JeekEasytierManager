@@ -6,7 +6,7 @@
     xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
     xmlns:local="clr-namespace:JeekEasytierManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Jeek Easytier Manager"
+    Title="Jeek Easytier 管理器"
     Width="1250"
     Height="800"
     MinWidth="680"
@@ -26,12 +26,12 @@
 
         <dialogHost:DialogHost.DialogContent>
             <StackPanel Width="250" Spacing="15">
-                <TextBlock FontSize="18" Text="Rename config:" />
+                <TextBlock FontSize="18" Text="重命名配置:" />
 
                 <TextBox
                     Loaded="DialogTextBox_Loaded"
                     Text="{Binding RenameConfigDialogText}"
-                    Watermark="Enter new name here...">
+                    Watermark="输入新名称...">
                     <TextBox.KeyBindings>
                         <KeyBinding Command="{Binding RenameConfigDialogSaveCommand}" Gesture="Enter" />
                         <KeyBinding Command="{Binding RenameConfigDialogCancelCommand}" Gesture="Escape" />
@@ -45,11 +45,11 @@
                     <Button
                         Classes="Secondary"
                         Command="{Binding RenameConfigDialogCancelCommand}"
-                        Content="Cancel" />
+                        Content="取消" />
                     <Button
                         Classes="Primary"
                         Command="{Binding RenameConfigDialogSaveCommand}"
-                        Content="Save" />
+                        Content="保存" />
                 </StackPanel>
             </StackPanel>
         </dialogHost:DialogHost.DialogContent>
@@ -63,12 +63,12 @@
 
             <dialogHost:DialogHost.DialogContent>
                 <StackPanel Width="250" Spacing="15">
-                    <TextBlock FontSize="18" Text="Add config:" />
+                    <TextBlock FontSize="18" Text="新增配置:" />
 
                     <TextBox
                         Loaded="DialogTextBox_Loaded"
                         Text="{Binding AddConfigDialogText}"
-                        Watermark="Enter new name here...">
+                        Watermark="输入新名称...">
                         <TextBox.KeyBindings>
                             <KeyBinding Command="{Binding AddConfigDialogAddCommand}" Gesture="Enter" />
                             <KeyBinding Command="{Binding AddConfigDialogCancelCommand}" Gesture="Escape" />
@@ -82,11 +82,11 @@
                         <Button
                             Classes="Secondary"
                             Command="{Binding AddConfigDialogCancelCommand}"
-                            Content="Cancel" />
+                            Content="取消" />
                         <Button
                             Classes="Primary"
                             Command="{Binding AddConfigDialogAddCommand}"
-                            Content="Save" />
+                            Content="保存" />
                     </StackPanel>
                 </StackPanel>
             </dialogHost:DialogHost.DialogContent>

@@ -14,7 +14,7 @@
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock Classes="Title" Text="⚙️" />
-                <Label Classes="Title" Content="Settings" />
+                <Label Classes="Title" Content="设置" />
             </StackPanel>
 
             <StackPanel Orientation="Vertical" Spacing="10">
@@ -22,13 +22,15 @@
                 <Button
                     Classes="Gray MinWidth"
                     Command="{Binding SwitchThemeCommand}"
-                    Content="Switch theme" />
+                    Content="切换主题" />
 
-                <ToggleSwitch Content="Start on boot" IsChecked="{Binding StartOnBoot}" />
-                <ToggleSwitch Content="Auto update easytier" IsChecked="{Binding AutoUpdateEasytier}" />
-                <ToggleSwitch Content="Auto update me" IsChecked="{Binding AutoUpdateMe}" />
+                <ToggleSwitch Content="开机启动" IsChecked="{Binding StartOnBoot}" />
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <ToggleSwitch Content="自动更新 Easytier" IsChecked="{Binding AutoUpdateEasytier}" />
+                    <ToggleSwitch Content="自动更新我" IsChecked="{Binding AutoUpdateMe}" />
+                </StackPanel>
 
-                <TextBlock Text="Sync password" />
+                <TextBlock Text="同步密码" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <TextBox
                         MinWidth="100"

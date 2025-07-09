@@ -10,34 +10,38 @@
             VerticalAlignment="Top"
             Orientation="Vertical"
             Spacing="10">
+
             <StackPanel Orientation="Horizontal">
                 <TextBlock Classes="Title" Text="🔧" />
-                <Label Classes="Title" Content="Service" />
+                <Label Classes="Title" Content="服务" />
             </StackPanel>
+
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button
                     Classes="Blue MinWidth"
                     Command="{Binding InstallSelectedServicesCommand}"
-                    Content="Install"
+                    Content="安装"
                     IsEnabled="{Binding HasSelectedConfigs}" />
                 <Button
                     Classes="Gray MinWidth"
                     Command="{Binding UninstallSelectedServicesCommand}"
-                    Content="Uninstall"
+                    Content="卸载"
                     IsEnabled="{Binding HasSelectedConfigs}" />
             </StackPanel>
+
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button
                     Classes="Green MinWidth"
                     Command="{Binding RestartSelectedServicesCommand}"
-                    Content="(Re)start"
+                    Content="重启"
                     IsEnabled="{Binding HasSelectedConfigs}" />
                 <Button
                     Classes="Red MinWidth"
                     Command="{Binding StopSelectedServicesCommand}"
-                    Content="Stop"
+                    Content="停止"
                     IsEnabled="{Binding HasSelectedConfigs}" />
             </StackPanel>
+
         </StackPanel>
     </Border>
 </UserControl>

@@ -12,23 +12,23 @@
             Spacing="10">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Classes="Title" Text="🔃" />
-                <Label Classes="Title" Content="Update" />
+                <Label Classes="Title" Content="更新" />
             </StackPanel>
             <StackPanel Orientation="Vertical" Spacing="10">
                 <Label
-                    Content="Easytier is not installed"
+                    Content="Easytier 未安装"
                     Foreground="Red"
                     IsVisible="{Binding !HasEasytier}" />
                 <Button
                     Classes="Gray MinWidth"
                     Command="{Binding UpdateEasytierCommand}"
                     CommandParameter="{x:True}"
-                    Content="Update Easytier" />
+                    Content="更新 Easytier" />
                 <Button
                     Classes="Gray MinWidth"
                     Command="{Binding UpdateMeCommand}"
                     CommandParameter="{x:True}"
-                    Content="Update Me" />
+                    Content="更新我" />
             </StackPanel>
         </StackPanel>
     </Border>

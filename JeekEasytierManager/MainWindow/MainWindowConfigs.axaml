@@ -10,7 +10,7 @@
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock Classes="Title" Text="📝" />
-                <Label Classes="Title" Content="Configs" />
+                <Label Classes="Title" Content="Easytier 配置" />
             </StackPanel>
 
             <local:ConfigListControl Configs="{Binding Configs}" />
@@ -22,20 +22,20 @@
                 <Button
                     Classes="Red"
                     Command="{Binding SyncConfigsCommand}"
-                    Content="Sync" />
+                    Content="同步" />
                 <Button
                     Classes="Blue"
                     Command="{Binding EditSelectedConfigsCommand}"
-                    Content="Edit selected"
+                    Content="编辑选中的"
                     IsEnabled="{Binding HasSelectedConfigs}" />
                 <Button
                     Classes="Yellow"
                     Command="{Binding RefreshConfigsCommand}"
-                    Content="Refresh" />
+                    Content="刷新" />
                 <Button
                     Classes="Green"
                     Command="{Binding AddConfigCommand}"
-                    Content="Add" />
+                    Content="新增" />
             </StackPanel>
 
         </StackPanel>

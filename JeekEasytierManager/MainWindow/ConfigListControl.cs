@@ -233,7 +233,7 @@ public class ConfigListControl : UserControl
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
             buttonPanel.Children.Add(button);
-            ToolTip.SetTip(button, "Restart service");
+            ToolTip.SetTip(button, "重启服务");
 
             button = new Button
             {
@@ -243,7 +243,7 @@ public class ConfigListControl : UserControl
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
             buttonPanel.Children.Add(button);
-            ToolTip.SetTip(button, "Stop service");
+            ToolTip.SetTip(button, "停止服务");
 
             button = new Button
             {
@@ -253,7 +253,7 @@ public class ConfigListControl : UserControl
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
             buttonPanel.Children.Add(button);
-            ToolTip.SetTip(button, "Edit config");
+            ToolTip.SetTip(button, "编辑配置");
 
             button = new Button
             {
@@ -263,7 +263,7 @@ public class ConfigListControl : UserControl
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
             buttonPanel.Children.Add(button);
-            ToolTip.SetTip(button, "Edit config file");
+            ToolTip.SetTip(button, "编辑配置文件");
 
             button = new Button
             {
@@ -273,7 +273,7 @@ public class ConfigListControl : UserControl
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
             buttonPanel.Children.Add(button);
-            ToolTip.SetTip(button, "Rename config");
+            ToolTip.SetTip(button, "重命名");
 
             button = new Button
             {
@@ -283,7 +283,7 @@ public class ConfigListControl : UserControl
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
             buttonPanel.Children.Add(button);
-            ToolTip.SetTip(button, "Delete config");
+            ToolTip.SetTip(button, "删除");
 
             _grid.Children.Add(buttonPanel);
             Grid.SetRow(buttonPanel, row);

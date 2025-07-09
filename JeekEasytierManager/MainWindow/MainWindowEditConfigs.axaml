@@ -16,7 +16,7 @@
 
             <StackPanel Grid.Row="0" Orientation="Horizontal">
                 <TextBlock Classes="Title" Text="📝" />
-                <Label Classes="Title" Content="Edit Config(s)" />
+                <Label Classes="Title" Content="编辑配置" />
             </StackPanel>
 
             <ScrollViewer Grid.Row="1">
