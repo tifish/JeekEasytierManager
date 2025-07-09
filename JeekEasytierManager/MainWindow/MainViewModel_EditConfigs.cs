@@ -104,81 +104,96 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var configData = Toml.Parse(File.ReadAllText(configPath)).ToModel();
 
         InstanceName = configName;
-        if (configData.TryGetValue("instance_id", out var instanceId))
-            InstanceId = (string)instanceId;
+        InstanceId = configData.Get("instance_id", "");
 
         if (configData.TryGetValue("network_identity", out var networkIdentityObj))
         {
             var networkIdentity = (TomlTable)networkIdentityObj;
-            if (networkIdentity.TryGetValue("network_name", out var networkName))
-                NetworkName = (string)networkName;
-            if (networkIdentity.TryGetValue("network_secret", out var networkSecret))
-                NetworkSecret = (string)networkSecret;
+            NetworkName = networkIdentity.Get("network_name", "");
+            NetworkSecret = networkIdentity.Get("network_secret", "");
+        }
+        else
+        {
+            NetworkName = "";
+            NetworkSecret = "";
         }
 
-        if (configData.TryGetValue("dhcp", out var dhcp))
-            Dhcp = (bool)dhcp;
-        if (configData.TryGetValue("ipv4", out var ipv4))
-            Ipv4 = (string)ipv4;
+        Dhcp = configData.Get("dhcp", false);
+        Ipv4 = configData.Get("ipv4", "");
 
         if (configData.TryGetValue("peer", out var peers))
         {
             var peersArray = (TomlTableArray)peers;
             Peers = string.Join("\n", peersArray.Select(peer => (string)peer["uri"]));
         }
+        else
+        {
+            Peers = "";
+        }
+
         if (configData.TryGetValue("listeners", out var listeners))
         {
             var listenersArray = (TomlArray)listeners;
             Listeners = string.Join("\n", listenersArray.Select(listener => (string)listener!));
         }
+        else
+        {
+            Listeners = "";
+        }
 
-        if (configData.TryGetValue("rpc_portal", out var rpcPortal))
-            RpcPortal = (string)rpcPortal;
+        RpcPortal = configData.Get("rpc_portal", "");
 
         if (configData.TryGetValue("proxy_network", out var proxyNetworks))
         {
             var proxyNetworksArray = (TomlTableArray)proxyNetworks;
             ProxyNetworks = string.Join("\n", proxyNetworksArray.Select(proxyNetwork => (string)proxyNetwork["cidr"]));
         }
+        else
+        {
+            ProxyNetworks = "";
+        }
 
         if (configData.TryGetValue("flags", out var flagsObj))
         {
             var flags = (TomlTable)flagsObj;
 
-            if (flags.TryGetValue("latency_first", out var latencyFirst))
-                LatencyFirst = (bool)latencyFirst;
-            if (flags.TryGetValue("use_smoltcp", out var useSmoltcp))
-                UseSmoltcp = (bool)useSmoltcp;
-            if (flags.TryGetValue("enable_kcp_proxy", out var enableKcpProxy))
-                EnableKcpProxy = (bool)enableKcpProxy;
-            if (flags.TryGetValue("disable_kcp_input", out var disableKcpInput))
-                DisableKcpInput = (bool)disableKcpInput;
-            if (flags.TryGetValue("enable_quic_proxy", out var enableQuicProxy))
-                EnableQuicProxy = (bool)enableQuicProxy;
-            if (flags.TryGetValue("disable_quic_input", out var disableQuicInput))
-                DisableQuicInput = (bool)disableQuicInput;
-            if (flags.TryGetValue("disable_p2p", out var disableP2p))
-                DisableP2p = (bool)disableP2p;
-            if (flags.TryGetValue("bind_device", out var bindDevice))
-                NotBindDevice = !(bool)bindDevice;
-            if (flags.TryGetValue("no_tun", out var noTun))
-                NoTun = (bool)noTun;
-            if (flags.TryGetValue("enable_exit_node", out var enableExitNode))
-                EnableExitNode = (bool)enableExitNode;
-            if (flags.TryGetValue("relay_all_peer_rpc", out var relayAllPeerRpc))
-                RelayAllPeerRpc = (bool)relayAllPeerRpc;
-            if (flags.TryGetValue("multi_thread", out var multiThread))
-                MultiThread = !(bool)multiThread;
-            if (flags.TryGetValue("proxy_forward_by_system", out var proxyForwardBySystem))
-                ProxyForwardBySystem = (bool)proxyForwardBySystem;
-            if (flags.TryGetValue("enable_encryption", out var enableEncryption))
-                DisableEncryption = !(bool)enableEncryption;
-            if (flags.TryGetValue("disable_udp_hole_punching", out var disableUdpHolePunching))
-                DisableUdpHolePunching = (bool)disableUdpHolePunching;
-            if (flags.TryGetValue("accept_dns", out var acceptDns))
-                AcceptDns = (bool)acceptDns;
-            if (flags.TryGetValue("private_mode", out var privateMode))
-                PrivateMode = (bool)privateMode;
+            LatencyFirst = flags.Get("latency_first", false);
+            UseSmoltcp = flags.Get("use_smoltcp", false);
+            EnableKcpProxy = flags.Get("enable_kcp_proxy", false);
+            DisableKcpInput = flags.Get("disable_kcp_input", false);
+            EnableQuicProxy = flags.Get("enable_quic_proxy", false);
+            DisableQuicInput = flags.Get("disable_quic_input", false);
+            DisableP2p = flags.Get("disable_p2p", false);
+            NotBindDevice = !flags.Get("bind_device", true);
+            NoTun = flags.Get("no_tun", false);
+            EnableExitNode = flags.Get("enable_exit_node", false);
+            RelayAllPeerRpc = flags.Get("relay_all_peer_rpc", false);
+            MultiThread = !flags.Get("multi_thread", true);
+            ProxyForwardBySystem = flags.Get("proxy_forward_by_system", false);
+            DisableEncryption = !flags.Get("enable_encryption", false);
+            DisableUdpHolePunching = flags.Get("disable_udp_hole_punching", false);
+            AcceptDns = flags.Get("accept_dns", false);
+            PrivateMode = flags.Get("private_mode", false);
+        }
+        else
+        {
+            LatencyFirst = false;
+            UseSmoltcp = false;
+            EnableKcpProxy = false;
+            DisableKcpInput = false;
+            EnableQuicProxy = false;
+            DisableQuicInput = false;
+            DisableP2p = false;
+            NotBindDevice = true;
+            NoTun = false;
+            EnableExitNode = false;
+            RelayAllPeerRpc = false;
+            MultiThread = true;
+            ProxyForwardBySystem = false;
+            DisableEncryption = false;
+            DisableUdpHolePunching = false;
+            AcceptDns = false;
+            PrivateMode = false;
         }
     }
 
@@ -193,8 +208,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var configPath = Path.Join(AppSettings.ConfigDirectory, config.Name + ".toml");
             var configData = Toml.Parse(File.ReadAllText(configPath)).ToModel();
 
-            if (InstanceName != null) // instance_name is always config.Name
-                configData["instance_name"] = InstanceName;
+            configData["instance_name"] = config.Name;
             if (!configData.TryGetValue("instance_id", out var instanceId)) // Add new instance_id if not exist
                 configData["instance_id"] = Guid.NewGuid().ToString();
 

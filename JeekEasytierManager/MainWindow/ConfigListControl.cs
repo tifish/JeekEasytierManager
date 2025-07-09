@@ -225,53 +225,65 @@ public class ConfigListControl : UserControl
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
 
-            buttonPanel.Children.Add(new Button
+            var button = new Button
             {
                 Content = "▶️",
                 Command = MainViewModel.Instance.RestartSingleServiceCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-            });
+            };
+            buttonPanel.Children.Add(button);
+            ToolTip.SetTip(button, "Restart service");
 
-            buttonPanel.Children.Add(new Button
+            button = new Button
             {
                 Content = "⏹️",
                 Command = MainViewModel.Instance.StopSingleServiceCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-            });
+            };
+            buttonPanel.Children.Add(button);
+            ToolTip.SetTip(button, "Stop service");
 
-            buttonPanel.Children.Add(new Button
+            button = new Button
             {
                 Content = "✏️",
                 Command = MainViewModel.Instance.EditConfigCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-            });
+            };
+            buttonPanel.Children.Add(button);
+            ToolTip.SetTip(button, "Edit config");
 
-            buttonPanel.Children.Add(new Button
+            button = new Button
             {
                 Content = "📝",
                 Command = MainViewModel.Instance.EditConfigFileCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-            });
+            };
+            buttonPanel.Children.Add(button);
+            ToolTip.SetTip(button, "Edit config file");
 
-            buttonPanel.Children.Add(new Button
+            button = new Button
             {
                 Content = "⛏️",
                 Command = MainViewModel.Instance.RenameConfigCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-            });
+            };
+            buttonPanel.Children.Add(button);
+            ToolTip.SetTip(button, "Rename config");
 
-            buttonPanel.Children.Add(new Button
+            button = new Button
             {
                 Content = "🗑️",
                 Command = MainViewModel.Instance.DeleteConfigCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-            });
+            };
+            buttonPanel.Children.Add(button);
+            ToolTip.SetTip(button, "Delete config");
 
             _grid.Children.Add(buttonPanel);
             Grid.SetRow(buttonPanel, row);
