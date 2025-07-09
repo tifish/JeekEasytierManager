@@ -110,8 +110,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!config.IsInstalled)
             return true;
 
-        if (!await StopService(config))
-            return false;
+        await StopService(config);
 
         if (await Nssm.UninstallService(ServicePrefix + config.Name))
         {
@@ -164,18 +163,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }, TimeSpan.FromSeconds(3));
     }
 
-    public async Task<bool> RestartService(ConfigInfo config)
+    [RelayCommand]
+    public async Task RestartSingleService(ConfigInfo config)
+    {
+        await RestartService(config);
+        await UpdateServiceStatus(config);
+    }
+
+    public async Task RestartService(ConfigInfo config)
     {
         if (!config.IsInstalled)
-            return false;
+            return;
 
         if (!await Nssm.RestartService(ServicePrefix + config.Name))
         {
             Messages = $"Failed to restart service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
-            return false;
+            return;
         }
-
-        return true;
     }
 
     [RelayCommand]
@@ -197,18 +201,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    public async Task<bool> StopService(ConfigInfo config)
+    [RelayCommand]
+    public async Task StopSingleService(ConfigInfo config)
+    {
+        await StopService(config);
+        await UpdateServiceStatus(config);
+    }
+
+    public async Task StopService(ConfigInfo config)
     {
         if (config.Status != ServiceStatus.Running)
-            return true;
+            return;
 
         if (!await Nssm.StopService(ServicePrefix + config.Name))
         {
             Messages = $"Failed to stop service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
-            return false;
+            return;
         }
-
-        return true;
     }
 
     private readonly List<string> _stoppedConfigNames = [];
