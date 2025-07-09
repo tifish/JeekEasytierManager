@@ -27,6 +27,12 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal"
                 Spacing="10">
+
+                <ToggleSwitch
+                    IsChecked="{Binding DeleteExtraConfigsOnOtherNodesWhenNextSync}"
+                    OffContent="同步删除"
+                    OnContent="同步删除"
+                    ToolTip.Tip="同步时删除其他节点的多余配置" />
                 <Button
                     Classes="Red"
                     Command="{Binding SyncConfigsCommand}"
@@ -44,6 +50,7 @@
                     Classes="Green"
                     Command="{Binding AddConfigCommand}"
                     Content="新增" />
+
             </StackPanel>
 
         </StackPanel>
