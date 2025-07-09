@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
@@ -70,13 +71,16 @@ public class SyncService : ServiceBase<ISyncService>, ISyncService
     public UnaryResult DeleteExtraConfigs(List<string> fileNames)
     {
         EnsureAuthorized();
-        MainViewModel.Instance.DeleteExtraConfigs(fileNames);
+        // Must run on UI thread
+        Dispatcher.UIThread.Post(() => MainViewModel.Instance.DeleteExtraConfigs(fileNames));
         return UnaryResult.CompletedResult;
     }
 
-    public async UnaryResult RefreshConfigs()
+    public UnaryResult RefreshConfigs()
     {
         EnsureAuthorized();
-        await MainViewModel.Instance.RefreshConfigs();
+        // Must run on UI thread
+        Dispatcher.UIThread.Post(async () => await MainViewModel.Instance.RefreshConfigs());
+        return UnaryResult.CompletedResult;
     }
 }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
+using Avalonia.Threading;
 
 namespace JeekEasytierManager;
 
@@ -177,6 +178,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public List<ConfigFileInfo> GetConfigFileInfoList()
     {
+        // Can run on any thread
         var result = new List<ConfigFileInfo>();
 
         foreach (var configFile in Directory.GetFiles(AppSettings.ConfigDirectory))
@@ -194,6 +196,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public async Task<List<ConfigFileInfo>> GetConfigFileContent(List<string> fileNames)
     {
+        // Can run on any thread
         var result = new List<ConfigFileInfo>();
 
         foreach (var fileName in fileNames)
@@ -212,6 +215,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public async Task WriteConfigFileContent(List<ConfigFileInfo> fileContentList)
     {
+        // Can run on any thread
         foreach (var fileContent in fileContentList)
         {
             var filePath = Path.Join(AppSettings.ConfigDirectory, fileContent.FileName);
@@ -222,7 +226,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public void DeleteExtraConfigs(List<string> fileNames)
     {
-        var configList = Configs.ToList();
+        // Must run on UI thread
         var isSelectedChanged = false;
 
         foreach (var fileName in fileNames)
@@ -232,12 +236,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 File.Delete(filePath);
 
             var configName = Path.GetFileNameWithoutExtension(fileName);
-            var configIndex = configList.FindIndex(config => config.Name == configName);
+            var configIndex = Configs.ToList().FindIndex(config => config.Name == configName);
             if (configIndex != -1)
             {
-                if (configList[configIndex].IsSelected)
+                if (Configs[configIndex].IsSelected)
                     isSelectedChanged = true;
 
+                Configs[configIndex].PropertyChanged -= OnConfigPropertyChanged;
                 Configs.RemoveAt(configIndex);
             }
         }

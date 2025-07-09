@@ -240,6 +240,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task RefreshConfigs()
     {
+        // Must run on UI thread
         await LoadConfigs(false);
     }
 
