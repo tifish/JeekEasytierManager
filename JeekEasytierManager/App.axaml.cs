@@ -107,7 +107,9 @@ public partial class App : Application
 
     public static void ExitApplication()
     {
+        // Hide tray icon, or the icon will be more and more.
         _trayIcon?.IsVisible = false;
+
         // Clean up resources
         MainViewModel.Instance.Dispose();
 
