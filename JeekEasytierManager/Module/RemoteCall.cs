@@ -54,8 +54,7 @@ public class RemoteCall
             if (!result)
                 return null;
 
-            _cachedClients.Add(url, client);
-
+            _cachedClients.TryAdd(url, client);
             return client;
         }
         catch
