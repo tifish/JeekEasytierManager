@@ -31,108 +31,102 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (rpcClients.Count == 0)
             return;
 
-        // Get all file info list from all rpc clients
-        var clientFileInfoLists = new List<List<ConfigFileInfo>>();
-
-        foreach (var rpcClient in rpcClients)
-        {
-            clientFileInfoLists.Add(await rpcClient.GetConfigFileInfoList());
-        }
-
         // Get local file info list
         var localFileInfoList = GetConfigFileInfoList();
-        var localFileNames = localFileInfoList.Select(fileInfo => fileInfo.FileName).ToHashSet();
-
-        // Delete extra configs on other nodes
-        if (DeleteExtraConfigsOnOtherNodesWhenNextSync)
+        var localFileNameIndexDict = new Dictionary<string, int>();
+        for (var i = 0; i < localFileInfoList.Count; i++)
         {
-            var fileNamesToDelete = new List<string>();
-
-            for (var i = 0; i < clientFileInfoLists.Count; i++)
-            {
-                var clientFileInfoList = clientFileInfoLists[i];
-                fileNamesToDelete.Clear();
-
-                for (var j = clientFileInfoList.Count - 1; j >= 0; j--)
-                {
-                    if (!localFileNames.Contains(clientFileInfoList[j].FileName))
-                    {
-                        fileNamesToDelete.Add(clientFileInfoList[j].FileName);
-                        clientFileInfoList.RemoveAt(j);
-                    }
-                }
-
-                if (fileNamesToDelete.Count > 0)
-                    await rpcClients[i].DeleteExtraConfigs(fileNamesToDelete);
-            }
-
-            DeleteExtraConfigsOnOtherNodesWhenNextSync = false;
+            localFileNameIndexDict.Add(localFileInfoList[i].FileName, i);
         }
 
-        // Add local file info list to the last of clientFileInfoList, to find latest file later.
-        clientFileInfoLists.Add(localFileInfoList);
+        var localNeedRefresh = false;
 
-        // Find latest file info
-        var latestFileInfoDict = new Dictionary<string, LatestFileInfo>();
-
-        for (int i = 0; i < clientFileInfoLists.Count; i++)
+        // Get all file info list from all rpc clients
+        foreach (var rpcClient in rpcClients)
         {
-            foreach (var fileInfo in clientFileInfoLists[i])
+            var remoteFileInfoList = await rpcClient.GetConfigFileInfoList();
+            var remoteFileNameIndexDict = new Dictionary<string, int>();
+            for (var i = 0; i < remoteFileInfoList.Count; i++)
             {
-                if (latestFileInfoDict.TryGetValue(fileInfo.FileName, out var latestFileInfo))
-                {
-                    if (latestFileInfo.FileTimeUtc < fileInfo.FileTimeUtc)
-                    {
-                        latestFileInfo.FileTimeUtc = fileInfo.FileTimeUtc;
-                        latestFileInfo.RpcClientIndex = i;
-                    }
+                remoteFileNameIndexDict.Add(remoteFileInfoList[i].FileName, i);
+            }
 
-                    // At least has compared once with different time
-                    if (latestFileInfo.FileTimeUtc != fileInfo.FileTimeUtc)
-                        latestFileInfo.IsLatest = true;
-                }
-                else
+            // Find local only files
+            var localOnlyFileInfos = localFileInfoList.Where(fileInfo => !remoteFileNameIndexDict.ContainsKey(fileInfo.FileName)).ToList();
+
+            // Find remote only files
+            var remoteOnlyFileInfos = remoteFileInfoList.Where(fileInfo => !localFileNameIndexDict.ContainsKey(fileInfo.FileName)).ToList();
+
+            // Find local newer files (files that exist on both local and remote, but local version is newer)
+            var localNewerFileInfos = new List<ConfigFileInfo>();
+            foreach (var localFileInfo in localFileInfoList)
+            {
+                if (remoteFileNameIndexDict.TryGetValue(localFileInfo.FileName, out var remoteIndex))
                 {
-                    latestFileInfoDict.Add(fileInfo.FileName,
-                        new LatestFileInfo
-                        {
-                            FileName = fileInfo.FileName,
-                            FileTimeUtc = fileInfo.FileTimeUtc,
-                            IsLatest = false,
-                            RpcClientIndex = i
-                        });
+                    var remoteFileInfo = remoteFileInfoList[remoteIndex];
+                    if (localFileInfo.FileTimeUtc > remoteFileInfo.FileTimeUtc)
+                        localNewerFileInfos.Add(localFileInfo);
                 }
             }
-        }
 
-        // Sync file content
-        var latestFileInfoList = latestFileInfoDict.Values.Where(fileInfo => fileInfo.IsLatest).ToList();
-        if (latestFileInfoList.Count == 0)
-            return;
+            // Find remote newer files (files that exist on both local and remote, but remote version is newer)
+            var remoteNewerFileInfos = new List<ConfigFileInfo>();
+            foreach (var remoteFileInfo in remoteFileInfoList)
+            {
+                if (localFileNameIndexDict.TryGetValue(remoteFileInfo.FileName, out var localIndex))
+                {
+                    var localFileInfo = localFileInfoList[localIndex];
+                    if (remoteFileInfo.FileTimeUtc > localFileInfo.FileTimeUtc)
+                        remoteNewerFileInfos.Add(remoteFileInfo);
+                }
+            }
 
-        var lastestFilesInLocal = latestFileInfoList
-            .Where(fileInfo => fileInfo.RpcClientIndex == clientFileInfoLists.Count - 1)
-            .Select(fileInfo => fileInfo.FileName)
-            .ToList();
-        var latestFileContentListInLocal = await GetConfigFileContent(lastestFilesInLocal);
+            var remoteNeedRefresh = false;
 
-        for (var i = 0; i < rpcClients.Count; i++)
-        {
-            var rpcClient = rpcClients[i];
-            var latestFilesInCurrentRpcClient = latestFileInfoList
-                .Where(fileInfo => fileInfo.RpcClientIndex == i)
-                .Select(fileInfo => fileInfo.FileName)
-                .ToList();
+            // Send local only files and local newer files to remote
+            if (localOnlyFileInfos.Count > 0 || localNewerFileInfos.Count > 0)
+            {
+                await rpcClient.SendConfigFileContent(localOnlyFileInfos.Concat(localNewerFileInfos).ToList());
+                remoteNeedRefresh = localOnlyFileInfos.Count > 0;
+            }
 
-            var fileContentList = await rpcClient.GetConfigFileContent(latestFilesInCurrentRpcClient);
-            await WriteConfigFileContent(fileContentList);
+            if (DeleteExtraConfigsOnOtherNodesWhenNextSync)
+            {
+                // Get remote newer files from remote
+                if (remoteNewerFileInfos.Count > 0)
+                {
+                    var remoteFileContentList = await rpcClient.GetConfigFileContent(remoteNewerFileInfos.Select(fileInfo => fileInfo.FileName).ToList());
+                    await WriteConfigFileContent(remoteFileContentList);
+                }
 
-            if (latestFileContentListInLocal.Count > 0)
-                await rpcClient.SendConfigFileContent(latestFileContentListInLocal);
+                // Delete remote only files on other nodes
+                if (remoteOnlyFileInfos.Count > 0)
+                {
+                    await rpcClient.DeleteExtraConfigs(remoteOnlyFileInfos.Select(fileInfo => fileInfo.FileName).ToList());
+                    remoteNeedRefresh = true;
+                }
+
+                DeleteExtraConfigsOnOtherNodesWhenNextSync = false;
+            }
+            else
+            {
+                // Get remote only files and remote newer files from remote
+                if (remoteOnlyFileInfos.Count > 0 || remoteNewerFileInfos.Count > 0)
+                {
+                    var remoteFileContentList = await rpcClient.GetConfigFileContent(remoteOnlyFileInfos.Concat(remoteNewerFileInfos).Select(fileInfo => fileInfo.FileName).ToList());
+                    await WriteConfigFileContent(remoteFileContentList);
+                    localNeedRefresh = remoteOnlyFileInfos.Count > 0;
+                }
+            }
+
+            // Refresh configs on remote
+            if (remoteNeedRefresh)
+                await rpcClient.RefreshConfigs();
         }
 
         // Refresh configs
-        await LoadConfigs(false);
+        if (localNeedRefresh)
+            await RefreshConfigs();
     }
 
     private async Task<List<ISyncService>> GetAllRpcClients()

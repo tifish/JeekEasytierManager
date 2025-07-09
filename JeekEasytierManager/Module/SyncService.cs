@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
@@ -15,6 +16,7 @@ public interface ISyncService : IService<ISyncService>
     UnaryResult<List<ConfigFileInfo>> GetConfigFileContent(List<string> fileNames);
     UnaryResult SendConfigFileContent(List<ConfigFileInfo> fileContentList);
     UnaryResult DeleteExtraConfigs(List<string> fileNames);
+    UnaryResult RefreshConfigs();
 }
 
 [MessagePackObject]
@@ -70,5 +72,11 @@ public class SyncService : ServiceBase<ISyncService>, ISyncService
         EnsureAuthorized();
         MainViewModel.Instance.DeleteExtraConfigs(fileNames);
         return UnaryResult.CompletedResult;
+    }
+
+    public async UnaryResult RefreshConfigs()
+    {
+        EnsureAuthorized();
+        await MainViewModel.Instance.RefreshConfigs();
     }
 }
