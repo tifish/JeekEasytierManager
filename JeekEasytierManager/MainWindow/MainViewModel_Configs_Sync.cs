@@ -112,8 +112,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     await rpcClient.DeleteExtraConfigs(fileNames);
                     remoteNeedRefresh = true;
                 }
-
-                DeleteExtraConfigsOnOtherNodesWhenNextSync = false;
             }
             else
             {
@@ -132,6 +130,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (remoteNeedRefresh)
                 await rpcClient.RefreshConfigs();
         }
+
+        DeleteExtraConfigsOnOtherNodesWhenNextSync = false;
 
         // Refresh configs
         if (localNeedRefresh)
