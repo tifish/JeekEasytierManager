@@ -200,6 +200,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         await RestartService(config);
         await UpdateServiceStatus(config);
+    }
+
+    public async Task RestartService(ConfigInfo config)
+    {
+        if (!config.IsInstalled)
+            return;
+
+        if (!await Nssm.RestartService(ServicePrefix + config.Name))
+        {
+            Messages = $"Failed to restart service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
+            return;
+        }
 
         // Wait 3 seconds to make sure the tun device is ready
         DispatcherTimer.RunOnce(async () =>
@@ -214,18 +226,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             await Executor.RunAndWait("powershell.exe", $"-ex bypass -command Set-NetConnectionProfile -InterfaceAlias \"{configData.Flags.DevName}\" -NetworkCategory Private", false, true);
         }, TimeSpan.FromSeconds(3));
-    }
-
-    public async Task RestartService(ConfigInfo config)
-    {
-        if (!config.IsInstalled)
-            return;
-
-        if (!await Nssm.RestartService(ServicePrefix + config.Name))
-        {
-            Messages = $"Failed to restart service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
-            return;
-        }
     }
 
     [RelayCommand]
