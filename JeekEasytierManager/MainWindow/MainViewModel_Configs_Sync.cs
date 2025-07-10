@@ -229,20 +229,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await File.WriteAllTextAsync(filePath, fileContent.Content);
             File.SetLastWriteTimeUtc(filePath, fileContent.FileTimeUtc);
         }
-
-        foreach (var fileContent in fileContentList)
-        {
-            var configName = Path.GetFileNameWithoutExtension(fileContent.FileName);
-            var config = Configs.FirstOrDefault(config => config.Name == configName);
-            if (config != null)
-            {
-                if (config.Status == ServiceStatus.Running)
-                {
-                    await RestartService(config);
-                    await UpdateServiceStatus(config);
-                }
-            }
-        }
     }
 
     public async Task DeleteExtraConfigs(List<string> fileNames)
