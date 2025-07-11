@@ -12,8 +12,8 @@ using System.Globalization;
 using Avalonia.Layout;
 using JeekTools;
 using System.IO;
-using Tomlyn;
 using System.Runtime.Serialization;
+using Nett;
 
 namespace JeekEasytierManager;
 
@@ -52,11 +52,7 @@ public partial class ConfigInfo : ObservableObject
 
     public EasytierConfig GetConfig()
     {
-        return Toml.ToModel<EasytierConfig>(
-            File.ReadAllText(GetConfigPath()), null, new TomlModelOptions()
-            {
-                IgnoreMissingProperties = true,
-            });
+        return Toml.ReadFile<EasytierConfig>(GetConfigPath());
     }
 }
 

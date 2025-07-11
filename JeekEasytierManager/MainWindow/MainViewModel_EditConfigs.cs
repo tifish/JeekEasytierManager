@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Tomlyn;
-using Tomlyn.Model;
+using Nett;
 
 namespace JeekEasytierManager;
 
@@ -101,42 +101,42 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public void LoadConfig(string configName)
     {
         var configPath = Path.Join(AppSettings.ConfigDirectory, configName + ".toml");
-        var configData = Toml.ToModel(File.ReadAllText(configPath));
+        var configData = Toml.ReadFile(configPath);
 
         InstanceName = configName;
         HostName = configData.Get("hostname", "");
 
         var networkIdentity = configData.GetTable("network_identity");
-        NetworkName = networkIdentity?.Get("network_name", "") ?? "";
-        NetworkSecret = networkIdentity?.Get("network_secret", "") ?? "";
+        NetworkName = networkIdentity.Get("network_name", "");
+        NetworkSecret = networkIdentity.Get("network_secret", "");
 
         Dhcp = configData.Get("dhcp", false);
         Ipv4 = configData.Get("ipv4", "");
 
-        Peers = configData.GetMultiLinesTextFromTableArray("peer", "uri") ?? "";
-        Listeners = configData.GetMultiLinesTextFromArray("listeners") ?? "";
+        Peers = configData.GetMultiLinesTextFromTableArray("peer", "uri");
+        Listeners = configData.GetMultiLinesTextFromArray("listeners");
         RpcPortal = configData.Get("rpc_portal", "");
-        ProxyNetworks = configData.GetMultiLinesTextFromTableArray("proxy_network", "cidr") ?? "";
+        ProxyNetworks = configData.GetMultiLinesTextFromTableArray("proxy_network", "cidr");
 
         var flags = configData.GetTable("flags");
 
-        LatencyFirst = flags?.Get("latency_first", false) ?? false;
-        UseSmoltcp = flags?.Get("use_smoltcp", false) ?? false;
-        EnableKcpProxy = flags?.Get("enable_kcp_proxy", false) ?? false;
-        DisableKcpInput = flags?.Get("disable_kcp_input", false) ?? false;
-        EnableQuicProxy = flags?.Get("enable_quic_proxy", false) ?? false;
-        DisableQuicInput = flags?.Get("disable_quic_input", false) ?? false;
-        DisableP2p = flags?.Get("disable_p2p", false) ?? false;
-        BindDevice = flags?.Get("bind_device", true) ?? true;
-        NoTun = flags?.Get("no_tun", false) ?? false;
-        EnableExitNode = flags?.Get("enable_exit_node", false) ?? false;
-        RelayAllPeerRpc = flags?.Get("relay_all_peer_rpc", false) ?? false;
-        MultiThread = flags?.Get("multi_thread", true) ?? true;
-        ProxyForwardBySystem = flags?.Get("proxy_forward_by_system", false) ?? false;
-        DisableEncryption = !(flags?.Get("enable_encryption", true) ?? true);
-        DisableUdpHolePunching = flags?.Get("disable_udp_hole_punching", false) ?? false;
-        AcceptDns = flags?.Get("accept_dns", false) ?? false;
-        PrivateMode = flags?.Get("private_mode", false) ?? false;
+        LatencyFirst = flags.Get("latency_first", false);
+        UseSmoltcp = flags.Get("use_smoltcp", false);
+        EnableKcpProxy = flags.Get("enable_kcp_proxy", false);
+        DisableKcpInput = flags.Get("disable_kcp_input", false);
+        EnableQuicProxy = flags.Get("enable_quic_proxy", false);
+        DisableQuicInput = flags.Get("disable_quic_input", false);
+        DisableP2p = flags.Get("disable_p2p", false);
+        BindDevice = flags.Get("bind_device", true);
+        NoTun = flags.Get("no_tun", false);
+        EnableExitNode = flags.Get("enable_exit_node", false);
+        RelayAllPeerRpc = flags.Get("relay_all_peer_rpc", false);
+        MultiThread = flags.Get("multi_thread", true);
+        ProxyForwardBySystem = flags.Get("proxy_forward_by_system", false);
+        DisableEncryption = !flags.Get("enable_encryption", true);
+        DisableUdpHolePunching = flags.Get("disable_udp_hole_punching", false);
+        AcceptDns = flags.Get("accept_dns", false);
+        PrivateMode = flags.Get("private_mode", false);
     }
 
     [RelayCommand]
@@ -148,13 +148,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 continue;
 
             var configPath = Path.Join(AppSettings.ConfigDirectory, config.Name + ".toml");
-            var configData = Toml.ToModel(File.ReadAllText(configPath));
+            var configData = Toml.ReadFile(configPath);
 
-            configData["instance_name"] = config.Name;
+            configData.Set("instance_name", config.Name);
 
             // Add new instance_id if not exist
             if (configData.Get("instance_id", "") == "")
-                configData["instance_id"] = Guid.NewGuid().ToString();
+                configData.Set("instance_id", Guid.NewGuid().ToString());
 
             configData.Set("hostname", HostName, "");
 
@@ -164,10 +164,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
             else
             {
-                configData.Set("network_identity", new TomlTable
+                configData.Set("network_identity", new Dictionary<string, object>()
                 {
-                    ["network_name"] = NetworkName,
-                    ["network_secret"] = NetworkSecret
+                    {"network_name", NetworkName},
+                    {"network_secret", NetworkSecret}
                 });
             }
 
@@ -197,10 +197,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 configData.SetMultiLinesTextToTableArray("proxy_network", "cidr", ProxyNetworks);
             }
 
-            var flags = new TomlTable();
+            var flags = configData.CreateEmptyAttachedTable();
             configData["flags"] = flags;
 
-            flags["dev_name"] = config.Name;
+            flags.Set("dev_name", config.Name);
 
             flags.Set("latency_first", LatencyFirst, false);
             flags.Set("use_smoltcp", UseSmoltcp, false);
@@ -220,7 +220,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             flags.Set("accept_dns", AcceptDns, false);
             flags.Set("private_mode", PrivateMode, false);
 
-            File.WriteAllText(configPath, Toml.FromModel(configData));
+            Toml.WriteFile(configData, configPath);
         }
 
         CloseEditConfigs();

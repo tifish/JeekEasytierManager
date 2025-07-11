@@ -29,7 +29,6 @@
     <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
     <PackageReference Include="nulastudio.NetBeauty" Version="2.1.5" />
     <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
-    <PackageReference Include="Tomlyn" Version="0.19.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +37,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JeekTools.NET\JeekTools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Nett">
+      <HintPath>..\..\..\OpenSource\Nett\Source\Nett\bin\Debug\net40\Nett.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <PropertyGroup>
