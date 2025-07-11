@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -100,9 +101,12 @@ public static class EasytierUpdate
 
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            LastError = ex.Message;
             return false;
         }
     }
+
+    public static string LastError { get; private set; } = "";
 }

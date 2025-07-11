@@ -34,7 +34,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             Messages += $"\nUpdating Easytier to {EasytierUpdate.RemoteVersion}...";
             await StopAllServices();
-            await EasytierUpdate.Update();
+            if (!await EasytierUpdate.Update())
+            {
+                Messages += $"\nUpdate Easytier failed: {EasytierUpdate.LastError}";
+                return;
+            }
             CheckHasEasytier();
             await RestoreAllServices();
             Messages += "\nUpdate completed.";
