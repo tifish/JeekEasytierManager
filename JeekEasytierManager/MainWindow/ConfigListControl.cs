@@ -265,8 +265,18 @@ public class ConfigListControl : UserControl
 
             button = new Button
             {
+                Content = "🧪",
+                Command = MainViewModel.Instance.TestSingleConfigCommand,
+                CommandParameter = config,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+            };
+            buttonPanel.Children.Add(button);
+            ToolTip.SetTip(button, "测试配置");
+
+            button = new Button
+            {
                 Content = "✏️",
-                Command = MainViewModel.Instance.EditConfigCommand,
+                Command = MainViewModel.Instance.EditSingleConfigCommand,
                 CommandParameter = config,
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };

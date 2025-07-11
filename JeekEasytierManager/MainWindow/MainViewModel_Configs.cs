@@ -107,7 +107,36 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    public void EditConfig(ConfigInfo config)
+    public async Task TestSingleConfig(ConfigInfo config)
+    {
+        var configFile = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
+        if (!File.Exists(configFile))
+            return;
+
+        // Run cmd file in temp directory
+        var cmdText = $"""
+            {AppSettings.EasytierCorePath} -c "{configFile}"
+            pause
+        """;
+        var cmdFile = Path.GetTempFileName() + ".cmd";
+        File.WriteAllText(cmdFile, cmdText);
+
+        using var process = Executor.Run(cmdFile);
+        if (process is null)
+        {
+            Messages = $"Failed to test config: {config.Name}";
+            return;
+        }
+
+        await process.WaitForExitAsync();
+        if (process.ExitCode != 0)
+        {
+            Messages = $"Failed to test config: {config.Name}";
+        }
+    }
+
+    [RelayCommand]
+    public void EditSingleConfig(ConfigInfo config)
     {
         foreach (var c in Configs)
         {
