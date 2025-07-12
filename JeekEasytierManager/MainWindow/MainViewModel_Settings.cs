@@ -17,6 +17,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         StartOnBoot = RegistryHelper.GetValue(RunKeyPath, RunValueName, "") == RunValue;
 
+        DisableMirrorDownload = Settings.DisableMirrorDownload;
+
         _autoUpdateTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromHours(1)
@@ -85,6 +87,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             Messages = $"Failed to set start on boot: {ex.Message}";
         }
+    }
+
+    [ObservableProperty]
+    public partial bool DisableMirrorDownload { get; set; }
+
+    partial void OnDisableMirrorDownloadChanged(bool value)
+    {
+        Settings.DisableMirrorDownload = value;
+        _ = AppSettings.Save();
     }
 
     [ObservableProperty]

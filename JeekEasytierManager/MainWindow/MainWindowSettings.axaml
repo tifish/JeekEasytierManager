@@ -24,11 +24,32 @@
                     Command="{Binding SwitchThemeCommand}"
                     Content="切换主题" />
 
-                <ToggleSwitch Content="开机启动" IsChecked="{Binding StartOnBoot}" />
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <ToggleSwitch Content="自动更新 Easytier" IsChecked="{Binding AutoUpdateEasytier}" />
-                    <ToggleSwitch Content="自动更新我" IsChecked="{Binding AutoUpdateMe}" />
-                </StackPanel>
+                <Grid
+                    ColumnDefinitions="Auto,Auto"
+                    ColumnSpacing="10"
+                    RowDefinitions="Auto,Auto"
+                    RowSpacing="10">
+                    <ToggleSwitch
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Content="开机启动"
+                        IsChecked="{Binding StartOnBoot}" />
+                    <ToggleSwitch
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Content="禁止镜像下载"
+                        IsChecked="{Binding DisableMirrorDownload}" />
+                    <ToggleSwitch
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Content="自动更新 Easytier"
+                        IsChecked="{Binding AutoUpdateEasytier}" />
+                    <ToggleSwitch
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Content="自动更新我"
+                        IsChecked="{Binding AutoUpdateMe}" />
+                </Grid>
 
                 <TextBlock Text="同步密码" />
                 <StackPanel Orientation="Horizontal" Spacing="10">

@@ -20,12 +20,19 @@ public static class AutoUpdate
             RemoteTime = null;
             LocalTime = null;
 
-            // Get the fastest mirror
-            var mirror = await GitHubMirrors.GetFastestMirror(AppSettings.JeekEasytierManagerZipUrl);
-            if (mirror == "")
-                return false;
+            if (Settings.DisableMirrorDownload)
+            {
+                DownloadUrl = AppSettings.JeekEasytierManagerZipUrl;
+            }
+            else
+            {
+                // Get the fastest mirror
+                var mirror = await GitHubMirrors.GetFastestMirror(AppSettings.JeekEasytierManagerZipUrl);
+                if (mirror == "")
+                    return false;
 
-            DownloadUrl = mirror;
+                DownloadUrl = mirror;
+            }
 
             // Try to get the headers from the mirror
             var headers = await HttpHelper.GetHeaders(DownloadUrl);

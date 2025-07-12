@@ -61,8 +61,9 @@ public class AppSettings
         }
     }
 
-    public bool AutoUpdateMe
-    { get; set; } = true;
+    public bool DisableMirrorDownload { get; set; } = false;
+
+    public bool AutoUpdateMe { get; set; } = true;
     public bool AutoUpdateEasytier { get; set; } = false;
 
     public string SyncPassword { get; set; } = "";

@@ -42,11 +42,23 @@ public static class EasytierUpdate
     private static async Task<string> GetLastestVersion()
     {
         var web = new HtmlWeb();
-        var mirror = await GitHubMirrors.GetFastestMirror(AppSettings.EasytierLatestReleasePageUrl);
-        if (mirror == "")
-            return "";
 
-        var doc = await web.LoadFromWebAsync(mirror);
+        string releasePageUrl;
+
+        if (Settings.DisableMirrorDownload)
+        {
+            releasePageUrl = AppSettings.EasytierLatestReleasePageUrl;
+        }
+        else
+        {
+            var mirror = await GitHubMirrors.GetFastestMirror(AppSettings.EasytierLatestReleasePageUrl);
+            if (mirror == "")
+                return "";
+
+            releasePageUrl = mirror;
+        }
+
+        var doc = await web.LoadFromWebAsync(releasePageUrl);
         if (doc == null)
             return "";
 
@@ -68,6 +80,10 @@ public static class EasytierUpdate
 
         // https://github.com/EasyTier/EasyTier/releases/download/v2.3.2/easytier-windows-x86_64-v2.3.2.zip
         var downloadUrl = $"https://github.com/EasyTier/EasyTier/releases/download/v{RemoteVersion}/easytier-windows-x86_64-v{RemoteVersion}.zip";
+
+        if (Settings.DisableMirrorDownload)
+            return downloadUrl;
+
         return await GitHubMirrors.GetFastestMirror(downloadUrl);
     }
 
