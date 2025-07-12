@@ -1,2 +1,2 @@
-# JeekEasytierManager
-An easy Easytier Manager.
+# JeekEasyTierManager
+An easy EasyTier Manager.

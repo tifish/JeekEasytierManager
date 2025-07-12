@@ -1,0 +1,100 @@
+<Window
+    x:Class="JeekEasyTierManager.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+    xmlns:local="clr-namespace:JeekEasyTierManager"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Jeek EasyTier 管理器"
+    Width="1260"
+    Height="800"
+    MinWidth="680"
+    MinHeight="480"
+    d:DesignHeight="480"
+    d:DesignWidth="680"
+    x:DataType="local:MainViewModel"
+    Icon="avares://JeekEasyTierManager/App.ico"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+
+    <!--  Rename config dialog  -->
+    <dialogHost:DialogHost
+        dialogHost:DialogHostStyle.CornerRadius="8"
+        DialogMargin="16"
+        IsOpen="{Binding RenameConfigDialogIsOpen}">
+
+        <dialogHost:DialogHost.DialogContent>
+            <StackPanel Width="250" Spacing="15">
+                <TextBlock FontSize="18" Text="重命名配置:" />
+
+                <TextBox
+                    Loaded="DialogTextBox_Loaded"
+                    Text="{Binding RenameConfigDialogText}"
+                    Watermark="输入新名称...">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Command="{Binding RenameConfigDialogSaveCommand}" Gesture="Enter" />
+                        <KeyBinding Command="{Binding RenameConfigDialogCancelCommand}" Gesture="Escape" />
+                    </TextBox.KeyBindings>
+                </TextBox>
+
+                <StackPanel
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal"
+                    Spacing="10">
+                    <Button
+                        Classes="Secondary"
+                        Command="{Binding RenameConfigDialogCancelCommand}"
+                        Content="取消" />
+                    <Button
+                        Classes="Primary"
+                        Command="{Binding RenameConfigDialogSaveCommand}"
+                        Content="保存" />
+                </StackPanel>
+            </StackPanel>
+        </dialogHost:DialogHost.DialogContent>
+        <!--  put the content over which the dialog is shown here (e.g. your main window grid)  -->
+
+        <!--  Add config dialog  -->
+        <dialogHost:DialogHost
+            dialogHost:DialogHostStyle.CornerRadius="8"
+            DialogMargin="16"
+            IsOpen="{Binding AddConfigDialogIsOpen}">
+
+            <dialogHost:DialogHost.DialogContent>
+                <StackPanel Width="250" Spacing="15">
+                    <TextBlock FontSize="18" Text="新增配置:" />
+
+                    <TextBox
+                        Loaded="DialogTextBox_Loaded"
+                        Text="{Binding AddConfigDialogText}"
+                        Watermark="输入新名称...">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Command="{Binding AddConfigDialogAddCommand}" Gesture="Enter" />
+                            <KeyBinding Command="{Binding AddConfigDialogCancelCommand}" Gesture="Escape" />
+                        </TextBox.KeyBindings>
+                    </TextBox>
+
+                    <StackPanel
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="10">
+                        <Button
+                            Classes="Secondary"
+                            Command="{Binding AddConfigDialogCancelCommand}"
+                            Content="取消" />
+                        <Button
+                            Classes="Primary"
+                            Command="{Binding AddConfigDialogAddCommand}"
+                            Content="保存" />
+                    </StackPanel>
+                </StackPanel>
+            </dialogHost:DialogHost.DialogContent>
+            <!--  put the content over which the dialog is shown here (e.g. your main window grid)  -->
+
+            <local:MainWindowGrid />
+
+        </dialogHost:DialogHost>
+    </dialogHost:DialogHost>
+
+</Window>

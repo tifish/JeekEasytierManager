@@ -1,0 +1,376 @@
+<UserControl
+    x:Class="JeekEasyTierManager.MainWindowEditConfigs"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:JeekEasyTierManager"
+    x:DataType="local:MainViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="MinWidth" Value="100" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border Classes="Card">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBlock Classes="Title" Text="📝" />
+                <Label Classes="Title" Content="编辑配置" />
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Orientation="Vertical" Spacing="10">
+
+                    <Border Classes="Card">
+                        <StackPanel Orientation="Vertical" Spacing="10">
+
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <StackPanel Orientation="Vertical" Spacing="10">
+                                    <TextBlock Text="名称" />
+                                    <TextBox IsReadOnly="True" Text="{Binding InstanceName}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Spacing="10">
+                                    <TextBlock Text="主机名称" />
+                                    <TextBox Text="{Binding HostName}" Watermark="留空默认使用主机名称" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <StackPanel Orientation="Vertical" Spacing="10">
+                                    <TextBlock Text="网络名称" />
+                                    <TextBox Text="{Binding NetworkName}" Watermark="个人使用请务必设置，否则相当于裸奔。" />
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" Spacing="10">
+                                    <TextBlock Text="网络密码" />
+                                    <TextBox Text="{Binding NetworkSecret}" Watermark="个人使用请务必设置，否则相当于裸奔。" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <CheckBox Content="修改虚拟 IPv4 地址" IsChecked="{Binding EditIpAddress}" />
+                                <CheckBox
+                                    Content="DHCP"
+                                    IsChecked="{Binding Dhcp}"
+                                    IsEnabled="{Binding EditIpAddress}" />
+                            </StackPanel>
+                            <TextBox
+                                IsEnabled="{Binding EditIpAddress}"
+                                Text="{Binding Ipv4}"
+                                Watermark="例如：192.168.8.1" />
+
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <StackPanel Orientation="Vertical" Spacing="10">
+                                    <CheckBox Content="修改连接服务器" IsChecked="{Binding EditPeers}" />
+                                    <TextBox
+                                        AcceptsReturn="True"
+                                        IsEnabled="{Binding EditPeers}"
+                                        Text="{Binding Peers}"
+                                        Watermark="例如：tcp://xxx.net:11010，可多行" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Vertical" Spacing="10">
+                                    <CheckBox Content="修改监听地址" IsChecked="{Binding EditListeners}" />
+                                    <TextBox
+                                        AcceptsReturn="True"
+                                        IsEnabled="{Binding EditListeners}"
+                                        Text="{Binding Listeners}"
+                                        Watermark="例如：tcp://0.0.0.0:11010，可多行" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Vertical" Spacing="10">
+                                <CheckBox Content="信息监听地址和端口" IsChecked="{Binding EditRpcPortal}" />
+                                <TextBox
+                                    IsEnabled="{Binding EditRpcPortal}"
+                                    Text="{Binding RpcPortal}"
+                                    Watermark="查看连接状态必备，例如：127.0.0.1:15888" />
+                            </StackPanel>
+
+                            <StackPanel Orientation="Vertical" Spacing="10">
+                                <CheckBox Content="修改子网代理" IsChecked="{Binding EditProxyNetworks}" />
+                                <TextBox
+                                    AcceptsReturn="True"
+                                    IsEnabled="{Binding EditProxyNetworks}"
+                                    Text="{Binding ProxyNetworks}"
+                                    Watermark="例如：192.168.8.0/24，可多行" />
+                            </StackPanel>
+
+                            <CheckBox Content="修改日志文件" IsChecked="{Binding EditFileLogger}" />
+                            <Border Classes="Card">
+                                <StackPanel
+                                    IsEnabled="{Binding EditFileLogger}"
+                                    Orientation="Vertical"
+                                    Spacing="10">
+                                    <CheckBox Content="启用日志文件" IsChecked="{Binding EnableFileLogger}" />
+
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <StackPanel Orientation="Vertical" Spacing="10">
+                                            <TextBlock Text="文件名（强制为配置名，不可修改）" />
+                                            <TextBox
+                                                IsEnabled="{Binding EnableFileLogger}"
+                                                IsReadOnly="True"
+                                                Text="{Binding FileLoggerName}" />
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Vertical" Spacing="10">
+                                            <TextBlock Text="日志级别" />
+                                            <ComboBox
+                                                IsEnabled="{Binding EnableFileLogger}"
+                                                ItemsSource="{Binding FileLoggerLevels}"
+                                                SelectedItem="{Binding FileLoggerLevel}" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Vertical" Spacing="10">
+                                        <TextBlock Text="日志目录（仅支持绝对路径）" />
+                                        <TextBox
+                                            IsEnabled="{Binding EnableFileLogger}"
+                                            Text="{Binding FileLoggerDir}"
+                                            Watermark="例如：C:\EasyTier\Logs" />
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="Card">
+                        <Grid
+                            MaxWidth="700"
+                            ColumnDefinitions="Auto,*"
+                            ColumnSpacing="20"
+                            RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+
+                            <CheckBox
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Content="开启延迟优先模式"
+                                IsChecked="{Binding LatencyFirst}" />
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="忽略中转跳数，选择总延迟最低的路径。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Content="使用用户态协议栈"
+                                IsChecked="{Binding UseSmoltcp}" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="使用用户态 TCP/IP 协议栈，避免操作系统防火墙问题导致无法子网代理 / KCP 代理。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Content="启用 KCP 代理"
+                                IsChecked="{Binding EnableKcpProxy}" />
+                            <TextBlock
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="将 TCP 流量转为 KCP 流量降低传输延迟，提升传输速度。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Content="禁用 KCP 输入"
+                                IsChecked="{Binding DisableKcpInput}" />
+                            <TextBlock
+                                Grid.Row="3"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="禁用 KCP 入站流量，其他开启KCP代理的节点仍然使用 TCP 连接到本节点。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="4"
+                                Grid.Column="0"
+                                Content="启用 QUIC 代理"
+                                IsChecked="{Binding EnableQuicProxy}" />
+                            <TextBlock
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="将 TCP 流量转为 QUIC 流量，降低传输延迟，提升传输速度。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="5"
+                                Grid.Column="0"
+                                Content="禁用 QUIC 输入"
+                                IsChecked="{Binding DisableQuicInput}" />
+                            <TextBlock
+                                Grid.Row="5"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="禁用 QUIC 入站流量，其他开启 QUIC 代理的节点仍然使用 TCP 连接到本节点。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="6"
+                                Grid.Column="0"
+                                Content="禁用 P2P"
+                                IsChecked="{Binding DisableP2p}" />
+                            <TextBlock
+                                Grid.Row="6"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="禁用 P2P，所有流量通过手动指定的服务器中转。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="7"
+                                Grid.Column="0"
+                                Content="仅使用物理网卡"
+                                IsChecked="{Binding BindDevice}" />
+                            <TextBlock
+                                Grid.Row="7"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="仅使用物理网卡，避免 EasyTier 通过其他虚拟网卡建立连接。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="8"
+                                Grid.Column="0"
+                                Content="无 TUN 模式"
+                                IsChecked="{Binding NoTun}" />
+                            <TextBlock
+                                Grid.Row="8"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="不使用 TUN 网卡，适合无管理员权限时使用。本节点仅允许被访问。访问其他节点需要使用 SOCKS5。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="9"
+                                Grid.Column="0"
+                                Content="启用出口节点"
+                                IsChecked="{Binding EnableExitNode}" />
+                            <TextBlock
+                                Grid.Row="9"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="充许此节点成为出口节点。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="10"
+                                Grid.Column="0"
+                                Content="转发 RPC 包"
+                                IsChecked="{Binding RelayAllPeerRpc}" />
+                            <TextBlock
+                                Grid.Row="10"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="允许转发所有对等节点的 RPC 数据包，即使对等节点不在转发网络白名单中。这可以帮助白名单外网络中的对等节点建立 P2P 连接。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="11"
+                                Grid.Column="0"
+                                Content="启用多线程"
+                                IsChecked="{Binding MultiThread}" />
+                            <TextBlock
+                                Grid.Row="11"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="使用多线程运行时。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="12"
+                                Grid.Column="0"
+                                Content="系统转发"
+                                IsChecked="{Binding ProxyForwardBySystem}" />
+                            <TextBlock
+                                Grid.Row="12"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="通过系统内核转发子网代理数据包，禁用内置 NAT。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="13"
+                                Grid.Column="0"
+                                Content="禁用加密"
+                                IsChecked="{Binding DisableEncryption}" />
+                            <TextBlock
+                                Grid.Row="13"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="禁用对等节点通信的加密，默认为 false，必须与对等节点相同。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="14"
+                                Grid.Column="0"
+                                Content="禁用 UDP 打洞"
+                                IsChecked="{Binding DisableUdpHolePunching}" />
+                            <TextBlock
+                                Grid.Row="14"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="禁用 UDP 打洞功能。某些公司网络环境下，UDP 打洞可能会被识别为恶意软件。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="15"
+                                Grid.Column="0"
+                                Content="启用魔法 DNS"
+                                IsChecked="{Binding AcceptDns}" />
+                            <TextBlock
+                                Grid.Row="15"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="启用魔法 DNS，允许通过 EaSyTier 的 DNS 服务器访问其他节点的虚拟 IPv4 地址，如 node1.et.net。"
+                                TextWrapping="Wrap" />
+
+                            <CheckBox
+                                Grid.Row="16"
+                                Grid.Column="0"
+                                Content="启用私有模式"
+                                IsChecked="{Binding PrivateMode}" />
+                            <TextBlock
+                                Grid.Row="16"
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Text="启用私有模式，则不允许使用了与本地网络不相同的网络名称和密码的节点通过本节点进行握手或中转。"
+                                TextWrapping="Wrap" />
+                        </Grid>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <StackPanel
+                Grid.Row="2"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Spacing="10">
+
+                <Button
+                    Classes="Green"
+                    Command="{Binding SaveEditConfigsCommand}"
+                    Content="保存"
+                    IsEnabled="{Binding HasSelectedConfigs}" />
+                <Button
+                    Classes="Gray"
+                    Command="{Binding CloseEditConfigsCommand}"
+                    Content="取消" />
+
+            </StackPanel>
+
+        </Grid>
+    </Border>
+
+</UserControl>

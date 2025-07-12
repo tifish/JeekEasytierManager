@@ -1,8 +1,0 @@
-{
-    "profiles": {
-        "C#: JeekEasytierManager Debug": {
-            "commandName": "Project",
-            "workingDirectory": "../bin"
-        }
-    }
-}

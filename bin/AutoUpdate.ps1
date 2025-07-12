@@ -1,4 +1,4 @@
-﻿$appName = "JeekEasytierManager"
+﻿$appName = "JeekEasyTierManager"
 
 # Wait for .exe to exit
 $process = Get-Process -Name $appName -ErrorAction SilentlyContinue
