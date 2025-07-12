@@ -303,6 +303,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         EditConfigs(null);
 
         InstanceName = MultipleConfigInstanceName;
+        FileLoggerName = MultipleConfigInstanceName;
     }
 
     public void EditConfigs(ConfigInfo? config)
@@ -318,6 +319,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         EditListeners = isSingleConfig;
         EditRpcPortal = isSingleConfig;
         EditProxyNetworks = isSingleConfig;
+        EditFileLogger = isSingleConfig;
 
         if (config != null)
             LoadConfig(config.Name);

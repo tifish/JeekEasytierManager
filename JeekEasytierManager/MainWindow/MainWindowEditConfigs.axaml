@@ -48,7 +48,7 @@
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Spacing="10">
-                                <CheckBox Content="虚拟 IPv4 地址" IsChecked="{Binding EditIpAddress}" />
+                                <CheckBox Content="修改虚拟 IPv4 地址" IsChecked="{Binding EditIpAddress}" />
                                 <CheckBox
                                     Content="DHCP"
                                     IsChecked="{Binding Dhcp}"
@@ -61,7 +61,7 @@
 
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <StackPanel Orientation="Vertical" Spacing="10">
-                                    <CheckBox Content="连接服务器" IsChecked="{Binding EditPeers}" />
+                                    <CheckBox Content="修改连接服务器" IsChecked="{Binding EditPeers}" />
                                     <TextBox
                                         AcceptsReturn="True"
                                         IsEnabled="{Binding EditPeers}"
@@ -70,7 +70,7 @@
                                 </StackPanel>
 
                                 <StackPanel Orientation="Vertical" Spacing="10">
-                                    <CheckBox Content="监听地址" IsChecked="{Binding EditListeners}" />
+                                    <CheckBox Content="修改监听地址" IsChecked="{Binding EditListeners}" />
                                     <TextBox
                                         AcceptsReturn="True"
                                         IsEnabled="{Binding EditListeners}"
@@ -88,13 +88,50 @@
                             </StackPanel>
 
                             <StackPanel Orientation="Vertical" Spacing="10">
-                                <CheckBox Content="子网代理" IsChecked="{Binding EditProxyNetworks}" />
+                                <CheckBox Content="修改子网代理" IsChecked="{Binding EditProxyNetworks}" />
                                 <TextBox
                                     AcceptsReturn="True"
                                     IsEnabled="{Binding EditProxyNetworks}"
                                     Text="{Binding ProxyNetworks}"
                                     Watermark="例如：192.168.8.0/24，可多行" />
                             </StackPanel>
+
+                            <CheckBox Content="修改日志文件" IsChecked="{Binding EditFileLogger}" />
+                            <Border Classes="Card">
+                                <StackPanel
+                                    IsEnabled="{Binding EditFileLogger}"
+                                    Orientation="Vertical"
+                                    Spacing="10">
+                                    <CheckBox Content="启用日志文件" IsChecked="{Binding EnableFileLogger}" />
+
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <StackPanel Orientation="Vertical" Spacing="10">
+                                            <TextBlock Text="文件名（强制为配置名，不可修改）" />
+                                            <TextBox
+                                                IsEnabled="{Binding EnableFileLogger}"
+                                                IsReadOnly="True"
+                                                Text="{Binding FileLoggerName}" />
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Vertical" Spacing="10">
+                                            <TextBlock Text="日志级别" />
+                                            <ComboBox
+                                                IsEnabled="{Binding EnableFileLogger}"
+                                                ItemsSource="{Binding FileLoggerLevels}"
+                                                SelectedItem="{Binding FileLoggerLevel}" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Vertical" Spacing="10">
+                                        <TextBlock Text="日志目录（仅支持绝对路径）" />
+                                        <TextBox
+                                            IsEnabled="{Binding EnableFileLogger}"
+                                            Text="{Binding FileLoggerDir}"
+                                            Watermark="例如：C:\EasyTier\Logs" />
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </Border>
 
                         </StackPanel>
                     </Border>

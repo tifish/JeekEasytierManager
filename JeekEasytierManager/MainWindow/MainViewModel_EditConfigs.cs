@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
@@ -46,6 +47,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public partial bool EditProxyNetworks { get; set; }
     [ObservableProperty]
     public partial string ProxyNetworks { get; set; } = "";
+
+    [ObservableProperty]
+    public partial bool EditFileLogger { get; set; }
+    [ObservableProperty]
+    public partial bool EnableFileLogger { get; set; }
+    [ObservableProperty]
+    public partial string FileLoggerName { get; set; } = "";
+    [ObservableProperty]
+    public partial string FileLoggerDir { get; set; } = "";
+    [ObservableProperty]
+    public partial string FileLoggerLevel { get; set; } = "error";
+    [ObservableProperty]
+    public partial ObservableCollection<string> FileLoggerLevels { get; set; } = new() { "error", "warn", "info", "debug" };
 
     [ObservableProperty]
     public partial bool LatencyFirst { get; set; }
@@ -117,6 +131,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Listeners = configData.GetMultiLinesTextFromArray("listeners");
         RpcPortal = configData.Get("rpc_portal", "");
         ProxyNetworks = configData.GetMultiLinesTextFromTableArray("proxy_network", "cidr");
+
+        var fileLogger = configData.GetTable("file_logger");
+        EnableFileLogger = fileLogger != null;
+        FileLoggerName = configName;
+        FileLoggerDir = fileLogger.Get("dir", "");
+        FileLoggerLevel = fileLogger.Get("level", "error");
 
         var flags = configData.GetTable("flags");
 
@@ -210,6 +230,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (EditProxyNetworks)
         {
             configData.SetMultiLinesTextToTableArray("proxy_network", "cidr", ProxyNetworks);
+        }
+
+        if (EditFileLogger)
+        {
+            if (EnableFileLogger)
+            {
+                configData.Set("file_logger", new Dictionary<string, object>()
+                    {
+                        {"file", configName},
+                        {"dir", FileLoggerDir},
+                        {"level", FileLoggerLevel}
+                    });
+            }
+            else
+            {
+                configData.Remove("file_logger");
+            }
         }
 
         var flags = configData.CreateEmptyAttachedTable();
