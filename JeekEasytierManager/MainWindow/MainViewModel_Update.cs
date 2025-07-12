@@ -61,6 +61,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         var hasUpdate = await AutoUpdate.HasUpdate();
 
+        Messages += $"\nChecking update from {AutoUpdate.DownloadUrl}";
         Messages += $"\nMy local version is {AutoUpdate.LocalTime}, remote version is {AutoUpdate.RemoteTime}";
 
         if (hasUpdate)

@@ -8,7 +8,7 @@ namespace JeekEasytierManager;
 
 public static class AutoUpdate
 {
-    private static string _downloadUrl = "";
+    public static string DownloadUrl { get; private set; } = "";
     public static DateTime? RemoteTime { get; private set; } = null;
     public static DateTime? LocalTime { get; private set; } = null;
 
@@ -16,7 +16,7 @@ public static class AutoUpdate
     {
         try
         {
-            _downloadUrl = "";
+            DownloadUrl = "";
             RemoteTime = null;
             LocalTime = null;
 
@@ -25,10 +25,10 @@ public static class AutoUpdate
             if (mirror == "")
                 return false;
 
-            _downloadUrl = mirror;
+            DownloadUrl = mirror;
 
             // Try to get the headers from the mirror
-            var headers = await HttpHelper.GetHeaders(_downloadUrl);
+            var headers = await HttpHelper.GetHeaders(DownloadUrl);
             if (headers == null)
                 return false;
 
@@ -48,14 +48,14 @@ public static class AutoUpdate
     {
         try
         {
-            if (_downloadUrl == "")
+            if (DownloadUrl == "")
                 return false;
 
             Process.Start(new ProcessStartInfo
             {
                 FileName = "powershell.exe",
                 Arguments = $"""
-                        -ExecutionPolicy Bypass -File "AutoUpdate.ps1" "{_downloadUrl}" {(hideMainWindow ? "/hide" : "")}
+                        -ExecutionPolicy Bypass -File "AutoUpdate.ps1" "{DownloadUrl}" {(hideMainWindow ? "/hide" : "")}
                         """,
                 WorkingDirectory = AppSettings.AppDirectory,
                 UseShellExecute = true,
