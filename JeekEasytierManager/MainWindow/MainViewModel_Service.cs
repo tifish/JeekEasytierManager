@@ -311,6 +311,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             config.Status = ServiceStatus.None;
         }
+
+        HasRunningService = Configs.Any(c => c.Status == ServiceStatus.Running);
     }
 
     public async Task UpdateAllServicesStatus(List<ConfigInfo>? configs = null)
@@ -321,8 +323,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             await UpdateServiceStatus(config);
         }
-
-        HasRunningService = configsToUpdate.Any(c => c.Status == ServiceStatus.Running);
     }
 
 }
