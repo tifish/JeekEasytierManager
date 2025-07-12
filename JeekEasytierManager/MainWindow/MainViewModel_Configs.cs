@@ -138,12 +138,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public void EditSingleConfig(ConfigInfo config)
     {
-        foreach (var c in Configs)
-        {
-            c.IsSelected = c == config;
-        }
-
-        EditSelectedConfigs();
+        EditConfigs(config);
     }
 
     [RelayCommand]
@@ -294,24 +289,37 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+    const string MultipleConfigInstanceName = "（选中的配置）";
+
     [RelayCommand]
     public void EditSelectedConfigs()
     {
         if (Configs.ToArray().All(c => !c.IsSelected))
             return;
 
+        EditConfigs(null);
+
+        InstanceName = MultipleConfigInstanceName;
+    }
+
+    public void EditConfigs(ConfigInfo? config)
+    {
         MainGrid.RowDefinitions[0].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
         MainGrid.RowDefinitions[1].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
         IsEditingConfigs = true;
 
-        var isSingleConfig = Configs.ToArray().Count(c => c.IsSelected) == 1;
+        var isSingleConfig = config != null;
+
         EditIpAddress = isSingleConfig;
         EditPeers = isSingleConfig;
         EditListeners = isSingleConfig;
         EditRpcPortal = isSingleConfig;
         EditProxyNetworks = isSingleConfig;
 
-        LoadConfig(Configs.First(c => c.IsSelected).Name);
+        if (config != null)
+            LoadConfig(config.Name);
+        else
+            LoadConfig(Configs.First(c => c.IsSelected).Name);
     }
 
     [RelayCommand]

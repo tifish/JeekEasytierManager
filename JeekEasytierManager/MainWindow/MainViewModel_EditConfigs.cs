@@ -142,88 +142,100 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public void SaveEditConfigs()
     {
-        foreach (var config in Configs.ToArray())
+        if (InstanceName == MultipleConfigInstanceName)
         {
-            if (!config.IsSelected)
-                continue;
-
-            var configPath = Path.Join(AppSettings.ConfigDirectory, config.Name + ".toml");
-            var configData = Toml.ReadFile(configPath);
-
-            configData.Set("instance_name", config.Name);
-
-            // Add new instance_id if not exist
-            if (configData.Get("instance_id", "") == "")
-                configData.Set("instance_id", Guid.NewGuid().ToString());
-
-            configData.Set("hostname", HostName, "");
-
-            if (NetworkName == "" && NetworkSecret == "")
+            foreach (var config in Configs.ToArray())
             {
-                configData.Remove("network_identity");
+                if (!config.IsSelected)
+                    continue;
+
+                SaveConfig(config.Name);
             }
-            else
-            {
-                configData.Set("network_identity", new Dictionary<string, object>()
+        }
+        else
+        {
+            SaveConfig(InstanceName);
+        }
+
+        CloseEditConfigs();
+    }
+
+    private void SaveConfig(string configName)
+    {
+        var configPath = Path.Join(AppSettings.ConfigDirectory, configName + ".toml");
+        var configData = Toml.ReadFile(configPath);
+
+        configData.Set("instance_name", configName);
+
+        // Add new instance_id if not exist
+        if (configData.Get("instance_id", "") == "")
+            configData.Set("instance_id", Guid.NewGuid().ToString());
+
+        configData.Set("hostname", HostName, "");
+
+        if (NetworkName == "" && NetworkSecret == "")
+        {
+            configData.Remove("network_identity");
+        }
+        else
+        {
+            configData.Set("network_identity", new Dictionary<string, object>()
                 {
                     {"network_name", NetworkName},
                     {"network_secret", NetworkSecret}
                 });
-            }
-
-            if (EditIpAddress)
-            {
-                configData.Set("dhcp", Dhcp, false);
-                configData.Set("ipv4", Ipv4, "");
-            }
-
-            if (EditPeers)
-            {
-                configData.SetMultiLinesTextToTableArray("peer", "uri", Peers);
-            }
-
-            if (EditListeners)
-            {
-                configData.SetMultiLinesTextToArray("listeners", Listeners);
-            }
-
-            if (EditRpcPortal)
-            {
-                configData.Set("rpc_portal", RpcPortal, "");
-            }
-
-            if (EditProxyNetworks)
-            {
-                configData.SetMultiLinesTextToTableArray("proxy_network", "cidr", ProxyNetworks);
-            }
-
-            var flags = configData.CreateEmptyAttachedTable();
-            configData["flags"] = flags;
-
-            flags.Set("dev_name", config.Name);
-
-            flags.Set("latency_first", LatencyFirst, false);
-            flags.Set("use_smoltcp", UseSmoltcp, false);
-            flags.Set("enable_kcp_proxy", EnableKcpProxy, false);
-            flags.Set("disable_kcp_input", DisableKcpInput, false);
-            flags.Set("enable_quic_proxy", EnableQuicProxy, false);
-            flags.Set("disable_quic_input", DisableQuicInput, false);
-            flags.Set("disable_p2p", DisableP2p, false);
-            flags.Set("bind_device", BindDevice, true);
-            flags.Set("no_tun", NoTun, false);
-            flags.Set("enable_exit_node", EnableExitNode, false);
-            flags.Set("relay_all_peer_rpc", RelayAllPeerRpc, false);
-            flags.Set("multi_thread", MultiThread, true);
-            flags.Set("proxy_forward_by_system", ProxyForwardBySystem, false);
-            flags.Set("enable_encryption", !DisableEncryption, true);
-            flags.Set("disable_udp_hole_punching", DisableUdpHolePunching, false);
-            flags.Set("accept_dns", AcceptDns, false);
-            flags.Set("private_mode", PrivateMode, false);
-
-            Toml.WriteFile(configData, configPath);
         }
 
-        CloseEditConfigs();
+        if (EditIpAddress)
+        {
+            configData.Set("dhcp", Dhcp, false);
+            configData.Set("ipv4", Ipv4, "");
+        }
+
+        if (EditPeers)
+        {
+            configData.SetMultiLinesTextToTableArray("peer", "uri", Peers);
+        }
+
+        if (EditListeners)
+        {
+            configData.SetMultiLinesTextToArray("listeners", Listeners);
+        }
+
+        if (EditRpcPortal)
+        {
+            configData.Set("rpc_portal", RpcPortal, "");
+        }
+
+        if (EditProxyNetworks)
+        {
+            configData.SetMultiLinesTextToTableArray("proxy_network", "cidr", ProxyNetworks);
+        }
+
+        var flags = configData.CreateEmptyAttachedTable();
+        configData["flags"] = flags;
+
+        flags.Set("dev_name", configName);
+
+        flags.Set("latency_first", LatencyFirst, false);
+        flags.Set("use_smoltcp", UseSmoltcp, false);
+        flags.Set("enable_kcp_proxy", EnableKcpProxy, false);
+        flags.Set("disable_kcp_input", DisableKcpInput, false);
+        flags.Set("enable_quic_proxy", EnableQuicProxy, false);
+        flags.Set("disable_quic_input", DisableQuicInput, false);
+        flags.Set("disable_p2p", DisableP2p, false);
+        flags.Set("bind_device", BindDevice, true);
+        flags.Set("no_tun", NoTun, false);
+        flags.Set("enable_exit_node", EnableExitNode, false);
+        flags.Set("relay_all_peer_rpc", RelayAllPeerRpc, false);
+        flags.Set("multi_thread", MultiThread, true);
+        flags.Set("proxy_forward_by_system", ProxyForwardBySystem, false);
+        flags.Set("enable_encryption", !DisableEncryption, true);
+        flags.Set("disable_udp_hole_punching", DisableUdpHolePunching, false);
+        flags.Set("accept_dns", AcceptDns, false);
+        flags.Set("private_mode", PrivateMode, false);
+
+        Toml.WriteFile(configData, configPath);
     }
 
     [RelayCommand]
