@@ -34,14 +34,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             Messages += $"\nUpdating Easytier to {EasytierUpdate.RemoteVersion}...";
             await StopAllServices();
-            if (!await EasytierUpdate.Update())
+            if (!await EasytierUpdate.Update((progress) =>
+            {
+                Messages = $"\nStart downloading Easytier from {EasytierUpdate.DownloadUrl}";
+                Messages += $"\nDownloading Easytier: {progress:F2}%";
+            }))
             {
                 Messages += $"\nUpdate Easytier failed: {EasytierUpdate.LastError}";
                 return;
             }
             CheckHasEasytier();
             await RestoreAllServices();
-            Messages += "\nUpdate completed.";
+            Messages += $"\nUpdate Easytier to {EasytierUpdate.RemoteVersion} completed.";
         }
         else
         {

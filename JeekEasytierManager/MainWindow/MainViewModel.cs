@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
+using JeekTools;
 
 namespace JeekEasytierManager;
 
@@ -20,6 +21,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         CheckHasEasytier();
         await ShowPeers();
         await ApplySettings();
+
+        GitHubMirrors.TestUrl = AppSettings.JeekEasytierManagerZipUrl;
     }
 
     public void Dispose()

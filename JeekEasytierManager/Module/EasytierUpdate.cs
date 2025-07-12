@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using JeekTools;
@@ -9,7 +10,6 @@ namespace JeekEasytierManager;
 
 public static class EasytierUpdate
 {
-    private static int _mirrorIndex = 0;
     public static string RemoteVersion { get; private set; } = "";
     public static string LocalVersion { get; private set; } = "";
 
@@ -21,6 +21,8 @@ public static class EasytierUpdate
             RemoteVersion = "";
 
             RemoteVersion = await GetLastestVersion();
+            if (RemoteVersion == "")
+                return false;
 
             if (!File.Exists(AppSettings.EasytierCliPath))
                 return true;
@@ -40,20 +42,11 @@ public static class EasytierUpdate
     private static async Task<string> GetLastestVersion()
     {
         var web = new HtmlWeb();
-        var mirrors = GitHubMirrors.GetMirrors(AppSettings.EasytierLatestReleasePageUrl);
-        HtmlDocument? doc = null;
-        _mirrorIndex = 0;
+        var mirror = await GitHubMirrors.GetFastestMirror(AppSettings.EasytierLatestReleasePageUrl);
+        if (mirror == "")
+            return "";
 
-        for (var i = 0; i < mirrors.Length; i++)
-        {
-            doc = await web.LoadFromWebAsync(mirrors[i]);
-            if (doc != null)
-            {
-                _mirrorIndex = i;
-                break;
-            }
-        }
-
+        var doc = await web.LoadFromWebAsync(mirror);
         if (doc == null)
             return "";
 
@@ -68,26 +61,29 @@ public static class EasytierUpdate
         return href.Split('/')[^1].TrimStart('v');
     }
 
-    public static string GetLastestDownloadUrl()
+    public static async Task<string> GetLastestDownloadUrl()
     {
         if (RemoteVersion == "")
             return "";
 
         // https://github.com/EasyTier/EasyTier/releases/download/v2.3.2/easytier-windows-x86_64-v2.3.2.zip
         var downloadUrl = $"https://github.com/EasyTier/EasyTier/releases/download/v{RemoteVersion}/easytier-windows-x86_64-v{RemoteVersion}.zip";
-        var mirrors = GitHubMirrors.GetMirrors(downloadUrl);
-        return mirrors[_mirrorIndex];
+        return await GitHubMirrors.GetFastestMirror(downloadUrl);
     }
 
-    public static async Task<bool> Update()
+    public static string DownloadUrl { get; private set; } = "";
+
+    public static async Task<bool> Update(Action<double>? progressCallback = null)
     {
         try
         {
-            var downloadUrl = GetLastestDownloadUrl();
-            if (downloadUrl == "")
+            DownloadUrl = await GetLastestDownloadUrl();
+            if (DownloadUrl == "")
                 return false;
 
-            var downloadPath = await HttpHelper.DownloadFile(downloadUrl, Path.GetTempPath());
+            var downloadPath = await HttpHelper.DownloadFile(DownloadUrl, Path.GetTempPath(), progressCallback);
+            if (downloadPath == null)
+                return false;
 
             if (Directory.Exists(AppSettings.EasytierDirectory))
                 Directory.Delete(AppSettings.EasytierDirectory, true);

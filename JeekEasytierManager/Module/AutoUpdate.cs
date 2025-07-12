@@ -20,27 +20,19 @@ public static class AutoUpdate
             RemoteTime = null;
             LocalTime = null;
 
-            // Try to get the headers from the mirrors
-            var mirrors = GitHubMirrors.GetMirrors(AppSettings.JeekEasytierManagerZipUrl);
-            HttpHelper.HttpHeaders? headers = null;
+            // Get the fastest mirror
+            var mirror = await GitHubMirrors.GetFastestMirror(AppSettings.JeekEasytierManagerZipUrl);
+            if (mirror == "")
+                return false;
 
-            foreach (var mirror in mirrors)
-            {
-                headers = await HttpHelper.GetHeaders(mirror);
-                if (headers != null)
-                {
-                    _downloadUrl = mirror;
-                    break;
-                }
-            }
+            _downloadUrl = mirror;
 
+            // Try to get the headers from the mirror
+            var headers = await HttpHelper.GetHeaders(_downloadUrl);
             if (headers == null)
                 return false;
 
-            // Get the update time
-            RemoteTime = headers?.LastModified;
-            if (RemoteTime == null)
-                return false;
+            RemoteTime = headers.LastModified;
 
             LocalTime = File.GetLastWriteTime(AppSettings.ExePath);
 
