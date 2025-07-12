@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 
 namespace JeekEasytierManager;
 
@@ -33,7 +34,10 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            await MessageBoxManager.GetMessageBoxStandard("Error", "Failed to initialize: " + ex.Message).ShowAsync();
+            await MessageBoxManager.GetMessageBoxStandard(
+                "Error", "Failed to initialize: " + ex.Message,
+                ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error)
+                .ShowWindowDialogAsync(this);
             App.ExitApplication();
         }
     }

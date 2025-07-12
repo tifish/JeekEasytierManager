@@ -27,7 +27,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 var result = await MessageBoxManager.GetMessageBoxStandard(
                     "Update Easytier", $"Do you want to update easytier to {EasytierUpdate.RemoteVersion}?",
                     ButtonEnum.YesNo, Icon.Question)
-                    .ShowAsync();
+                    .ShowWindowDialogAsync(_mainWindow!);
                 if (result == ButtonResult.No)
                     return;
             }
@@ -71,7 +71,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 var result = await MessageBoxManager.GetMessageBoxStandard(
                     "Update Me", $"Do you want to update me to {AutoUpdate.RemoteTime}?",
                     ButtonEnum.YesNo, Icon.Question)
-                    .ShowAsync();
+                    .ShowWindowDialogAsync(_mainWindow!);
                 if (result == ButtonResult.No)
                     return;
             }

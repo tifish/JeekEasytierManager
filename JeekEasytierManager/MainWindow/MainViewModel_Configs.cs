@@ -246,7 +246,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task DeleteConfig(ConfigInfo config)
     {
-        var result = await MessageBoxManager.GetMessageBoxStandard("Delete Config", "Are you sure you want to delete this config?", ButtonEnum.YesNo).ShowAsync();
+        var result = await MessageBoxManager.GetMessageBoxStandard(
+            "Delete Config", "Are you sure you want to delete this config?",
+            ButtonEnum.YesNo, Icon.Question)
+            .ShowWindowDialogAsync(_mainWindow!);
         if (result != ButtonResult.Yes)
             return;
 
