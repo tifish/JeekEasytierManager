@@ -16,13 +16,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public async Task Init()
     {
+        GitHubMirrors.TestUrl = AppSettings.JeekEasytierManagerZipUrl;
+
         await AppSettings.Load();
         await LoadConfigs(true);
         CheckHasEasytier();
         await ShowPeers();
         await ApplySettings();
-
-        GitHubMirrors.TestUrl = AppSettings.JeekEasytierManagerZipUrl;
     }
 
     public void Dispose()
