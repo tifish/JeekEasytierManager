@@ -17,6 +17,7 @@ public partial class MainWindow : Window
 
         Loaded += OnLoaded;
         Closing += OnClosing;
+        Activated += OnActivated;
     }
 
     private async void OnLoaded(object? sender, RoutedEventArgs e)
@@ -34,6 +35,14 @@ public partial class MainWindow : Window
         {
             await MessageBoxManager.GetMessageBoxStandard("Error", "Failed to initialize: " + ex.Message).ShowAsync();
             App.ExitApplication();
+        }
+    }
+
+    private async void OnActivated(object? sender, EventArgs e)
+    {
+        if (Settings.AutoRefreshInfo)
+        {
+            await MainViewModel.Instance.ShowInfo();
         }
     }
 

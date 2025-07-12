@@ -31,6 +31,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         SyncPassword = Settings.SyncPassword;
 
+        AutoRefreshInfo = Settings.AutoRefreshInfo;
+
         // Check for updates when start
         await CheckForUpdates();
     }
@@ -170,4 +172,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     public partial bool DeleteExtraConfigsOnOtherNodesWhenNextSync { get; set; }
+
+    [ObservableProperty]
+    public partial bool AutoRefreshInfo { get; set; }
+
+    partial void OnAutoRefreshInfoChanged(bool value)
+    {
+        Settings.AutoRefreshInfo = value;
+        _ = AppSettings.Save();
+    }
 }

@@ -21,7 +21,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await AppSettings.Load();
         await LoadConfigs(true);
         CheckHasEasytier();
-        await ShowPeers();
+        await ShowInfo();
         await ApplySettings();
     }
 

@@ -29,6 +29,10 @@
                         Command="{Binding ShowRouteCommand}"
                         Content="显示路由"
                         IsEnabled="{Binding HasRunningService}" />
+                    <ToggleSwitch
+                        IsChecked="{Binding AutoRefreshInfo}"
+                        OffContent="激活窗口时自动刷新"
+                        OnContent="激活窗口时自动刷新" />
                 </StackPanel>
 
             </StackPanel>

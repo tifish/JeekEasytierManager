@@ -45,6 +45,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         return defaultRpcSocket;
     }
 
+    private bool _showPeersOrRoute = true;
+
     [RelayCommand]
     public async Task ShowPeers()
     {
@@ -54,7 +56,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        Messages = "";
+        var messages = new StringBuilder();
 
         foreach (var config in Configs)
         {
@@ -63,8 +65,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             var rpcSocket = GetRpcSocket(config.Name);
             var peers = await Executor.RunWithOutput(AppSettings.EasytierCliPath, $"-p {rpcSocket} peer", Encoding.UTF8);
-            Messages += $"{config.Name}:\n{peers}\n\n";
+            messages.AppendLine($"{config.Name}:");
+            messages.AppendLine(peers);
+            messages.AppendLine();
         }
+
+        Messages = messages.ToString();
+
+        _showPeersOrRoute = true;
     }
 
     [RelayCommand]
@@ -76,7 +84,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        Messages = "";
+        var messages = new StringBuilder();
 
         foreach (var config in Configs)
         {
@@ -85,8 +93,22 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             var rpcSocket = GetRpcSocket(config.Name);
             var route = await Executor.RunWithOutput(AppSettings.EasytierCliPath, $"-p {rpcSocket} route", Encoding.UTF8);
-            Messages += $"{config.Name}:\n{route}\n\n";
+            messages.AppendLine($"{config.Name}:");
+            messages.AppendLine(route);
+            messages.AppendLine();
         }
+
+        Messages = messages.ToString();
+
+        _showPeersOrRoute = false;
+    }
+
+    public async Task ShowInfo()
+    {
+        if (_showPeersOrRoute)
+            await ShowPeers();
+        else
+            await ShowRoute();
     }
 
     [ObservableProperty]

@@ -67,6 +67,8 @@ public class AppSettings
     public bool AutoUpdateEasytier { get; set; } = false;
 
     public string SyncPassword { get; set; } = "";
+
+    public bool AutoRefreshInfo { get; set; } = true;
 }
 
 public static class SettingsContainer
