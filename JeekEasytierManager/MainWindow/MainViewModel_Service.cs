@@ -71,6 +71,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await RestartService(config);
             await UpdateServiceStatus(config);
         }
+
+        await ShowPeers();
     }
 
     [RelayCommand]
@@ -89,6 +91,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await LoadInstalledServices();
         await RestartService(config);
         await UpdateServiceStatus(config);
+        await ShowPeers();
     }
 
     private async Task InstallService(ConfigInfo config)
@@ -140,6 +143,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             await UpdateServiceStatus(config);
         }
+
+        await ShowPeers();
     }
 
     [RelayCommand]
@@ -155,6 +160,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         await LoadInstalledServices();
         await UpdateServiceStatus(config);
+
+        await ShowPeers();
     }
 
     private async Task<bool> UninstallService(ConfigInfo config)
@@ -193,6 +200,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await RestartService(config);
             await UpdateServiceStatus(config);
         }
+
+        await ShowPeers();
     }
 
     [RelayCommand]
@@ -200,6 +209,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         await RestartService(config);
         await UpdateServiceStatus(config);
+        await ShowPeers();
     }
 
     public async Task RestartService(ConfigInfo config)
@@ -245,6 +255,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await StopService(config);
             await UpdateServiceStatus(config);
         }
+
+        await ShowPeers();
     }
 
     [RelayCommand]
@@ -252,6 +264,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         await StopService(config);
         await UpdateServiceStatus(config);
+        await ShowPeers();
     }
 
     public async Task StopService(ConfigInfo config)
