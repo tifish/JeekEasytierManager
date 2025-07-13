@@ -12,7 +12,10 @@
     </UserControl.Styles>
 
     <Border Classes="Card">
-        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+        <Grid
+            ColumnDefinitions="*"
+            RowDefinitions="Auto,*,Auto"
+            RowSpacing="10">
 
             <StackPanel Grid.Row="0" Orientation="Horizontal">
                 <TextBlock Classes="Title" Text="📝" />
@@ -138,7 +141,6 @@
 
                     <Border Classes="Card">
                         <Grid
-                            MaxWidth="700"
                             ColumnDefinitions="Auto,*"
                             ColumnSpacing="20"
                             RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">

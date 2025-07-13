@@ -13,35 +13,44 @@
     <Grid
         x:Name="MainGrid"
         Margin="20"
+        ColumnDefinitions="*"
+        ColumnSpacing="20"
         RowDefinitions="Auto,*">
 
-        <StackPanel
-            Grid.Row="0"
-            Orientation="Horizontal"
-            Spacing="20">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*">
 
-            <local:MainWindowConfigs />
-
-            <local:MainWindowEditConfigs IsVisible="{Binding IsEditingConfigs}" />
+            <local:MainWindowConfigs Grid.Column="0" Margin="0,0,20,0" />
 
             <StackPanel
-                HorizontalAlignment="Left"
-                VerticalAlignment="Top"
+                Grid.Column="1"
                 IsVisible="{Binding !IsEditingConfigs}"
-                Orientation="Vertical"
-                Spacing="10">
+                Orientation="Horizontal">
 
-                <local:MainWindowService />
+                <StackPanel Orientation="Horizontal" Spacing="20">
 
-                <local:MainWindowUpdate />
+                    <StackPanel
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Orientation="Vertical"
+                        Spacing="10">
 
+                        <local:MainWindowService />
+
+                        <local:MainWindowUpdate />
+
+                    </StackPanel>
+
+                    <local:MainWindowSettings />
+
+                </StackPanel>
             </StackPanel>
 
-            <local:MainWindowSettings IsVisible="{Binding !IsEditingConfigs}" />
+            <local:MainWindowEditConfigs Grid.Column="2" IsVisible="{Binding IsEditingConfigs}" />
 
-        </StackPanel>
+        </Grid>
 
         <local:MainWindowInfo Grid.Row="1" IsVisible="{Binding !IsEditingConfigs}" />
+
     </Grid>
 
 </UserControl>
