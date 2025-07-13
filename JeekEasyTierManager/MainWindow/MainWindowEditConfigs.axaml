@@ -2,7 +2,8 @@
     x:Class="JeekEasyTierManager.MainWindowEditConfigs"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:JeekEasyTierManager"
+    xmlns:converters="using:Avalonia.Data.Converters"
+    xmlns:local="using:JeekEasyTierManager"
     x:DataType="local:MainViewModel">
 
     <UserControl.Styles>
@@ -46,7 +47,10 @@
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical" Spacing="10">
                                     <TextBlock Text="网络密码" />
-                                    <TextBox Text="{Binding NetworkSecret}" Watermark="个人使用请务必设置，否则相当于裸奔。" />
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBox Text="{Binding NetworkSecret}" Watermark="个人使用请务必设置，否则相当于裸奔。" />
+                                        <Button Command="{Binding SetRandomNetworkSecretCommand}" Content="随机生成" />
+                                    </StackPanel>
                                 </StackPanel>
                             </StackPanel>
 
@@ -60,11 +64,24 @@
                             <TextBox
                                 IsEnabled="{Binding EditIpAddress}"
                                 Text="{Binding Ipv4}"
-                                Watermark="例如：192.168.8.1" />
+                                Watermark="虚拟网卡的地址，用来访问这个节点。子网代理则提供了另一种访问方式。">
+                                <TextBox.IsEnabled>
+                                    <MultiBinding Converter="{x:Static converters:BoolConverters.And}">
+                                        <Binding Path="EditIpAddress" />
+                                        <Binding Path="!Dhcp" />
+                                    </MultiBinding>
+                                </TextBox.IsEnabled>
+                            </TextBox>
 
                             <StackPanel Orientation="Horizontal" Spacing="10">
                                 <StackPanel Orientation="Vertical" Spacing="10">
-                                    <CheckBox Content="修改连接服务器" IsChecked="{Binding EditPeers}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <CheckBox Content="修改连接服务器" IsChecked="{Binding EditPeers}" />
+                                        <Button
+                                            Command="{Binding SetDefaultPeersCommand}"
+                                            Content="官方服务器"
+                                            IsEnabled="{Binding EditPeers}" />
+                                    </StackPanel>
                                     <TextBox
                                         AcceptsReturn="True"
                                         IsEnabled="{Binding EditPeers}"
@@ -82,22 +99,30 @@
                                 </StackPanel>
                             </StackPanel>
 
-                            <StackPanel Orientation="Vertical" Spacing="10">
-                                <CheckBox Content="信息监听地址和端口" IsChecked="{Binding EditRpcPortal}" />
-                                <TextBox
-                                    IsEnabled="{Binding EditRpcPortal}"
-                                    Text="{Binding RpcPortal}"
-                                    Watermark="查看连接状态必备，例如：127.0.0.1:15888" />
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <CheckBox Content="编辑信息监听地址和端口" IsChecked="{Binding EditRpcPortal}" />
+                                <Button
+                                    Command="{Binding SetDefaultRpcPortalCommand}"
+                                    Content="默认值"
+                                    IsEnabled="{Binding EditRpcPortal}" />
                             </StackPanel>
+                            <TextBox
+                                IsEnabled="{Binding EditRpcPortal}"
+                                Text="{Binding RpcPortal}"
+                                Watermark="查看连接状态必备，例如：127.0.0.1:15888" />
 
-                            <StackPanel Orientation="Vertical" Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
                                 <CheckBox Content="修改子网代理" IsChecked="{Binding EditProxyNetworks}" />
-                                <TextBox
-                                    AcceptsReturn="True"
-                                    IsEnabled="{Binding EditProxyNetworks}"
-                                    Text="{Binding ProxyNetworks}"
-                                    Watermark="例如：192.168.8.0/24，可多行" />
+                                <Button
+                                    Command="{Binding SetCurrentProxyNetworksCommand}"
+                                    Content="当前子网"
+                                    IsEnabled="{Binding EditProxyNetworks}" />
                             </StackPanel>
+                            <TextBox
+                                AcceptsReturn="True"
+                                IsEnabled="{Binding EditProxyNetworks}"
+                                Text="{Binding ProxyNetworks}"
+                                Watermark="让其他节点访问子网的任意地址。例如：192.168.1.0/24，可多行" />
 
                             <CheckBox Content="修改日志文件" IsChecked="{Binding EditFileLogger}" />
                             <Border Classes="Card">

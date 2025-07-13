@@ -282,4 +282,82 @@ public partial class MainViewModel : ObservableObject, IDisposable
         MainGrid.RowDefinitions[0].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
         MainGrid.RowDefinitions[1].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
     }
+
+    [RelayCommand]
+    public void SetDefaultRpcPortal()
+    {
+        RpcPortal = "127.0.0.1:15888";
+    }
+
+    [RelayCommand]
+    public void SetCurrentProxyNetworks()
+    {
+        // 通过创建一个 socket 访问一个全球可达的地址，获取到当前主网卡的子网
+        try
+        {
+            // 连接到一个国内常用的公网地址（如 114.114.114.114:53），以获取本地出口IP
+            using (var socket = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Dgram, 0))
+            {
+                // 114.114.114.114 是中国大陆常用的公共DNS服务器
+                socket.Connect("114.114.114.114", 53);
+                var localEndPoint = socket.LocalEndPoint as System.Net.IPEndPoint;
+                if (localEndPoint != null)
+                {
+                    var localIp = localEndPoint.Address;
+                    // 获取所有本地网卡信息
+                    var allNics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+                    foreach (var nic in allNics)
+                    {
+                        if (nic.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up)
+                            continue;
+                        var ipProps = nic.GetIPProperties();
+                        foreach (var unicast in ipProps.UnicastAddresses)
+                        {
+                            if (unicast.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
+                                unicast.Address.Equals(localIp))
+                            {
+                                // 计算子网
+                                var ipBytes = unicast.Address.GetAddressBytes();
+                                var maskBytes = unicast.IPv4Mask.GetAddressBytes();
+                                var networkBytes = new byte[4];
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    networkBytes[i] = (byte)(ipBytes[i] & maskBytes[i]);
+                                }
+                                var networkAddress = new System.Net.IPAddress(networkBytes);
+                                // 计算掩码长度
+                                int maskLength = 0;
+                                foreach (var b in maskBytes)
+                                {
+                                    for (int i = 7; i >= 0; i--)
+                                    {
+                                        if ((b & (1 << i)) != 0)
+                                            maskLength++;
+                                    }
+                                }
+                                ProxyNetworks = $"{networkAddress}/{maskLength}";
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Messages += $"\n获取子网失败: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    public void SetDefaultPeers()
+    {
+        Peers = "tcp://public.easytier.top:11010";
+    }
+
+    [RelayCommand]
+    public void SetRandomNetworkSecret()
+    {
+        NetworkSecret = Guid.NewGuid().ToString()[..14].Replace("-", "");
+    }
 }
