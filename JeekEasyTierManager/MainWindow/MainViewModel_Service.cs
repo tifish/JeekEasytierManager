@@ -18,11 +18,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var configsToUpdate = configs ?? [.. Configs];
 
         // Get installed services
-        var easyTierServices = ServiceController.GetServices().Where(s => s.ServiceName.StartsWith(ServicePrefix));
+        var easyTierServices = ServiceController.GetServices().Where(
+            s => s.ServiceName.StartsWith(ServicePrefix, StringComparison.InvariantCultureIgnoreCase));
 
         foreach (var config in configsToUpdate)
         {
-            config.Service = easyTierServices.FirstOrDefault(s => s.ServiceName == ServicePrefix + config.Name);
+            config.Service = easyTierServices.FirstOrDefault(
+                s => s.ServiceName.Equals(ServicePrefix + config.Name, StringComparison.InvariantCultureIgnoreCase));
             config.IsInstalled = config.Service != null;
         }
     }

@@ -10,8 +10,6 @@ namespace JeekEasyTierManager;
 
 class Program
 {
-
-
     // Property to track if the application should start hidden
     public static bool StartHidden { get; private set; } = false;
 

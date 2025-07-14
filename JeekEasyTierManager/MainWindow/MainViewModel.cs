@@ -3,11 +3,14 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using JeekTools;
+using Microsoft.Extensions.Logging;
 
 namespace JeekEasyTierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
+    private static readonly ILogger Log = LogManager.CreateLogger(nameof(MainViewModel));
+
     public static MainViewModel Instance { get; private set; } = new();
 
     [ObservableProperty]
