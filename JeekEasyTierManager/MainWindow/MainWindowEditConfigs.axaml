@@ -388,8 +388,7 @@
                 <Button
                     Classes="Green"
                     Command="{Binding SaveEditConfigsCommand}"
-                    Content="保存"
-                    IsEnabled="{Binding HasSelectedConfigs}" />
+                    Content="保存" />
                 <Button
                     Classes="Gray"
                     Command="{Binding CloseEditConfigsCommand}"
