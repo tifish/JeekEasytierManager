@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.ServiceProcess;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -12,31 +13,17 @@ namespace JeekEasyTierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    private async Task LoadInstalledServices(List<ConfigInfo>? configs = null)
+    private void LoadInstalledServices(List<ConfigInfo>? configs = null)
     {
         var configsToUpdate = configs ?? [.. Configs];
 
         // Get installed services
-        var output = await Executor.RunWithOutput("sc", "query type= service state= all");
-        var lines = output.Split('\n');
-        var installedServices = new HashSet<string>();
-
-        foreach (var line in lines)
-        {
-            if (line.Trim().StartsWith("SERVICE_NAME:"))
-            {
-                var serviceName = line.Split(':')[1].Trim();
-                if (serviceName.StartsWith(ServicePrefix))
-                {
-                    var configName = serviceName[ServicePrefix.Length..];
-                    installedServices.Add(configName);
-                }
-            }
-        }
+        var easyTierServices = ServiceController.GetServices().Where(s => s.ServiceName.StartsWith(ServicePrefix));
 
         foreach (var config in configsToUpdate)
         {
-            config.IsInstalled = installedServices.Contains(config.Name);
+            config.Service = easyTierServices.FirstOrDefault(s => s.ServiceName == ServicePrefix + config.Name);
+            config.IsInstalled = config.Service != null;
         }
     }
 
@@ -61,7 +48,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await InstallService(config);
         }
 
-        await LoadInstalledServices();
+        LoadInstalledServices();
 
         foreach (var config in Configs)
         {
@@ -69,7 +56,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 continue;
 
             await RestartService(config);
-            await UpdateServiceStatus(config);
+            UpdateServiceStatus(config);
         }
 
         await ShowInfo();
@@ -88,9 +75,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         await InstallService(config);
 
-        await LoadInstalledServices();
+        LoadInstalledServices();
         await RestartService(config);
-        await UpdateServiceStatus(config);
+        UpdateServiceStatus(config);
         await ShowInfo();
     }
 
@@ -134,14 +121,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await UninstallService(config);
         }
 
-        await LoadInstalledServices();
+        LoadInstalledServices();
 
         foreach (var config in Configs)
         {
             if (!config.IsSelected)
                 continue;
 
-            await UpdateServiceStatus(config);
+            UpdateServiceStatus(config);
         }
 
         await ShowInfo();
@@ -158,8 +145,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         await UninstallService(config);
 
-        await LoadInstalledServices();
-        await UpdateServiceStatus(config);
+        LoadInstalledServices();
+        UpdateServiceStatus(config);
 
         await ShowInfo();
     }
@@ -198,7 +185,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 continue;
 
             await RestartService(config);
-            await UpdateServiceStatus(config);
+            UpdateServiceStatus(config);
         }
 
         await ShowInfo();
@@ -208,30 +195,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public async Task RestartSingleService(ConfigInfo config)
     {
         await RestartService(config);
-        await UpdateServiceStatus(config);
+        UpdateServiceStatus(config);
         await ShowInfo();
     }
 
     public async Task RestartService(ConfigInfo config)
     {
-        if (!config.IsInstalled)
+        if (config.Service == null)
             return;
 
-        if (!await Nssm.RestartService(ServicePrefix + config.Name))
-        {
-            Messages = $"Failed to restart service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
-            return;
-        }
+        await config.Service.StopAsync();
+        await config.Service.StartAsync();
 
         // Wait 3 seconds to make sure the tun device is ready
         DispatcherTimer.RunOnce(async () =>
         {
             // Since the interface seems to be private, but not really private, we need to set it to private again.
             var configData = config.GetConfig();
+            if (configData == null)
+                return;
             if (configData.Flags?.NoTun ?? false)
                 return;
 
-            if (string.IsNullOrEmpty(configData.Flags?.DevName))
+            if (string.IsNullOrEmpty(configData!.Flags?.DevName))
                 return;
 
             await Executor.RunAndWait("powershell.exe", $"-ex bypass -command Set-NetConnectionProfile -InterfaceAlias \"{configData.Flags.DevName}\" -NetworkCategory Private", false, true);
@@ -253,7 +239,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 continue;
 
             await StopService(config);
-            await UpdateServiceStatus(config);
+            UpdateServiceStatus(config);
         }
 
         await ShowInfo();
@@ -263,20 +249,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public async Task StopSingleService(ConfigInfo config)
     {
         await StopService(config);
-        await UpdateServiceStatus(config);
+        UpdateServiceStatus(config);
         await ShowInfo();
     }
 
     public async Task StopService(ConfigInfo config)
     {
-        if (config.Status != ServiceStatus.Running)
+        if (config.Service == null)
             return;
 
-        if (!await Nssm.StopService(ServicePrefix + config.Name))
-        {
-            Messages = $"Failed to stop service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
-            return;
-        }
+        await config.Service.StopAsync();
     }
 
     private readonly List<string> _stoppedConfigNames = [];
@@ -290,7 +272,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (config.Status == ServiceStatus.Running)
             {
                 await StopService(config);
-                await UpdateServiceStatus(config);
+                UpdateServiceStatus(config);
                 _stoppedConfigNames.Add(config.Name);
             }
         }
@@ -305,7 +287,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 continue;
 
             await RestartService(config);
-            await UpdateServiceStatus(config);
+            UpdateServiceStatus(config);
         }
 
         _stoppedConfigNames.Clear();
@@ -314,11 +296,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     public partial bool HasRunningService { get; set; }
 
-    public async Task UpdateServiceStatus(ConfigInfo config)
+    public void UpdateServiceStatus(ConfigInfo config)
     {
-        if (config.IsInstalled)
+        if (config.Service != null)
         {
-            config.Status = await Nssm.GetServiceStatus(ServicePrefix + config.Name);
+            config.Service.Refresh();
+
+            config.Status = (ServiceStatus)config.Service.Status;
         }
         else
         {
@@ -328,13 +312,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         HasRunningService = Configs.Any(c => c.Status == ServiceStatus.Running);
     }
 
-    public async Task UpdateAllServicesStatus(List<ConfigInfo>? configs = null)
+    public void UpdateAllServicesStatus(List<ConfigInfo>? configs = null)
     {
         var configsToUpdate = configs ?? [.. Configs];
 
         foreach (var config in configsToUpdate)
         {
-            await UpdateServiceStatus(config);
+            UpdateServiceStatus(config);
         }
     }
 

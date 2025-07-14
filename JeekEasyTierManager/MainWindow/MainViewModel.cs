@@ -18,7 +18,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         GitHubMirrors.TestUrl = AppSettings.JeekEasyTierManagerZipUrl;
 
         await AppSettings.Load();
-        await LoadConfigs(true);
+        LoadConfigs(true);
         CheckHasEasyTier();
         await ShowInfo();
         await ApplySettings();

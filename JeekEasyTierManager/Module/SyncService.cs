@@ -77,7 +77,7 @@ public class SyncService : ServiceBase<ISyncService>, ISyncService
     public UnaryResult RefreshConfigs()
     {
         EnsureAuthorized();
-        Dispatcher.UIThread.Post(async () => await MainViewModel.Instance.RefreshConfigs());
+        Dispatcher.UIThread.Post(() => MainViewModel.Instance.RefreshConfigs());
         return UnaryResult.CompletedResult;
     }
 }

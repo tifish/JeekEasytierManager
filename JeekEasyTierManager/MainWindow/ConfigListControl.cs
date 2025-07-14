@@ -14,6 +14,7 @@ using JeekTools;
 using System.IO;
 using System.Runtime.Serialization;
 using Nett;
+using System.ServiceProcess;
 
 namespace JeekEasyTierManager;
 
@@ -50,19 +51,29 @@ public partial class ConfigInfo : ObservableObject
         return Path.Join(AppSettings.ConfigDirectory, Name + ".toml");
     }
 
-    public EasyTierConfig GetConfig()
+    public EasyTierConfig? GetConfig()
     {
-        return Toml.ReadFile<EasyTierConfig>(GetConfigPath());
+        try
+        {
+            return Toml.ReadFile<EasyTierConfig>(GetConfigPath());
+        }
+        catch
+        {
+            return null;
+        }
     }
+
+    public ServiceController? Service { get; set; }
 }
 
 // Add status to color converter
 public class ServiceStatusToColorConverter : IValueConverter
 {
     // Cache color brushes for performance
-    private static readonly Lazy<SolidColorBrush> _runningBrush = new(() => GetResourceColor("Green"));
-    private static readonly Lazy<SolidColorBrush> _stoppedBrush = new(() => GetResourceColor("Red"));
-    private static readonly Lazy<SolidColorBrush> _noneBrush = new(() => GetResourceColor("Gray"));
+    private static readonly Lazy<SolidColorBrush> _greenBrush = new(() => GetResourceColor("Green"));
+    private static readonly Lazy<SolidColorBrush> _redBrush = new(() => GetResourceColor("Red"));
+    private static readonly Lazy<SolidColorBrush> _yellowBrush = new(() => GetResourceColor("Yellow"));
+    private static readonly Lazy<SolidColorBrush> _grayBrush = new(() => GetResourceColor("Gray"));
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
@@ -70,13 +81,14 @@ public class ServiceStatusToColorConverter : IValueConverter
         {
             return status switch
             {
-                ServiceStatus.Running => _runningBrush.Value,
-                ServiceStatus.Stopped => _stoppedBrush.Value,
-                ServiceStatus.None => _noneBrush.Value,
-                _ => _noneBrush.Value
+                ServiceStatus.Running => _greenBrush.Value,
+                ServiceStatus.Stopped => _yellowBrush.Value,
+                ServiceStatus.Paused => _redBrush.Value,
+                ServiceStatus.None => _grayBrush.Value,
+                _ => _grayBrush.Value
             };
         }
-        return _noneBrush.Value;
+        return _grayBrush.Value;
     }
 
     private static SolidColorBrush GetResourceColor(string resourceKey)

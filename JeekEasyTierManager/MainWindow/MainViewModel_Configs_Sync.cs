@@ -24,7 +24,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task SyncConfigs()
     {
-        await UpdateAllServicesStatus();
+        UpdateAllServicesStatus();
 
         // Get all rpc clients
         var rpcClients = await GetAllRpcClients();
@@ -135,7 +135,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         // Refresh configs
         if (localNeedRefresh)
-            await RefreshConfigs();
+            RefreshConfigs();
     }
 
     private async Task<List<ISyncService>> GetAllRpcClients()

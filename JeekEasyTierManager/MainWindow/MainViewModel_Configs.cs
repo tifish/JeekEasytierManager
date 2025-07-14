@@ -14,7 +14,7 @@ namespace JeekEasyTierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    private async Task LoadConfigs(bool isInitial)
+    private void LoadConfigs(bool isInitial)
     {
         if (!Directory.Exists(AppSettings.ConfigDirectory))
             return;
@@ -42,8 +42,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (configNames.Count == Configs.Count
             && configNames.All(c => Configs.Any(c2 => c2.Name == c)))
         {
-            await LoadInstalledServices();
-            await UpdateAllServicesStatus();
+            LoadInstalledServices();
+            UpdateAllServicesStatus();
         }
         else
         {
@@ -68,8 +68,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
 
             // Update service status
-            await LoadInstalledServices(newConfigs);
-            await UpdateAllServicesStatus(newConfigs);
+            LoadInstalledServices(newConfigs);
+            UpdateAllServicesStatus(newConfigs);
 
             if (isInitial)
             {
@@ -265,10 +265,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    public async Task RefreshConfigs()
+    public void RefreshConfigs()
     {
         // Must run on UI thread
-        await LoadConfigs(false);
+        LoadConfigs(false);
     }
 
     [ObservableProperty]
