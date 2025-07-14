@@ -36,26 +36,13 @@ public class RemoteCall
         app.RunAsync(url);
     }
 
-    private static Dictionary<string, ISyncService> _cachedClients = [];
-
-    public static async Task<ISyncService?> GetClient(string url)
+    public static ISyncService? GetClient(string url)
     {
-        // Ping to check if the server is running
         try
         {
-            if (!_cachedClients.TryGetValue(url, out var client))
-            {
-                var channel = GrpcChannel.ForAddress(url);
-                var invoker = channel.Intercept(new AuthInterceptor());
-                client = MagicOnionClient.Create<ISyncService>(invoker);
-            }
-
-            var result = await client.WithDeadline(DateTime.UtcNow.AddSeconds(1)).Ping();
-            if (!result)
-                return null;
-
-            _cachedClients.TryAdd(url, client);
-            return client;
+            var channel = GrpcChannel.ForAddress(url);
+            var invoker = channel.Intercept(new AuthInterceptor());
+            return MagicOnionClient.Create<ISyncService>(invoker);
         }
         catch
         {

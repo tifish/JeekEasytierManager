@@ -12,3 +12,4 @@ obj
 /bin/*.deps.json
 /bin/*.runtimeconfig.json
 /bin/Settings
+/bin/Logs

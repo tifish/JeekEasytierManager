@@ -27,9 +27,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         UpdateAllServicesStatus();
 
         // Get all rpc clients
-        var rpcClients = await GetAllRpcClients();
+        var (rpcClients, rpcClientIps) = await GetAllRpcClients();
         if (rpcClients.Count == 0)
+        {
+            AddMessage("No rpc clients found");
             return;
+        }
 
         // Get local file info list
         var localFileInfoList = GetConfigFileInfoList();
@@ -42,13 +45,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var localNeedRefresh = false;
 
         // Get all file info list from all rpc clients
-        foreach (var rpcClient in rpcClients)
+        for (var i = 0; i < rpcClients.Count; i++)
         {
+            var rpcClient = rpcClients[i];
+            var rpcClientIp = rpcClientIps[i];
+
+            AddMessage($"Syncing configs with {rpcClientIp}");
+
             var remoteFileInfoList = await rpcClient.GetConfigFileInfoList();
             var remoteFileNameIndexDict = new Dictionary<string, int>();
-            for (var i = 0; i < remoteFileInfoList.Count; i++)
+            for (var j = 0; j < remoteFileInfoList.Count; j++)
             {
-                remoteFileNameIndexDict.Add(remoteFileInfoList[i].FileName, i);
+                remoteFileNameIndexDict.Add(remoteFileInfoList[j].FileName, j);
             }
 
             // Find local only files
@@ -93,6 +101,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 var fileContentList = await GetConfigFileContent(fileNames);
                 await rpcClient.SendConfigFileContent(fileContentList);
                 remoteNeedRefresh = localOnlyFileInfos.Count > 0;
+
+                AddMessage($"Sent {fileNames.Count} files to {rpcClientIp}");
             }
 
             if (DeleteExtraConfigsOnOtherNodesWhenNextSync)
@@ -103,6 +113,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     var fileNames = remoteNewerFileInfos.Select(fileInfo => fileInfo.FileName).ToList();
                     var remoteFileContentList = await rpcClient.GetConfigFileContent(fileNames);
                     await WriteConfigFileContent(remoteFileContentList);
+
+                    AddMessage($"Received {fileNames.Count} files from {rpcClientIp}");
                 }
 
                 // Delete remote only files on other nodes
@@ -111,6 +123,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     var fileNames = remoteOnlyFileInfos.Select(fileInfo => fileInfo.FileName).ToList();
                     await rpcClient.DeleteExtraConfigs(fileNames);
                     remoteNeedRefresh = true;
+
+                    AddMessage($"Deleted {fileNames.Count} files in {rpcClientIp}");
                 }
             }
             else
@@ -123,12 +137,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     var remoteFileContentList = await rpcClient.GetConfigFileContent(fileNames);
                     await WriteConfigFileContent(remoteFileContentList);
                     localNeedRefresh = remoteOnlyFileInfos.Count > 0;
+
+                    AddMessage($"Received {fileNames.Count} files from {rpcClientIp}");
                 }
             }
 
             // Refresh configs on remote
             if (remoteNeedRefresh)
                 await rpcClient.RefreshConfigs();
+
+            AddMessage($"Synced configs with {rpcClientIp}");
         }
 
         DeleteExtraConfigsOnOtherNodesWhenNextSync = false;
@@ -138,9 +156,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             RefreshConfigs();
     }
 
-    private async Task<List<ISyncService>> GetAllRpcClients()
+    private async Task<(List<ISyncService>, List<string>)> GetAllRpcClients()
     {
-        var rpcClients = new List<ISyncService>();
+        var rpcPeerIps = new List<string>();
 
         foreach (var config in Configs)
         {
@@ -156,15 +174,53 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 if (peer.Cost == "Local")
                     continue;
 
-                var rpcClient = await RemoteCall.GetClient($"http://{peer.Ipv4}:16666");
-                if (rpcClient == null)
-                    continue;
-
-                rpcClients.Add(rpcClient);
+                rpcPeerIps.Add(peer.Ipv4);
             }
         }
 
-        return rpcClients;
+        var rpcClients = new List<ISyncService>();
+        var rpcClientIps = new List<string>();
+        var untestedRpcClients = new List<(ISyncService?, string)>();
+
+        foreach (var rpcPeerIp in rpcPeerIps)
+        {
+            var rpcClient = RemoteCall.GetClient($"http://{rpcPeerIp}:16666");
+            if (rpcClient != null)
+            {
+                untestedRpcClients.Add((rpcClient, rpcPeerIp));
+            }
+        }
+
+        // Parallel test all rpc clients
+        var tasks = untestedRpcClients.Select(async (rpcClientAndIp) =>
+        {
+            try
+            {
+                var result = await rpcClientAndIp.Item1!.WithDeadline(DateTime.UtcNow.AddSeconds(2)).Ping();
+                if (result)
+                {
+                    return rpcClientAndIp;
+                }
+            }
+            catch
+            {
+            }
+
+            return (null, "");
+        });
+
+        var results = await Task.WhenAll(tasks);
+
+        foreach (var result in results)
+        {
+            if (result.Item1 != null)
+            {
+                rpcClients.Add(result.Item1);
+                rpcClientIps.Add(result.Item2);
+            }
+        }
+
+        return (rpcClients, rpcClientIps);
     }
 
     private class PeerInfo

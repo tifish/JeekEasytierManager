@@ -18,7 +18,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         var hasUpdate = await EasyTierUpdate.HasUpdate();
 
-        Messages += $"\nEasyTier local version is {EasyTierUpdate.LocalVersion}, remote version is {EasyTierUpdate.RemoteVersion}";
+        AddMessage($"EasyTier local version is {EasyTierUpdate.LocalVersion}, remote version is {EasyTierUpdate.RemoteVersion}");
 
         if (hasUpdate)
         {
@@ -32,24 +32,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     return;
             }
 
-            Messages += $"\nUpdating EasyTier to {EasyTierUpdate.RemoteVersion}...";
+            AddMessage($"Updating EasyTier to {EasyTierUpdate.RemoteVersion}...");
             await StopAllServices();
             if (!await EasyTierUpdate.Update((progress) =>
             {
-                Messages = $"\nStart downloading EasyTier from {EasyTierUpdate.DownloadUrl}";
-                Messages += $"\nDownloading EasyTier: {progress:F2}%";
+                AddMessage($"\nStart downloading EasyTier from {EasyTierUpdate.DownloadUrl}");
+                AddMessage($"Downloading EasyTier: {progress:F2}%");
             }))
             {
-                Messages += $"\nUpdate EasyTier failed: {EasyTierUpdate.LastError}";
+                AddMessage($"Update EasyTier failed: {EasyTierUpdate.LastError}");
                 return;
             }
             CheckHasEasyTier();
             await RestoreAllServices();
-            Messages += $"\nUpdate EasyTier to {EasyTierUpdate.RemoteVersion} completed.";
+            AddMessage($"Update EasyTier to {EasyTierUpdate.RemoteVersion} completed.");
         }
         else
         {
-            Messages += "\nNo update of EasyTier found.";
+            AddMessage("No update of EasyTier found.");
         }
     }
 
@@ -61,8 +61,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         var hasUpdate = await AutoUpdate.HasUpdate();
 
-        Messages += $"\nChecking update from {AutoUpdate.DownloadUrl}";
-        Messages += $"\nMy local version is {AutoUpdate.LocalTime}, remote version is {AutoUpdate.RemoteTime}";
+        AddMessage($"Checking update from {AutoUpdate.DownloadUrl}");
+        AddMessage($"My local version is {AutoUpdate.LocalTime}, remote version is {AutoUpdate.RemoteTime}");
 
         if (hasUpdate)
         {
@@ -76,12 +76,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     return;
             }
 
-            Messages += "\nUpdating me...";
+            AddMessage("Updating me...");
             AutoUpdate.Update(!_mainWindow!.IsVisible);
         }
         else
         {
-            Messages += "\nNo update of me found.";
+            AddMessage("No update of me found.");
         }
     }
 

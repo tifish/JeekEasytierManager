@@ -345,7 +345,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            Messages += $"\n获取子网失败: {ex.Message}";
+            AddMessage($"Failed to get current proxy networks: {ex.Message}");
         }
     }
 
