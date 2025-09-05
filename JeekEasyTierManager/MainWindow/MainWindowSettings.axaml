@@ -24,6 +24,8 @@
                     Command="{Binding SwitchThemeCommand}"
                     Content="切换主题" />
 
+                <Separator />
+
                 <Grid
                     ColumnDefinitions="Auto,Auto"
                     ColumnSpacing="10"
@@ -51,6 +53,8 @@
                         IsChecked="{Binding AutoUpdateMe}" />
                 </Grid>
 
+                <Separator />
+
                 <Label
                     Content="EasyTier 未安装"
                     Foreground="Red"
@@ -68,6 +72,8 @@
                         CommandParameter="{x:True}"
                         Content="更新我" />
                 </StackPanel>
+
+                <Separator />
 
                 <TextBlock Text="同步密码" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
