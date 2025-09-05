@@ -22,7 +22,6 @@ public partial class MainWindowConfigs : UserControl
 
         var dataGrid = (DataGrid)sender!;
         var selectedItems = dataGrid.SelectedItems;
-        MainViewModel.Instance.HasSelectedConfigs = selectedItems.Count > 0;
         MainViewModel.Instance.SelectedConfigs = [.. selectedItems.Cast<ConfigInfo>()];
     }
 

@@ -274,10 +274,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             _renameConfigDialogOldConfig.Name = newName;
             _renameConfigDialogOldConfig = null;
-
-            // Notify that HasSelectedConfigs might have changed
-            OnPropertyChanged(nameof(HasSelectedConfigs));
-            EditSelectedConfigsCommand.NotifyCanExecuteChanged();
         }
         catch (Exception ex)
         {
@@ -383,9 +379,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _mainWindowConfigs = mainWindowConfigs;
     }
 
-    [ObservableProperty]
-    public partial bool HasSelectedConfigs { get; set; }
-
     public ObservableCollection<ConfigInfo> SelectedConfigs { get; set; } = [];
 
     private void AddSelectedConfig(ConfigInfo config)
@@ -393,7 +386,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!SelectedConfigs.Contains(config))
         {
             SelectedConfigs.Add(config);
-            HasSelectedConfigs = SelectedConfigs.Count > 0;
             _mainWindowConfigs?.UpdateDataGridSelection();
         }
     }
