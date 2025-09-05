@@ -2,26 +2,109 @@
     x:Class="JeekEasyTierManager.MainWindowConfigs"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:JeekEasyTierManager"
+    xmlns:local="using:JeekEasyTierManager"
     x:DataType="local:MainViewModel">
 
     <Border Classes="Card">
         <StackPanel Orientation="Vertical" Spacing="10">
 
-            <Grid ColumnDefinitions="Auto,*">
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Classes="Title" Text="📝" />
-                    <Label Classes="Title" Content="EasyTier 配置" />
-                </StackPanel>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <TextBlock Classes="Title" Text="📝" />
+                <Label Classes="Title" Content="EasyTier 配置" />
+            </StackPanel>
 
-                <ToggleButton
-                    Grid.Column="1"
-                    HorizontalAlignment="Right"
-                    Content="更多功能"
-                    IsChecked="{Binding ShowMoreConfigActions}" />
-            </Grid>
+            <DataGrid
+                x:Name="ConfigsDataGrid"
+                AutoGenerateColumns="False"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                GridLinesVisibility="All"
+                HeadersVisibility="None"
+                ItemsSource="{Binding Configs}"
+                SelectionChanged="DataGrid_SelectionChanged">
 
-            <local:ConfigListControl Configs="{Binding Configs}" />
+                <DataGrid.Columns>
+
+                    <DataGridTextColumn Binding="{Binding Name}" />
+
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Margin="10,0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Bold"
+                                    Foreground="{Binding Status, Converter={x:Static local:ServiceStatusToColorConverter.Instance}}"
+                                    Text="{Binding Status}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button
+                                        Command="{Binding RestartSingleServiceCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                        CommandParameter="{Binding}"
+                                        Content="▶️"
+                                        ToolTip.Tip="重启服务" />
+                                    <Button
+                                        Command="{Binding StopSingleServiceCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                        CommandParameter="{Binding}"
+                                        Content="⏹️"
+                                        ToolTip.Tip="停止服务" />
+                                    <Button
+                                        Command="{Binding EditSingleConfigCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                        CommandParameter="{Binding}"
+                                        Content="✏️"
+                                        ToolTip.Tip="编辑配置" />
+                                    <Button
+                                        Command="{Binding TestSingleConfigCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                        CommandParameter="{Binding}"
+                                        Content="🏃"
+                                        ToolTip.Tip="测试配置" />
+                                    <Button
+                                        Content="..."
+                                        ToolTip.Tip="更多功能...">
+                                        <Button.Flyout>
+                                            <MenuFlyout>
+                                                <MenuItem
+                                                    Command="{Binding InstallSingleServiceCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                                    CommandParameter="{Binding}"
+                                                    Header="安装服务"
+                                                    Icon="📌" />
+                                                <MenuItem
+                                                    Command="{Binding UninstallSingleServiceCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                                    CommandParameter="{Binding}"
+                                                    Header="卸载服务"
+                                                    Icon="✂️" />
+                                                <MenuItem
+                                                    Command="{Binding EditSingleConfigFileCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                                    CommandParameter="{Binding}"
+                                                    Header="编辑原始配置文件"
+                                                    Icon="📄" />
+                                                <MenuItem
+                                                    Command="{Binding RenameSingleConfigCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                                    CommandParameter="{Binding}"
+                                                    Header="重命名配置"
+                                                    Icon="⛏️" />
+                                                <MenuItem
+                                                    Command="{Binding DeleteSingleConfigCommand, Source={x:Static local:MainViewModel.Instance}}"
+                                                    CommandParameter="{Binding}"
+                                                    Header="删除配置"
+                                                    Icon="🗑️" />
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
 
             <StackPanel
                 HorizontalAlignment="Right"
@@ -36,24 +119,57 @@
                 <Button
                     Classes="Red"
                     Command="{Binding SyncConfigsCommand}"
-                    Content="同步" />
+                    Content="同步"
+                    ToolTip.Tip="同步配置到其他节点" />
                 <Button
-                    Classes="Blue"
-                    Command="{Binding EditSelectedConfigsCommand}"
-                    Content="编辑选中的"
-                    IsEnabled="{Binding HasSelectedConfigs}" />
-                <Button
-                    Classes="Yellow"
                     Command="{Binding RefreshConfigsCommand}"
-                    Content="刷新" />
+                    Content="🔄"
+                    ToolTip.Tip="刷新列表" />
                 <Button
-                    Classes="Green"
                     Command="{Binding AddConfigCommand}"
-                    Content="新增" />
+                    Content="➕"
+                    ToolTip.Tip="新增配置" />
+                <Button
+                    Command="{Binding RestartSelectedServicesCommand}"
+                    Content="▶️"
+                    ToolTip.Tip="重启服务" />
+                <Button
+                    Command="{Binding StopSelectedServicesCommand}"
+                    Content="⏹️"
+                    ToolTip.Tip="停止服务" />
+                <Button
+                    Command="{Binding EditSelectedConfigsCommand}"
+                    Content="✏️"
+                    ToolTip.Tip="编辑配置" />
+                <Button
+                    Content="..."
+                    ToolTip.Tip="更多功能...">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuItem
+                                Command="{Binding InstallSelectedServicesCommand}"
+                                Header="安装服务"
+                                Icon="📌" />
+                            <MenuItem
+                                Command="{Binding UninstallSelectedServicesCommand}"
+                                Header="卸载服务"
+                                Icon="✂️" />
+                            <MenuItem
+                                Command="{Binding EditSelectedConfigsCommand}"
+                                Header="编辑原始配置文件"
+                                Icon="📄" />
+                            <MenuItem
+                                Command="{Binding DeleteSelectedConfigsCommand}"
+                                Header="删除配置"
+                                Icon="🗑️" />
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
 
             </StackPanel>
 
         </StackPanel>
+
     </Border>
 
 </UserControl>

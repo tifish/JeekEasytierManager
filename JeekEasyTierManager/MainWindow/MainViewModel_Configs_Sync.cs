@@ -7,7 +7,6 @@ using JeekTools;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace JeekEasyTierManager;
 
@@ -223,15 +222,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         return (rpcClients, rpcClientIps);
     }
 
-    private class PeerInfo
-    {
-        [JsonPropertyName("ipv4")]
-        public string Ipv4 { get; set; } = "";
-
-        [JsonPropertyName("cost")]
-        public string Cost { get; set; } = "";
-    }
-
     private async Task<List<PeerInfo>> GetPeers(ConfigInfo config)
     {
         var rpcSocket = GetRpcSocket(config.Name);
@@ -289,8 +279,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public async Task DeleteExtraConfigs(List<string> fileNames)
     {
-        var isSelectedChanged = false;
-
         foreach (var fileName in fileNames)
         {
             var filePath = Path.Join(AppSettings.ConfigDirectory, fileName);
@@ -303,20 +291,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             {
                 var config = Configs[configIndex];
 
-                if (config.IsSelected)
-                    isSelectedChanged = true;
-
                 await UninstallService(config);
-
-                config.PropertyChanged -= OnConfigPropertyChanged;
 
                 Configs.RemoveAt(configIndex);
             }
-        }
-
-        if (isSelectedChanged)
-        {
-            UpdateHasSelectedConfigs();
         }
     }
 

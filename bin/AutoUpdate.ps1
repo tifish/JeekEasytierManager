@@ -20,28 +20,12 @@ try {
     # Download .7z to system temp directory
     $packPath = "$env:TEMP\$appName.7z"
 
-    # Try to download from multiple mirrors
-    $mirrors = @(
-        $downloadUrl,
-        ($downloadUrl -replace "^https://github.com/", "https://ghfast.top/https://github.com/"),
-        ($downloadUrl -replace "^https://github.com/", "https://gh-proxy.com/github.com/")
-    )
-
-    $downloaded = $false
-    foreach ($url in $mirrors) {
-        Write-Host "Trying to download update from $url..."
-        try {
-            Invoke-WebRequest -Uri $url -OutFile $packPath -ErrorAction Stop
-            $downloaded = $true
-            break
-        }
-        catch {
-            Write-Host "Failed to download $url. Error: $($_.Exception.Message)"
-        }
+    Write-Host "Downloading update from $downloadUrl..."
+    try {
+        Invoke-WebRequest -Uri $downloadUrl -OutFile $packPath -ErrorAction Stop
     }
-
-    if (-not $downloaded) {
-        Write-Host "All download attempts failed. Exiting..."
+    catch {
+        Write-Host "Failed to download $url. Error: $($_.Exception.Message)"
         Pause
         Exit
     }

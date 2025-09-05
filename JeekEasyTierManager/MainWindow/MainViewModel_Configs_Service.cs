@@ -25,7 +25,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             config.Service = easyTierServices.FirstOrDefault(
                 s => s.ServiceName.Equals(ServicePrefix + config.Name, StringComparison.InvariantCultureIgnoreCase));
-            config.IsInstalled = config.Service != null;
         }
     }
 
@@ -42,19 +41,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         await AddEasyTierToFirewall();
 
-        foreach (var config in Configs)
+        foreach (var config in SelectedConfigs)
         {
-            if (!config.IsSelected)
-                continue;
-
             await InstallService(config);
         }
 
         LoadInstalledServices();
 
-        foreach (var config in Configs)
+        foreach (var config in SelectedConfigs)
         {
-            if (!config.IsSelected || !config.IsInstalled)
+            if (config.Service == null)
                 continue;
 
             await RestartService(config);
@@ -91,8 +87,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
             Messages = $"Failed to install service {ServicePrefix + config.Name}\n{Nssm.LastError}";
             return;
         }
-
-        config.IsInstalled = true;
     }
 
     private async Task AddEasyTierToFirewall()
@@ -115,21 +109,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        foreach (var config in Configs)
+        foreach (var config in SelectedConfigs)
         {
-            if (!config.IsSelected)
-                continue;
-
             await UninstallService(config);
         }
 
         LoadInstalledServices();
 
-        foreach (var config in Configs)
+        foreach (var config in SelectedConfigs)
         {
-            if (!config.IsSelected)
-                continue;
-
             UpdateServiceStatus(config);
         }
 
@@ -153,22 +141,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await ShowInfo();
     }
 
-    private async Task<bool> UninstallService(ConfigInfo config)
+    private async Task UninstallService(ConfigInfo config)
     {
-        if (!config.IsInstalled)
-            return true;
+        if (config.Service == null)
+            return;
 
         await StopService(config);
 
         if (await Nssm.UninstallService(ServicePrefix + config.Name))
         {
-            config.IsInstalled = false;
-            return true;
+            return;
         }
         else
         {
             Messages = $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
-            return false;
         }
     }
 
@@ -181,9 +167,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        foreach (var config in Configs)
+        foreach (var config in SelectedConfigs)
         {
-            if (!config.IsSelected || !config.IsInstalled)
+            if (config.Service == null)
                 continue;
 
             await RestartService(config);
@@ -235,11 +221,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        foreach (var config in Configs)
+        foreach (var config in SelectedConfigs)
         {
-            if (!config.IsSelected)
-                continue;
-
             await StopService(config);
             UpdateServiceStatus(config);
         }

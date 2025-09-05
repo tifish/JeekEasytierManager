@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -58,7 +61,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         var messages = new StringBuilder();
 
-        foreach (var config in Configs)
+        foreach (var config in Configs.ToArray()) // Solve problem of modifying collection while iterating
         {
             if (config.Status != ServiceStatus.Running)
                 continue;
@@ -86,7 +89,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         var messages = new StringBuilder();
 
-        foreach (var config in Configs)
+        foreach (var config in Configs.ToArray()) // Solve problem of modifying collection while iterating
         {
             if (config.Status != ServiceStatus.Running)
                 continue;
@@ -101,6 +104,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Messages = messages.ToString();
 
         _showPeersOrRoute = false;
+    }
+
+    [ObservableProperty]
+    public partial ObservableCollection<PeerInfo> PeerInfos { get; set; } = [];
+
+    private async Task GetPeersInfo(string rpcSocket)
+    {
+        var peers = await Executor.RunWithOutput(AppSettings.EasyTierCliPath, $"-p {rpcSocket} peer", Encoding.UTF8);
+        var peerInfos = JsonFile<List<PeerInfo>>.FromJson(peers) ?? [];
     }
 
     public async Task ShowInfo()

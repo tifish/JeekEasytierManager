@@ -9,8 +9,56 @@ using JeekTools;
 using System.Linq;
 using Avalonia.Controls;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Runtime.Serialization;
+using Nett;
+using System.ServiceProcess;
 
 namespace JeekEasyTierManager;
+
+public class EasyTierConfig
+{
+    [DataMember(Name = "flags")]
+    public EasyTierConfigFlags? Flags { get; set; } = new();
+}
+
+public class EasyTierConfigFlags
+{
+    [DataMember(Name = "dev_name")]
+    public string? DevName { get; set; } = "";
+
+    [DataMember(Name = "no_tun")]
+    public bool NoTun { get; set; } = false;
+}
+
+public partial class ConfigInfo : ObservableObject
+{
+    [ObservableProperty]
+    public partial string Name { get; set; } = "";
+
+    [ObservableProperty]
+    public partial ServiceStatus Status { get; set; } = ServiceStatus.None;
+
+    public string GetConfigPath()
+    {
+        return Path.Join(AppSettings.ConfigDirectory, Name + ".toml");
+    }
+
+    public EasyTierConfig? GetConfig()
+    {
+        try
+        {
+            return Toml.ReadFile<EasyTierConfig>(GetConfigPath());
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public ServiceController? Service { get; set; }
+}
+
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
@@ -20,13 +68,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
 
         // Save selected config
-        var selectedConfigNames = Configs.Where(c => c.IsSelected).Select(c => c.Name).ToList();
-
-        // Remove property change listeners from existing configs
-        foreach (var config in Configs)
-        {
-            config.PropertyChanged -= OnConfigPropertyChanged;
-        }
+        var selectedConfigNames = SelectedConfigs.Select(c => c.Name).ToList();
 
         // Get config files
         var configNames = new List<string>();
@@ -62,7 +104,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 Configs.Clear();
                 foreach (var config in newConfigs)
                 {
-                    config.PropertyChanged += OnConfigPropertyChanged;
                     Configs.Add(config);
                 }
             }
@@ -71,13 +112,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
             LoadInstalledServices(newConfigs);
             UpdateAllServicesStatus(newConfigs);
 
+            // Update Configs at once, to avoid unnecessary Status changes on UI.
+            if (!isInitial)
+            {
+                Configs.Clear();
+                foreach (var config in newConfigs)
+                {
+                    Configs.Add(config);
+                }
+            }
+
             if (isInitial)
             {
                 // Select installed configs
                 foreach (var config in newConfigs)
                 {
                     if (config.Status != ServiceStatus.None)
-                        config.IsSelected = true;
+                        AddSelectedConfig(config);
                 }
             }
             else
@@ -87,23 +138,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 {
                     var config = Configs.FirstOrDefault(c => c.Name == configName);
                     if (config != null)
-                        config.IsSelected = true;
+                        AddSelectedConfig(config);
                 }
             }
-
-            // Update Configs at once, to avoid unnecessary Status changes on UI.
-            if (!isInitial)
-            {
-                Configs.Clear();
-                foreach (var config in newConfigs)
-                {
-                    config.PropertyChanged += OnConfigPropertyChanged;
-                    Configs.Add(config);
-                }
-            }
-
-            UpdateHasSelectedConfigs();
         }
+    }
+
+    [RelayCommand]
+    public void EditSingleConfig(ConfigInfo config)
+    {
+        EditConfigs(config);
     }
 
     [RelayCommand]
@@ -136,19 +180,48 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    public void EditSingleConfig(ConfigInfo config)
-    {
-        EditConfigs(config);
-    }
-
-    [RelayCommand]
-    public void EditConfigFile(ConfigInfo config)
+    public void EditSingleConfigFile(ConfigInfo config)
     {
         var configFile = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
         if (!File.Exists(configFile))
             return;
 
         Executor.Open(configFile);
+    }
+
+    const string MultipleConfigInstanceName = "（选中的配置）";
+
+    [RelayCommand]
+    public void EditSelectedConfigs()
+    {
+        if (SelectedConfigs.Count == 0)
+            return;
+
+        EditConfigs(null);
+
+        InstanceName = MultipleConfigInstanceName;
+        FileLoggerName = MultipleConfigInstanceName;
+    }
+
+    public void EditConfigs(ConfigInfo? config)
+    {
+        MainGrid.RowDefinitions[0].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
+        MainGrid.RowDefinitions[1].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
+        IsEditingConfigs = true;
+
+        var isSingleConfig = config != null;
+
+        EditIpAddress = isSingleConfig;
+        EditPeers = isSingleConfig;
+        EditListeners = isSingleConfig;
+        EditRpcPortal = isSingleConfig;
+        EditProxyNetworks = isSingleConfig;
+        EditFileLogger = isSingleConfig;
+
+        if (config != null)
+            LoadConfig(config.Name);
+        else
+            LoadConfig(SelectedConfigs.First().Name);
     }
 
     [ObservableProperty]
@@ -160,7 +233,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private ConfigInfo? _renameConfigDialogOldConfig = null;
 
     [RelayCommand]
-    public void RenameConfig(ConfigInfo config)
+    public void RenameSingleConfig(ConfigInfo config)
     {
         RenameConfigDialogIsOpen = true;
         RenameConfigDialogText = config.Name;
@@ -239,12 +312,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         File.Create(configFile).Close();
         var config = new ConfigInfo { Name = newName };
-        config.PropertyChanged += OnConfigPropertyChanged;
         Configs.Add(config);
     }
 
     [RelayCommand]
-    public async Task DeleteConfig(ConfigInfo config)
+    public async Task DeleteSingleConfig(ConfigInfo config)
     {
         var result = await MessageBoxManager.GetMessageBoxStandard(
             "Delete Config", "Are you sure you want to delete this config?",
@@ -253,15 +325,44 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (result != ButtonResult.Yes)
             return;
 
+        DeleteConfig(config);
+    }
+
+    [RelayCommand]
+    public async Task DeleteSelectedConfigs()
+    {
+        if (SelectedConfigs.Count == 0)
+            return;
+
+        var result = await MessageBoxManager.GetMessageBoxStandard(
+            "Delete Selected Configs", "Are you sure you want to delete selected configs?",
+            ButtonEnum.YesNo, Icon.Question)
+            .ShowWindowDialogAsync(_mainWindow!);
+        if (result != ButtonResult.Yes)
+            return;
+
+        DeleteConfigs(null);
+    }
+
+    private void DeleteConfigs(ConfigInfo? config)
+    {
+        if (config != null)
+        {
+            DeleteConfig(config);
+            return;
+        }
+
+        foreach (var aConfig in SelectedConfigs)
+            DeleteConfig(aConfig);
+    }
+
+    private void DeleteConfig(ConfigInfo config)
+    {
         var configFile = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
         if (File.Exists(configFile))
             File.Delete(configFile);
 
-        // Remove property change listener before removing from collection
-        config.PropertyChanged -= OnConfigPropertyChanged;
         Configs.Remove(config);
-
-        UpdateHasSelectedConfigs();
     }
 
     [RelayCommand]
@@ -275,56 +376,26 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public partial bool IsEditingConfigs { get; set; } = false;
     public Grid MainGrid { get; internal set; } = null!;
 
+    private MainWindowConfigs? _mainWindowConfigs;
+
+    public void SetMainWindowConfigs(MainWindowConfigs mainWindowConfigs)
+    {
+        _mainWindowConfigs = mainWindowConfigs;
+    }
+
     [ObservableProperty]
     public partial bool HasSelectedConfigs { get; set; }
 
-    private void UpdateHasSelectedConfigs()
-    {
-        HasSelectedConfigs = Configs.Any(c => c.IsSelected);
-    }
+    public ObservableCollection<ConfigInfo> SelectedConfigs { get; set; } = [];
 
-    // Handle property changes in ConfigInfo objects
-    private void OnConfigPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void AddSelectedConfig(ConfigInfo config)
     {
-        if (e.PropertyName == nameof(ConfigInfo.IsSelected))
+        if (!SelectedConfigs.Contains(config))
         {
-            UpdateHasSelectedConfigs();
+            SelectedConfigs.Add(config);
+            HasSelectedConfigs = SelectedConfigs.Count > 0;
+            _mainWindowConfigs?.UpdateDataGridSelection();
         }
-    }
-
-    const string MultipleConfigInstanceName = "（选中的配置）";
-
-    [RelayCommand]
-    public void EditSelectedConfigs()
-    {
-        if (Configs.ToArray().All(c => !c.IsSelected))
-            return;
-
-        EditConfigs(null);
-
-        InstanceName = MultipleConfigInstanceName;
-        FileLoggerName = MultipleConfigInstanceName;
-    }
-
-    public void EditConfigs(ConfigInfo? config)
-    {
-        MainGrid.RowDefinitions[0].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
-        MainGrid.RowDefinitions[1].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
-        IsEditingConfigs = true;
-
-        var isSingleConfig = config != null;
-
-        EditIpAddress = isSingleConfig;
-        EditPeers = isSingleConfig;
-        EditListeners = isSingleConfig;
-        EditRpcPortal = isSingleConfig;
-        EditProxyNetworks = isSingleConfig;
-        EditFileLogger = isSingleConfig;
-
-        if (config != null)
-            LoadConfig(config.Name);
-        else
-            LoadConfig(Configs.First(c => c.IsSelected).Name);
     }
 
     [RelayCommand]
@@ -333,6 +404,4 @@ public partial class MainViewModel : ObservableObject, IDisposable
         AddConfigDialogIsOpen = true;
     }
 
-    [ObservableProperty]
-    public partial bool ShowMoreConfigActions { get; set; } = false;
 }

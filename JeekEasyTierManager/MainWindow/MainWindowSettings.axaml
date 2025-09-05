@@ -51,6 +51,24 @@
                         IsChecked="{Binding AutoUpdateMe}" />
                 </Grid>
 
+                <Label
+                    Content="EasyTier 未安装"
+                    Foreground="Red"
+                    IsVisible="{Binding !HasEasyTier}" />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button
+                        Classes="Gray MinWidth"
+                        Command="{Binding UpdateEasyTierCommand}"
+                        CommandParameter="{x:True}"
+                        Content="EasyTier" />
+                    <Button
+                        Classes="Gray MinWidth"
+                        Command="{Binding UpdateMeCommand}"
+                        CommandParameter="{x:True}"
+                        Content="我" />
+                </StackPanel>
+
                 <TextBlock Text="同步密码" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <TextBox

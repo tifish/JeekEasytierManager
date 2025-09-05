@@ -164,11 +164,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (InstanceName == MultipleConfigInstanceName)
         {
-            foreach (var config in Configs.ToArray())
+            foreach (var config in SelectedConfigs.ToArray())
             {
-                if (!config.IsSelected)
-                    continue;
-
                 SaveConfig(config.Name);
             }
         }
