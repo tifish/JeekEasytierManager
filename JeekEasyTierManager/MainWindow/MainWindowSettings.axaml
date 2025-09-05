@@ -61,12 +61,12 @@
                         Classes="Gray MinWidth"
                         Command="{Binding UpdateEasyTierCommand}"
                         CommandParameter="{x:True}"
-                        Content="EasyTier" />
+                        Content="更新 EasyTier" />
                     <Button
                         Classes="Gray MinWidth"
                         Command="{Binding UpdateMeCommand}"
                         CommandParameter="{x:True}"
-                        Content="我" />
+                        Content="更新我" />
                 </StackPanel>
 
                 <TextBlock Text="同步密码" />
