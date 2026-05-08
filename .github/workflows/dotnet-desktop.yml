@@ -26,7 +26,7 @@ jobs:
                   submodules: true
 
             - name: Build
-              run: dotnet build --configuration Release ${{ env.PROJECT_NAME }}.sln
+              run: dotnet publish --configuration Release ${{ env.PROJECT_NAME }}.sln
 
             - name: Pack files
               run: |
