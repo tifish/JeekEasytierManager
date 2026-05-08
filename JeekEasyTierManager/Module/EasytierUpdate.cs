@@ -50,7 +50,9 @@ public static class EasyTierUpdate
         }
         else
         {
-            var mirror = await GitHubMirrors.GetFastestMirror(AppSettings.EasyTierLatestReleasePageUrl);
+            var mirror = await GitHubMirrors.GetFastestMirror(
+                AppSettings.EasyTierLatestReleasePageUrl
+            );
             if (mirror == "")
                 return "";
 
@@ -61,7 +63,9 @@ public static class EasyTierUpdate
         if (doc == null)
             return "";
 
-        var link = doc.DocumentNode.SelectSingleNode("//a[contains(@href, '/EasyTier/EasyTier/releases/tag/')]");
+        var link = doc.DocumentNode.SelectSingleNode(
+            "//a[contains(@href, '/EasyTier/EasyTier/releases/tag/')]"
+        );
         if (link == null)
             return "";
 
@@ -78,7 +82,8 @@ public static class EasyTierUpdate
             return "";
 
         // https://github.com/EasyTier/EasyTier/releases/download/v2.3.2/easytier-windows-x86_64-v2.3.2.zip
-        var downloadUrl = $"https://github.com/EasyTier/EasyTier/releases/download/v{RemoteVersion}/easytier-windows-x86_64-v{RemoteVersion}.zip";
+        var downloadUrl =
+            $"https://github.com/EasyTier/EasyTier/releases/download/v{RemoteVersion}/easytier-windows-x86_64-v{RemoteVersion}.zip";
 
         if (Settings.DisableMirrorDownload)
             return downloadUrl;
@@ -96,7 +101,11 @@ public static class EasyTierUpdate
             if (DownloadUrl == "")
                 return false;
 
-            var downloadPath = await HttpHelper.DownloadFile(DownloadUrl, Path.GetTempPath(), progressCallback);
+            var downloadPath = await HttpHelper.DownloadFile(
+                DownloadUrl,
+                Path.GetTempPath(),
+                progressCallback
+            );
             if (downloadPath == null)
                 return false;
 

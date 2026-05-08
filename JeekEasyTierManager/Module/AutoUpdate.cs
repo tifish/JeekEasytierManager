@@ -27,7 +27,9 @@ public static class AutoUpdate
             else
             {
                 // Get the fastest mirror
-                var mirror = await GitHubMirrors.GetFastestMirror(AppSettings.JeekEasyTierManagerZipUrl);
+                var mirror = await GitHubMirrors.GetFastestMirror(
+                    AppSettings.JeekEasyTierManagerZipUrl
+                );
                 if (mirror == "")
                     return false;
 
@@ -58,15 +60,19 @@ public static class AutoUpdate
             if (DownloadUrl == "")
                 return false;
 
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "powershell.exe",
-                Arguments = $"""
-                        -ExecutionPolicy Bypass -File "AutoUpdate.ps1" "{DownloadUrl}" {(hideMainWindow ? "/hide" : "")}
-                        """,
-                WorkingDirectory = AppSettings.AppDirectory,
-                UseShellExecute = true,
-            });
+            Process.Start(
+                new ProcessStartInfo
+                {
+                    FileName = "powershell.exe",
+                    Arguments = $"""
+                    -ExecutionPolicy Bypass -File "AutoUpdate.ps1" "{DownloadUrl}" {(
+                        hideMainWindow ? "/hide" : ""
+                    )}
+                    """,
+                    WorkingDirectory = AppSettings.AppDirectory,
+                    UseShellExecute = true,
+                }
+            );
 
             App.ExitApplication();
             return true;

@@ -65,20 +65,35 @@ public static class TomlTableExt
     }
 
     // Table
-    public static void Set<T>(this TomlTable table, string key, IDictionary<string, T> tableData, TomlTable.TableTypes type = TomlTable.TableTypes.Default)
+    public static void Set<T>(
+        this TomlTable table,
+        string key,
+        IDictionary<string, T> tableData,
+        TomlTable.TableTypes type = TomlTable.TableTypes.Default
+    )
     {
         var newTable = table.CreateAttached(tableData, type);
         table[key] = newTable;
     }
 
-    public static void Set(this TomlTable table, string key, object obj, TomlTable.TableTypes type = TomlTable.TableTypes.Default)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        object obj,
+        TomlTable.TableTypes type = TomlTable.TableTypes.Default
+    )
     {
         var newTable = table.CreateAttached(obj, type);
         table[key] = newTable;
     }
 
     // Table Array
-    public static void Set<T>(this TomlTable table, string key, IEnumerable<T> items, TomlTable.TableTypes type = TomlTable.TableTypes.Default)
+    public static void Set<T>(
+        this TomlTable table,
+        string key,
+        IEnumerable<T> items,
+        TomlTable.TableTypes type = TomlTable.TableTypes.Default
+    )
     {
         var tableArray = table.CreateAttached(items, type);
         table[key] = tableArray;
@@ -172,7 +187,12 @@ public static class TomlTableExt
             table.Set(key, value);
     }
 
-    public static void Set(this TomlTable table, string key, DateTimeOffset value, DateTimeOffset defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        DateTimeOffset value,
+        DateTimeOffset defaultValue
+    )
     {
         if (value.Equals(defaultValue))
             table.Remove(key);
@@ -189,7 +209,13 @@ public static class TomlTableExt
     }
 
     // Table with default value check
-    public static void Set<T>(this TomlTable table, string key, IDictionary<string, T> tableData, IDictionary<string, T> defaultValue, TomlTable.TableTypes type = TomlTable.TableTypes.Default)
+    public static void Set<T>(
+        this TomlTable table,
+        string key,
+        IDictionary<string, T> tableData,
+        IDictionary<string, T> defaultValue,
+        TomlTable.TableTypes type = TomlTable.TableTypes.Default
+    )
     {
         if (tableData.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -197,7 +223,13 @@ public static class TomlTableExt
             table.Set(key, tableData, type);
     }
 
-    public static void Set(this TomlTable table, string key, object obj, object defaultValue, TomlTable.TableTypes type = TomlTable.TableTypes.Default)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        object obj,
+        object defaultValue,
+        TomlTable.TableTypes type = TomlTable.TableTypes.Default
+    )
     {
         if (obj.Equals(defaultValue))
             table.Remove(key);
@@ -206,7 +238,13 @@ public static class TomlTableExt
     }
 
     // Table Array with default value check
-    public static void Set<T>(this TomlTable table, string key, IEnumerable<T> items, IEnumerable<T> defaultValue, TomlTable.TableTypes type = TomlTable.TableTypes.Default)
+    public static void Set<T>(
+        this TomlTable table,
+        string key,
+        IEnumerable<T> items,
+        IEnumerable<T> defaultValue,
+        TomlTable.TableTypes type = TomlTable.TableTypes.Default
+    )
     {
         if (items.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -215,7 +253,12 @@ public static class TomlTableExt
     }
 
     // Arrays with default value check
-    public static void Set(this TomlTable table, string key, IEnumerable<bool> array, IEnumerable<bool> defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        IEnumerable<bool> array,
+        IEnumerable<bool> defaultValue
+    )
     {
         if (array.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -223,7 +266,12 @@ public static class TomlTableExt
             table.Set(key, array);
     }
 
-    public static void Set(this TomlTable table, string key, IEnumerable<string> array, IEnumerable<string> defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        IEnumerable<string> array,
+        IEnumerable<string> defaultValue
+    )
     {
         if (array.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -231,7 +279,12 @@ public static class TomlTableExt
             table.Set(key, array);
     }
 
-    public static void Set(this TomlTable table, string key, IEnumerable<long> array, IEnumerable<long> defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        IEnumerable<long> array,
+        IEnumerable<long> defaultValue
+    )
     {
         if (array.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -239,7 +292,12 @@ public static class TomlTableExt
             table.Set(key, array);
     }
 
-    public static void Set(this TomlTable table, string key, IEnumerable<int> array, IEnumerable<int> defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        IEnumerable<int> array,
+        IEnumerable<int> defaultValue
+    )
     {
         if (array.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -247,7 +305,12 @@ public static class TomlTableExt
             table.Set(key, array);
     }
 
-    public static void Set(this TomlTable table, string key, IEnumerable<double> array, IEnumerable<double> defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        IEnumerable<double> array,
+        IEnumerable<double> defaultValue
+    )
     {
         if (array.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -255,7 +318,12 @@ public static class TomlTableExt
             table.Set(key, array);
     }
 
-    public static void Set(this TomlTable table, string key, IEnumerable<float> array, IEnumerable<float> defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        IEnumerable<float> array,
+        IEnumerable<float> defaultValue
+    )
     {
         if (array.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -263,7 +331,12 @@ public static class TomlTableExt
             table.Set(key, array);
     }
 
-    public static void Set(this TomlTable table, string key, IEnumerable<DateTimeOffset> array, IEnumerable<DateTimeOffset> defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        IEnumerable<DateTimeOffset> array,
+        IEnumerable<DateTimeOffset> defaultValue
+    )
     {
         if (array.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -271,7 +344,12 @@ public static class TomlTableExt
             table.Set(key, array);
     }
 
-    public static void Set(this TomlTable table, string key, IEnumerable<DateTime> array, IEnumerable<DateTime> defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        IEnumerable<DateTime> array,
+        IEnumerable<DateTime> defaultValue
+    )
     {
         if (array.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -279,7 +357,12 @@ public static class TomlTableExt
             table.Set(key, array);
     }
 
-    public static void Set(this TomlTable table, string key, IEnumerable<TimeSpan> array, IEnumerable<TimeSpan> defaultValue)
+    public static void Set(
+        this TomlTable table,
+        string key,
+        IEnumerable<TimeSpan> array,
+        IEnumerable<TimeSpan> defaultValue
+    )
     {
         if (array.SequenceEqual(defaultValue))
             table.Remove(key);
@@ -317,18 +400,28 @@ public static class TomlTableExt
         }
     }
 
-    public static void SetMultiLinesTextToArray(this TomlTable table, string tableArrayKey, string value)
+    public static void SetMultiLinesTextToArray(
+        this TomlTable table,
+        string tableArrayKey,
+        string value
+    )
     {
-        List<string> array = [.. value
-            .Split('\n')
-            .Select(item => item.Trim())
-            .Where(item => !string.IsNullOrEmpty(item))
+        List<string> array =
+        [
+            .. value
+                .Split('\n')
+                .Select(item => item.Trim())
+                .Where(item => !string.IsNullOrEmpty(item)),
         ];
 
         table.Set(tableArrayKey, array);
     }
 
-    public static string GetMultiLinesTextFromTableArray(this TomlTable table, string tableArrayKey, string propertyKey)
+    public static string GetMultiLinesTextFromTableArray(
+        this TomlTable table,
+        string tableArrayKey,
+        string propertyKey
+    )
     {
         if (table == null)
             return "";
@@ -344,14 +437,18 @@ public static class TomlTableExt
         }
     }
 
-    public static void SetMultiLinesTextToTableArray(this TomlTable table, string tableArrayKey, string propertyKey, string value)
+    public static void SetMultiLinesTextToTableArray(
+        this TomlTable table,
+        string tableArrayKey,
+        string propertyKey,
+        string value
+    )
     {
         var array = value
             .Split('\n')
             .Select(item => item.Trim())
             .Where(item => !string.IsNullOrEmpty(item))
             .ToList();
-
 
         var tableArray = table.CreateEmptyAttachedTableArray();
 
@@ -364,5 +461,4 @@ public static class TomlTableExt
 
         table[tableArrayKey] = tableArray;
     }
-
 }

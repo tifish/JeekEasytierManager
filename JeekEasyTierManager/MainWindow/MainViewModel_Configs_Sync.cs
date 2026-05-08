@@ -1,13 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JeekTools;
 using Json.Easy;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
 
 namespace JeekEasyTierManager;
 
@@ -61,17 +61,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             // Find local only files
             var localOnlyFileInfos = localFileInfoList
-                .Where(fileInfo => !remoteFileNameIndexDict.ContainsKey(fileInfo.FileName)).ToList();
+                .Where(fileInfo => !remoteFileNameIndexDict.ContainsKey(fileInfo.FileName))
+                .ToList();
 
             // Find remote only files
             var remoteOnlyFileInfos = remoteFileInfoList
-                .Where(fileInfo => !localFileNameIndexDict.ContainsKey(fileInfo.FileName)).ToList();
+                .Where(fileInfo => !localFileNameIndexDict.ContainsKey(fileInfo.FileName))
+                .ToList();
 
             // Find local newer files (files that exist on both local and remote, but local version is newer)
             var localNewerFileInfos = new List<ConfigFileInfo>();
             foreach (var localFileInfo in localFileInfoList)
             {
-                if (remoteFileNameIndexDict.TryGetValue(localFileInfo.FileName, out var remoteIndex))
+                if (
+                    remoteFileNameIndexDict.TryGetValue(localFileInfo.FileName, out var remoteIndex)
+                )
                 {
                     var remoteFileInfo = remoteFileInfoList[remoteIndex];
                     if (localFileInfo.FileTimeUtc > remoteFileInfo.FileTimeUtc)
@@ -96,8 +100,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // Send local only files and local newer files to remote
             if (localOnlyFileInfos.Count > 0 || localNewerFileInfos.Count > 0)
             {
-                var fileNames = localOnlyFileInfos.Concat(localNewerFileInfos)
-                    .Select(f => f.FileName).ToList();
+                var fileNames = localOnlyFileInfos
+                    .Concat(localNewerFileInfos)
+                    .Select(f => f.FileName)
+                    .ToList();
                 var fileContentList = await GetConfigFileContent(fileNames);
                 await rpcClient.SendConfigFileContent(fileContentList);
                 remoteNeedRefresh = localOnlyFileInfos.Count > 0;
@@ -110,7 +116,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 // Get remote newer files from remote
                 if (remoteNewerFileInfos.Count > 0)
                 {
-                    var fileNames = remoteNewerFileInfos.Select(fileInfo => fileInfo.FileName).ToList();
+                    var fileNames = remoteNewerFileInfos
+                        .Select(fileInfo => fileInfo.FileName)
+                        .ToList();
                     var remoteFileContentList = await rpcClient.GetConfigFileContent(fileNames);
                     await WriteConfigFileContent(remoteFileContentList);
 
@@ -120,7 +128,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 // Delete remote only files on other nodes
                 if (remoteOnlyFileInfos.Count > 0)
                 {
-                    var fileNames = remoteOnlyFileInfos.Select(fileInfo => fileInfo.FileName).ToList();
+                    var fileNames = remoteOnlyFileInfos
+                        .Select(fileInfo => fileInfo.FileName)
+                        .ToList();
                     await rpcClient.DeleteExtraConfigs(fileNames);
                     remoteNeedRefresh = true;
 
@@ -132,8 +142,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 // Get remote only files and remote newer files from remote
                 if (remoteOnlyFileInfos.Count > 0 || remoteNewerFileInfos.Count > 0)
                 {
-                    var fileNames = remoteOnlyFileInfos.Concat(remoteNewerFileInfos)
-                        .Select(fileInfo => fileInfo.FileName).ToList();
+                    var fileNames = remoteOnlyFileInfos
+                        .Concat(remoteNewerFileInfos)
+                        .Select(fileInfo => fileInfo.FileName)
+                        .ToList();
                     var remoteFileContentList = await rpcClient.GetConfigFileContent(fileNames);
                     await WriteConfigFileContent(remoteFileContentList);
                     localNeedRefresh = remoteOnlyFileInfos.Count > 0;
@@ -192,22 +204,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         // Parallel test all rpc clients
-        var tasks = untestedRpcClients.Select(async (rpcClientAndIp) =>
-        {
-            try
+        var tasks = untestedRpcClients.Select(
+            async (rpcClientAndIp) =>
             {
-                var result = await rpcClientAndIp.Item1!.WithDeadline(DateTime.UtcNow.AddSeconds(2)).Ping();
-                if (result)
+                try
                 {
-                    return rpcClientAndIp;
+                    var result = await rpcClientAndIp
+                        .Item1!.WithDeadline(DateTime.UtcNow.AddSeconds(2))
+                        .Ping();
+                    if (result)
+                    {
+                        return rpcClientAndIp;
+                    }
                 }
-            }
-            catch
-            {
-            }
+                catch { }
 
-            return (null, "");
-        });
+                return (null, "");
+            }
+        );
 
         var results = await Task.WhenAll(tasks);
 
@@ -226,7 +240,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private async Task<List<PeerInfo>> GetPeers(ConfigInfo config)
     {
         var rpcSocket = GetRpcSocket(config.Name);
-        var peersJson = await Executor.RunWithOutput(AppSettings.EasyTierCliPath, $"-p {rpcSocket} -o json peer", Encoding.UTF8);
+        var peersJson = await Executor.RunWithOutput(
+            AppSettings.EasyTierCliPath,
+            $"-p {rpcSocket} -o json peer",
+            Encoding.UTF8
+        );
         var peers = JsonFile.FromJson<List<PeerInfo>>(peersJson);
         return peers ?? [];
     }
@@ -241,7 +259,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var fileInfo = new ConfigFileInfo
             {
                 FileName = Path.GetFileName(configFile),
-                FileTimeUtc = File.GetLastWriteTimeUtc(configFile)
+                FileTimeUtc = File.GetLastWriteTimeUtc(configFile),
             };
             result.Add(fileInfo);
         }
@@ -257,12 +275,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         foreach (var fileName in fileNames)
         {
             var filePath = Path.Join(AppSettings.ConfigDirectory, fileName);
-            result.Add(new ConfigFileInfo
-            {
-                FileName = fileName,
-                FileTimeUtc = File.GetLastWriteTimeUtc(filePath),
-                Content = await File.ReadAllTextAsync(filePath),
-            });
+            result.Add(
+                new ConfigFileInfo
+                {
+                    FileName = fileName,
+                    FileTimeUtc = File.GetLastWriteTimeUtc(filePath),
+                    Content = await File.ReadAllTextAsync(filePath),
+                }
+            );
         }
 
         return result;
@@ -298,5 +318,4 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
         }
     }
-
 }

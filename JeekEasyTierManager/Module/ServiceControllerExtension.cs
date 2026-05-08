@@ -8,7 +8,10 @@ public static class ServiceControllerExtension
     private const int WaitInterval = 100;
     private const int TimeoutMilliseconds = 3000;
 
-    public static async Task<bool> WaitForStatusAsync(this ServiceController service, ServiceControllerStatus status)
+    public static async Task<bool> WaitForStatusAsync(
+        this ServiceController service,
+        ServiceControllerStatus status
+    )
     {
         var startTime = System.Environment.TickCount;
         service.Refresh();

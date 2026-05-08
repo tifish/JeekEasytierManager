@@ -1,18 +1,18 @@
 using System;
-using System.IO;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
-using JeekTools;
-using System.Linq;
-using Avalonia.Controls;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
-using Nett;
 using System.ServiceProcess;
+using System.Threading.Tasks;
+using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using JeekTools;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+using Nett;
 
 namespace JeekEasyTierManager;
 
@@ -59,7 +59,6 @@ public partial class ConfigInfo : ObservableObject
     public ServiceController? Service { get; set; }
 }
 
-
 public partial class MainViewModel : ObservableObject, IDisposable
 {
     private void LoadConfigs(bool isInitial)
@@ -81,8 +80,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         // If configs are the same, only update service status
-        if (configNames.Count == Configs.Count
-            && configNames.All(c => Configs.Any(c2 => c2.Name == c)))
+        if (
+            configNames.Count == Configs.Count
+            && configNames.All(c => Configs.Any(c2 => c2.Name == c))
+        )
         {
             LoadInstalledServices();
             UpdateAllServicesStatus();
@@ -159,9 +160,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         // Run cmd file in temp directory
         var cmdText = $"""
-            {AppSettings.EasyTierCorePath} -c "{configFile}"
-            pause
-        """;
+                {AppSettings.EasyTierCorePath} -c "{configFile}"
+                pause
+            """;
         var cmdFile = Path.GetTempFileName() + ".cmd";
         File.WriteAllText(cmdFile, cmdText);
 
@@ -205,8 +206,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public void EditConfigs(ConfigInfo? config)
     {
-        MainGrid.RowDefinitions[0].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
-        MainGrid.RowDefinitions[1].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
+        MainGrid
+            .RowDefinitions[0]
+            .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
+        MainGrid
+            .RowDefinitions[1]
+            .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
         IsEditingConfigs = true;
 
         var isSingleConfig = config != null;
@@ -259,7 +264,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (string.IsNullOrWhiteSpace(newName) || newName == _renameConfigDialogOldConfig.Name)
             return;
 
-        var oldConfigFile = Path.Combine(AppSettings.ConfigDirectory, _renameConfigDialogOldConfig.Name + ".toml");
+        var oldConfigFile = Path.Combine(
+            AppSettings.ConfigDirectory,
+            _renameConfigDialogOldConfig.Name + ".toml"
+        );
         var newConfigFile = Path.Combine(AppSettings.ConfigDirectory, newName + ".toml");
 
         if (File.Exists(newConfigFile))
@@ -314,9 +322,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task DeleteSingleConfig(ConfigInfo config)
     {
-        var result = await MessageBoxManager.GetMessageBoxStandard(
-            "Delete Config", "Are you sure you want to delete this config?",
-            ButtonEnum.YesNo, Icon.Question)
+        var result = await MessageBoxManager
+            .GetMessageBoxStandard(
+                "Delete Config",
+                "Are you sure you want to delete this config?",
+                ButtonEnum.YesNo,
+                Icon.Question
+            )
             .ShowWindowDialogAsync(_mainWindow!);
         if (result != ButtonResult.Yes)
             return;
@@ -330,9 +342,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (SelectedConfigs.Count == 0)
             return;
 
-        var result = await MessageBoxManager.GetMessageBoxStandard(
-            "Delete Selected Configs", "Are you sure you want to delete selected configs?",
-            ButtonEnum.YesNo, Icon.Question)
+        var result = await MessageBoxManager
+            .GetMessageBoxStandard(
+                "Delete Selected Configs",
+                "Are you sure you want to delete selected configs?",
+                ButtonEnum.YesNo,
+                Icon.Question
+            )
             .ShowWindowDialogAsync(_mainWindow!);
         if (result != ButtonResult.Yes)
             return;
@@ -395,5 +411,4 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         AddConfigDialogIsOpen = true;
     }
-
 }

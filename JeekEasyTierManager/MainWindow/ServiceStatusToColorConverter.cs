@@ -13,9 +13,13 @@ public class ServiceStatusToColorConverter : IValueConverter
     public static ServiceStatusToColorConverter Instance { get; } = new();
 
     // Cache color brushes for performance
-    private static readonly Lazy<SolidColorBrush> _greenBrush = new(() => GetResourceColor("Green"));
+    private static readonly Lazy<SolidColorBrush> _greenBrush = new(() =>
+        GetResourceColor("Green")
+    );
     private static readonly Lazy<SolidColorBrush> _redBrush = new(() => GetResourceColor("Red"));
-    private static readonly Lazy<SolidColorBrush> _yellowBrush = new(() => GetResourceColor("Yellow"));
+    private static readonly Lazy<SolidColorBrush> _yellowBrush = new(() =>
+        GetResourceColor("Yellow")
+    );
     private static readonly Lazy<SolidColorBrush> _grayBrush = new(() => GetResourceColor("Gray"));
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -28,7 +32,7 @@ public class ServiceStatusToColorConverter : IValueConverter
                 ServiceStatus.Stopped => _yellowBrush.Value,
                 ServiceStatus.Paused => _redBrush.Value,
                 ServiceStatus.None => _grayBrush.Value,
-                _ => _grayBrush.Value
+                _ => _grayBrush.Value,
             };
         }
         return _grayBrush.Value;
@@ -36,8 +40,11 @@ public class ServiceStatusToColorConverter : IValueConverter
 
     private static SolidColorBrush GetResourceColor(string resourceKey)
     {
-        if (Application.Current?.Resources.TryGetResource(resourceKey, null, out var resource) == true
-            && resource is Color color)
+        if (
+            Application.Current?.Resources.TryGetResource(resourceKey, null, out var resource)
+                == true
+            && resource is Color color
+        )
         {
             return new SolidColorBrush(color);
         }
@@ -45,9 +52,13 @@ public class ServiceStatusToColorConverter : IValueConverter
         return new SolidColorBrush(Colors.Gray);
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object? ConvertBack(
+        object? value,
+        Type targetType,
+        object? parameter,
+        CultureInfo culture
+    )
     {
         throw new NotImplementedException();
     }
 }
-

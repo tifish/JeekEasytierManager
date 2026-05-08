@@ -68,7 +68,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 continue;
 
             var rpcSocket = GetRpcSocket(config.Name);
-            var peers = await Executor.RunWithOutput(AppSettings.EasyTierCliPath, $"-p {rpcSocket} peer", Encoding.UTF8);
+            var peers = await Executor.RunWithOutput(
+                AppSettings.EasyTierCliPath,
+                $"-p {rpcSocket} peer",
+                Encoding.UTF8
+            );
             messages.AppendLine($"{config.Name}:");
             messages.AppendLine(peers);
             messages.AppendLine();
@@ -96,7 +100,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 continue;
 
             var rpcSocket = GetRpcSocket(config.Name);
-            var route = await Executor.RunWithOutput(AppSettings.EasyTierCliPath, $"-p {rpcSocket} route", Encoding.UTF8);
+            var route = await Executor.RunWithOutput(
+                AppSettings.EasyTierCliPath,
+                $"-p {rpcSocket} route",
+                Encoding.UTF8
+            );
             messages.AppendLine($"{config.Name}:");
             messages.AppendLine(route);
             messages.AppendLine();
@@ -112,7 +120,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private async Task GetPeersInfo(string rpcSocket)
     {
-        var peers = await Executor.RunWithOutput(AppSettings.EasyTierCliPath, $"-p {rpcSocket} peer", Encoding.UTF8);
+        var peers = await Executor.RunWithOutput(
+            AppSettings.EasyTierCliPath,
+            $"-p {rpcSocket} peer",
+            Encoding.UTF8
+        );
         var peerInfos = JsonFile.FromJson<List<PeerInfo>>(peers) ?? [];
     }
 

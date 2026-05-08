@@ -14,52 +14,67 @@ public partial class MainViewModel : ObservableObject, IDisposable
 {
     [ObservableProperty]
     public partial string InstanceName { get; set; }
+
     [ObservableProperty]
     public partial string HostName { get; set; } = "";
 
     [ObservableProperty]
     public partial string NetworkName { get; set; } = "";
+
     [ObservableProperty]
     public partial string NetworkSecret { get; set; } = "";
 
     [ObservableProperty]
     public partial bool EditIpAddress { get; set; }
+
     [ObservableProperty]
     public partial bool Dhcp { get; set; }
+
     [ObservableProperty]
     public partial string Ipv4 { get; set; } = "";
 
     [ObservableProperty]
     public partial bool EditPeers { get; set; }
+
     [ObservableProperty]
     public partial string Peers { get; set; } = "";
+
     [ObservableProperty]
     public partial bool EditListeners { get; set; }
+
     [ObservableProperty]
     public partial string Listeners { get; set; } = "";
 
     [ObservableProperty]
     public partial bool EditRpcPortal { get; set; }
+
     [ObservableProperty]
     public partial string RpcPortal { get; set; } = "";
 
     [ObservableProperty]
     public partial bool EditProxyNetworks { get; set; }
+
     [ObservableProperty]
     public partial string ProxyNetworks { get; set; } = "";
 
     [ObservableProperty]
     public partial bool EditFileLogger { get; set; }
+
     [ObservableProperty]
     public partial bool EnableFileLogger { get; set; }
+
     [ObservableProperty]
     public partial string FileLoggerName { get; set; } = "";
+
     [ObservableProperty]
     public partial string FileLoggerDir { get; set; } = "";
+
     [ObservableProperty]
     public partial string FileLoggerLevel { get; set; } = "error";
+
     [ObservableProperty]
-    public partial ObservableCollection<string> FileLoggerLevels { get; set; } = new() { "error", "warn", "info", "debug" };
+    public partial ObservableCollection<string> FileLoggerLevels { get; set; } =
+        new() { "error", "warn", "info", "debug" };
 
     [ObservableProperty]
     public partial bool LatencyFirst { get; set; }
@@ -196,11 +211,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         else
         {
-            configData.Set("network_identity", new Dictionary<string, object>()
+            configData.Set(
+                "network_identity",
+                new Dictionary<string, object>()
                 {
-                    {"network_name", NetworkName},
-                    {"network_secret", NetworkSecret}
-                });
+                    { "network_name", NetworkName },
+                    { "network_secret", NetworkSecret },
+                }
+            );
         }
 
         if (EditIpAddress)
@@ -233,12 +251,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             if (EnableFileLogger)
             {
-                configData.Set("file_logger", new Dictionary<string, object>()
+                configData.Set(
+                    "file_logger",
+                    new Dictionary<string, object>()
                     {
-                        {"file", configName},
-                        {"dir", FileLoggerDir},
-                        {"level", FileLoggerLevel}
-                    });
+                        { "file", configName },
+                        { "dir", FileLoggerDir },
+                        { "level", FileLoggerLevel },
+                    }
+                );
             }
             else
             {
@@ -276,8 +297,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public void CloseEditConfigs()
     {
         IsEditingConfigs = false;
-        MainGrid.RowDefinitions[0].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
-        MainGrid.RowDefinitions[1].SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
+        MainGrid
+            .RowDefinitions[0]
+            .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
+        MainGrid
+            .RowDefinitions[1]
+            .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
     }
 
     [RelayCommand]
@@ -293,7 +318,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         try
         {
             // 连接到一个国内常用的公网地址（如 114.114.114.114:53），以获取本地出口IP
-            using (var socket = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Dgram, 0))
+            using (
+                var socket = new System.Net.Sockets.Socket(
+                    System.Net.Sockets.AddressFamily.InterNetwork,
+                    System.Net.Sockets.SocketType.Dgram,
+                    0
+                )
+            )
             {
                 // 114.114.114.114 是中国大陆常用的公共DNS服务器
                 socket.Connect("114.114.114.114", 53);
@@ -302,16 +333,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 {
                     var localIp = localEndPoint.Address;
                     // 获取所有本地网卡信息
-                    var allNics = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+                    var allNics =
+                        System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
                     foreach (var nic in allNics)
                     {
-                        if (nic.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up)
+                        if (
+                            nic.OperationalStatus
+                            != System.Net.NetworkInformation.OperationalStatus.Up
+                        )
                             continue;
                         var ipProps = nic.GetIPProperties();
                         foreach (var unicast in ipProps.UnicastAddresses)
                         {
-                            if (unicast.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
-                                unicast.Address.Equals(localIp))
+                            if (
+                                unicast.Address.AddressFamily
+                                    == System.Net.Sockets.AddressFamily.InterNetwork
+                                && unicast.Address.Equals(localIp)
+                            )
                             {
                                 // 计算子网
                                 var ipBytes = unicast.Address.GetAddressBytes();

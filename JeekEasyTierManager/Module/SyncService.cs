@@ -63,14 +63,18 @@ public class SyncService : ServiceBase<ISyncService>, ISyncService
     public UnaryResult SendConfigFileContent(List<ConfigFileInfo> fileContentList)
     {
         EnsureAuthorized();
-        Dispatcher.UIThread.Post(async () => await MainViewModel.Instance.WriteConfigFileContent(fileContentList));
+        Dispatcher.UIThread.Post(async () =>
+            await MainViewModel.Instance.WriteConfigFileContent(fileContentList)
+        );
         return UnaryResult.CompletedResult;
     }
 
     public UnaryResult DeleteExtraConfigs(List<string> fileNames)
     {
         EnsureAuthorized();
-        Dispatcher.UIThread.Post(async () => await MainViewModel.Instance.DeleteExtraConfigs(fileNames));
+        Dispatcher.UIThread.Post(async () =>
+            await MainViewModel.Instance.DeleteExtraConfigs(fileNames)
+        );
         return UnaryResult.CompletedResult;
     }
 

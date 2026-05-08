@@ -20,10 +20,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         DisableMirrorDownload = Settings.DisableMirrorDownload;
 
-        _autoUpdateTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromHours(1)
-        };
+        _autoUpdateTimer = new DispatcherTimer { Interval = TimeSpan.FromHours(1) };
         _autoUpdateTimer.Tick += OnAutoUpdateMeTimerElapsed;
 
         // The timer will be updated
@@ -64,7 +61,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await AppSettings.Save();
     }
 
-    private const string RunKeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+    private const string RunKeyPath =
+        @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
     private const string RunValueName = "JeekEasyTierManager";
     private static readonly string RunValue = $"\"{AppSettings.ExePath}\" /hide";
 

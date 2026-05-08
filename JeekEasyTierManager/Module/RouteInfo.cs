@@ -44,4 +44,3 @@ public class RouteInfo
     [JsonPropertyName("version")]
     public string Version { get; set; } = "";
 }
-

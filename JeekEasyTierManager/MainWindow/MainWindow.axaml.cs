@@ -34,9 +34,13 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            await MessageBoxManager.GetMessageBoxStandard(
-                "Error", "Failed to initialize: " + ex.Message,
-                ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error)
+            await MessageBoxManager
+                .GetMessageBoxStandard(
+                    "Error",
+                    "Failed to initialize: " + ex.Message,
+                    ButtonEnum.Ok,
+                    MsBox.Avalonia.Enums.Icon.Error
+                )
                 .ShowWindowDialogAsync(this);
             App.ExitApplication();
         }

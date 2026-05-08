@@ -18,13 +18,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var configsToUpdate = configs ?? [.. Configs];
 
         // Get installed services
-        var easyTierServices = ServiceController.GetServices().Where(
-            s => s.ServiceName.StartsWith(ServicePrefix, StringComparison.InvariantCultureIgnoreCase));
+        var easyTierServices = ServiceController
+            .GetServices()
+            .Where(s =>
+                s.ServiceName.StartsWith(ServicePrefix, StringComparison.InvariantCultureIgnoreCase)
+            );
 
         foreach (var config in configsToUpdate)
         {
-            config.Service = easyTierServices.FirstOrDefault(
-                s => s.ServiceName.Equals(ServicePrefix + config.Name, StringComparison.InvariantCultureIgnoreCase));
+            config.Service = easyTierServices.FirstOrDefault(s =>
+                s.ServiceName.Equals(
+                    ServicePrefix + config.Name,
+                    StringComparison.InvariantCultureIgnoreCase
+                )
+            );
         }
     }
 
@@ -82,7 +89,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private async Task InstallService(ConfigInfo config)
     {
         var configPath = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
-        if (!await Nssm.InstallService(ServicePrefix + config.Name, AppSettings.EasyTierCorePath, $"-c \"{configPath}\""))
+        if (
+            !await Nssm.InstallService(
+                ServicePrefix + config.Name,
+                AppSettings.EasyTierCorePath,
+                $"-c \"{configPath}\""
+            )
+        )
         {
             Messages = $"Failed to install service {ServicePrefix + config.Name}\n{Nssm.LastError}";
             return;
@@ -96,7 +109,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await Executor.RunAndWait("netsh", deleteRuleArgs, false, true);
 
         // Add new firewall rule
-        var firewallArgs = $"""advfirewall firewall add rule name="EasyTier Core" dir=in action=allow program="{AppSettings.EasyTierCorePath}" enable=yes""";
+        var firewallArgs =
+            $"""advfirewall firewall add rule name="EasyTier Core" dir=in action=allow program="{AppSettings.EasyTierCorePath}" enable=yes""";
         await Executor.RunAndWait("netsh", firewallArgs, false, true);
     }
 
@@ -154,7 +168,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         else
         {
-            Messages = $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
+            Messages =
+                $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
         }
     }
 
@@ -196,20 +211,28 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await config.Service.StartAsync();
 
         // Wait 3 seconds to make sure the tun device is ready
-        DispatcherTimer.RunOnce(async () =>
-        {
-            // Since the interface seems to be private, but not really private, we need to set it to private again.
-            var configData = config.GetConfig();
-            if (configData == null)
-                return;
-            if (configData.Flags?.NoTun ?? false)
-                return;
+        DispatcherTimer.RunOnce(
+            async () =>
+            {
+                // Since the interface seems to be private, but not really private, we need to set it to private again.
+                var configData = config.GetConfig();
+                if (configData == null)
+                    return;
+                if (configData.Flags?.NoTun ?? false)
+                    return;
 
-            if (string.IsNullOrEmpty(configData!.Flags?.DevName))
-                return;
+                if (string.IsNullOrEmpty(configData!.Flags?.DevName))
+                    return;
 
-            await Executor.RunAndWait("powershell.exe", $"-ex bypass -command Set-NetConnectionProfile -InterfaceAlias \"{configData.Flags.DevName}\" -NetworkCategory Private", false, true);
-        }, TimeSpan.FromSeconds(3));
+                await Executor.RunAndWait(
+                    "powershell.exe",
+                    $"-ex bypass -command Set-NetConnectionProfile -InterfaceAlias \"{configData.Flags.DevName}\" -NetworkCategory Private",
+                    false,
+                    true
+                );
+            },
+            TimeSpan.FromSeconds(3)
+        );
     }
 
     [RelayCommand]
@@ -306,5 +329,4 @@ public partial class MainViewModel : ObservableObject, IDisposable
             UpdateServiceStatus(config);
         }
     }
-
 }

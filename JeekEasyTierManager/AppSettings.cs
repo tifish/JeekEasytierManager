@@ -16,12 +16,20 @@ public class AppSettings
     public static readonly string EasyTierDirectory = Path.Join(AppDirectory, "EasyTier");
     public static readonly string ConfigDirectory = Path.Join(AppDirectory, "Config");
 
-    public static readonly string EasyTierCorePath = Path.Join(EasyTierDirectory, "easytier-core.exe");
-    public static readonly string EasyTierCliPath = Path.Join(EasyTierDirectory, "easytier-cli.exe");
+    public static readonly string EasyTierCorePath = Path.Join(
+        EasyTierDirectory,
+        "easytier-core.exe"
+    );
+    public static readonly string EasyTierCliPath = Path.Join(
+        EasyTierDirectory,
+        "easytier-cli.exe"
+    );
     public static readonly string NssmPath = Path.Join(AppDirectory, "Nssm", "nssm.exe");
 
-    public static readonly string JeekEasyTierManagerZipUrl = "https://github.com/tifish/JeekEasyTierManager/releases/download/latest_release/JeekEasyTierManager.7z";
-    public static readonly string EasyTierLatestReleasePageUrl = "https://github.com/EasyTier/EasyTier/releases/latest";
+    public static readonly string JeekEasyTierManagerZipUrl =
+        "https://github.com/tifish/JeekEasyTierManager/releases/download/latest_release/JeekEasyTierManager.7z";
+    public static readonly string EasyTierLatestReleasePageUrl =
+        "https://github.com/EasyTier/EasyTier/releases/latest";
 
     public static readonly string SettingsDirectory = Path.Combine(AppDirectory, "Settings");
     public static readonly string SettingsFile = Path.Combine(SettingsDirectory, "Settings.json");
@@ -57,7 +65,7 @@ public class AppSettings
                 "Default" => ThemeVariant.Default,
                 "Light" => ThemeVariant.Light,
                 "Dark" => ThemeVariant.Dark,
-                _ => ThemeVariant.Default
+                _ => ThemeVariant.Default,
             };
         }
     }

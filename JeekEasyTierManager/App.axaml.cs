@@ -42,9 +42,11 @@ public partial class App : Application
     {
         _trayIcon = new TrayIcon()
         {
-            Icon = new WindowIcon(new Bitmap(AssetLoader.Open(new Uri("avares://JeekEasyTierManager/App.ico")))),
+            Icon = new WindowIcon(
+                new Bitmap(AssetLoader.Open(new Uri("avares://JeekEasyTierManager/App.ico")))
+            ),
             ToolTipText = "Jeek EasyTier 管理器",
-            IsVisible = true
+            IsVisible = true,
         };
 
         // Create right-click menu
@@ -59,16 +61,20 @@ public partial class App : Application
         menu.Add(new NativeMenuItemSeparator());
 
         // Start service
-        menu.Add(new NativeMenuItem("重启服务")
-        {
-            Command = MainViewModel.Instance.RestartSelectedServicesCommand
-        });
+        menu.Add(
+            new NativeMenuItem("重启服务")
+            {
+                Command = MainViewModel.Instance.RestartSelectedServicesCommand,
+            }
+        );
 
         // Stop service
-        menu.Add(new NativeMenuItem("停止服务")
-        {
-            Command = MainViewModel.Instance.StopSelectedServicesCommand
-        });
+        menu.Add(
+            new NativeMenuItem("停止服务")
+            {
+                Command = MainViewModel.Instance.StopSelectedServicesCommand,
+            }
+        );
 
         // Separator
         menu.Add(new NativeMenuItemSeparator());

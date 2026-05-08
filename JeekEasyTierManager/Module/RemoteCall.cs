@@ -55,7 +55,8 @@ public class RemoteCall
         public override AsyncUnaryCall<TResponse> AsyncUnaryCall<TRequest, TResponse>(
             TRequest request,
             ClientInterceptorContext<TRequest, TResponse> context,
-            AsyncUnaryCallContinuation<TRequest, TResponse> continuation)
+            AsyncUnaryCallContinuation<TRequest, TResponse> continuation
+        )
         {
             var headers = context.Options.Headers ?? [];
             headers.Add("authorization", Settings.SyncPassword);
@@ -63,12 +64,15 @@ public class RemoteCall
             var newContext = new ClientInterceptorContext<TRequest, TResponse>(
                 context.Method,
                 context.Host,
-                new CallOptions(headers,
+                new CallOptions(
+                    headers,
                     context.Options.Deadline,
                     context.Options.CancellationToken,
                     context.Options.WriteOptions,
                     context.Options.PropagationToken,
-                    context.Options.Credentials));
+                    context.Options.Credentials
+                )
+            );
 
             return base.AsyncUnaryCall(request, newContext, continuation);
         }
