@@ -1,7 +1,7 @@
 ﻿# 自动检查并安装 .NET Runtime
 
 param(
-    [int]$Version = 8,
+    [int]$Version = 10,
     [ValidateSet("WindowsDesktop", "AspNetCore", "NETCore")]
     [string]$Type = "WindowsDesktop",
     [switch]$Verbose
@@ -80,7 +80,7 @@ function Test-DotNetRuntime {
     通过多种方法检查指定版本和类型的 .NET Runtime 的安装状态
     
     .PARAMETER Version
-    .NET 版本号 (7, 8, 9)
+    .NET 版本号 (7, 8, 9, 10)
     
     .PARAMETER Type
     Runtime 类型 (WindowsDesktop, AspNetCore, NETCore)
@@ -233,7 +233,7 @@ function Install-DotNetRuntime {
     下载并安装指定版本和类型的 .NET Runtime
     
     .PARAMETER Version
-    .NET 版本号 (7, 8, 9)
+    .NET 版本号 (7, 8, 9, 10)
     
     .PARAMETER Type
     Runtime 类型 (WindowsDesktop, AspNetCore, NETCore)
