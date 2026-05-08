@@ -13,3 +13,5 @@ obj
 /bin/*.runtimeconfig.json
 /bin/Settings
 /bin/Logs
+/BuildAndDeploy.cmd
+/Deploy.cmd
