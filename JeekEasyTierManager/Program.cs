@@ -23,7 +23,7 @@ class Program
         if (singleInstance.IsRunning)
             return;
 
-        singleInstance.StartIPCServer(async () =>
+        singleInstance.StartIPCServer(async _ =>
         {
             // Use Avalonia dispatcher to show window on UI thread
             if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)

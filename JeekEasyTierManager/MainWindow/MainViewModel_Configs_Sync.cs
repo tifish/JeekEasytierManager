@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JeekTools;
+using Json.Easy;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
@@ -226,7 +227,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         var rpcSocket = GetRpcSocket(config.Name);
         var peersJson = await Executor.RunWithOutput(AppSettings.EasyTierCliPath, $"-p {rpcSocket} -o json peer", Encoding.UTF8);
-        var peers = JsonFile<List<PeerInfo>>.FromJson(peersJson);
+        var peers = JsonFile.FromJson<List<PeerInfo>>(peersJson);
         return peers ?? [];
     }
 

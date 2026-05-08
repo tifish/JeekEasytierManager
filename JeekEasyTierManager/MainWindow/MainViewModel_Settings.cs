@@ -6,6 +6,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JeekTools;
+using RegistryHelper = DotNetRun.Reg;
 
 namespace JeekEasyTierManager;
 

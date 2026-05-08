@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Styling;
 using JeekTools;
+using Json.Easy;
 
 namespace JeekEasyTierManager;
 
@@ -25,11 +26,11 @@ public class AppSettings
     public static readonly string SettingsDirectory = Path.Combine(AppDirectory, "Settings");
     public static readonly string SettingsFile = Path.Combine(SettingsDirectory, "Settings.json");
 
-    private static readonly JsonFile<AppSettings> _settingsFile = new(SettingsFile);
+    private static readonly JsonFile _settingsFile = new(SettingsFile);
 
     public static async Task Load()
     {
-        var settings = await _settingsFile.Load();
+        var settings = await _settingsFile.Load<AppSettings>();
         if (settings != null)
             Settings = settings;
     }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JeekTools;
+using Json.Easy;
 using Nett;
 
 namespace JeekEasyTierManager;
@@ -112,7 +113,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private async Task GetPeersInfo(string rpcSocket)
     {
         var peers = await Executor.RunWithOutput(AppSettings.EasyTierCliPath, $"-p {rpcSocket} peer", Encoding.UTF8);
-        var peerInfos = JsonFile<List<PeerInfo>>.FromJson(peers) ?? [];
+        var peerInfos = JsonFile.FromJson<List<PeerInfo>>(peers) ?? [];
     }
 
     public async Task ShowInfo()

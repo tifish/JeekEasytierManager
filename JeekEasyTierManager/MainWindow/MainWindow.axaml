@@ -31,7 +31,7 @@
                 <TextBox
                     Loaded="DialogTextBox_Loaded"
                     Text="{Binding RenameConfigDialogText}"
-                    Watermark="输入新名称...">
+                    PlaceholderText="输入新名称...">
                     <TextBox.KeyBindings>
                         <KeyBinding Command="{Binding RenameConfigDialogSaveCommand}" Gesture="Enter" />
                         <KeyBinding Command="{Binding RenameConfigDialogCancelCommand}" Gesture="Escape" />
@@ -68,7 +68,7 @@
                     <TextBox
                         Loaded="DialogTextBox_Loaded"
                         Text="{Binding AddConfigDialogText}"
-                        Watermark="输入新名称...">
+                        PlaceholderText="输入新名称...">
                         <TextBox.KeyBindings>
                             <KeyBinding Command="{Binding AddConfigDialogAddCommand}" Gesture="Enter" />
                             <KeyBinding Command="{Binding AddConfigDialogCancelCommand}" Gesture="Escape" />
