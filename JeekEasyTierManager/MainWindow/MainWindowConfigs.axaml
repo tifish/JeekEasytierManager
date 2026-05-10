@@ -39,6 +39,7 @@
                             <DataTemplate>
                                 <CheckBox
                                     HorizontalAlignment="Center"
+                                    Margin="10,0"
                                     VerticalAlignment="Center"
                                     IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                     IsCheckedChanged="ConfigSelectionCheckBoxChanged"
