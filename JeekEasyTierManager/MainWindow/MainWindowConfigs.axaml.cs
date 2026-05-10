@@ -22,7 +22,32 @@ public partial class MainWindowConfigs : UserControl
 
         var dataGrid = (DataGrid)sender!;
         var selectedItems = dataGrid.SelectedItems;
-        MainViewModel.Instance.SelectedConfigs = [.. selectedItems.Cast<ConfigInfo>()];
+        _isUpdatingSelection = true;
+        try
+        {
+            MainViewModel.Instance.SetSelectedConfigs(
+                selectedItems.Cast<ConfigInfo>(),
+                updateDataGridSelection: false
+            );
+        }
+        finally
+        {
+            _isUpdatingSelection = false;
+        }
+    }
+
+    public void ConfigSelectionCheckBoxChanged(
+        object? sender,
+        Avalonia.Interactivity.RoutedEventArgs e
+    )
+    {
+        if (_isUpdatingSelection)
+            return;
+
+        if (sender is not CheckBox checkBox || checkBox.DataContext is not ConfigInfo config)
+            return;
+
+        MainViewModel.Instance.SetConfigSelected(config, checkBox.IsChecked == true);
     }
 
     public void UpdateDataGridSelection()

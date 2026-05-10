@@ -21,9 +21,23 @@
                 GridLinesVisibility="All"
                 HeadersVisibility="None"
                 ItemsSource="{Binding Configs}"
-                SelectionChanged="DataGrid_SelectionChanged">
+                SelectionChanged="DataGrid_SelectionChanged"
+                SelectionMode="Extended">
 
                 <DataGrid.Columns>
+
+                    <DataGridTemplateColumn Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                    IsCheckedChanged="ConfigSelectionCheckBoxChanged"
+                                    ToolTip.Tip="选择配置" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
                     <DataGridTextColumn Binding="{Binding Name}" />
 

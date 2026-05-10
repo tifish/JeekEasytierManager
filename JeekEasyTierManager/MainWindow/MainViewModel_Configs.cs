@@ -37,6 +37,9 @@ public partial class ConfigInfo : ObservableObject
     public partial string Name { get; set; } = "";
 
     [ObservableProperty]
+    public partial bool IsSelected { get; set; } = false;
+
+    [ObservableProperty]
     public partial ServiceStatus Status { get; set; } = ServiceStatus.None;
 
     public string GetConfigPath()
@@ -364,7 +367,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        foreach (var aConfig in SelectedConfigs)
+        foreach (var aConfig in SelectedConfigs.ToArray())
             DeleteConfig(aConfig);
     }
 
@@ -375,6 +378,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             File.Delete(configFile);
 
         Configs.Remove(config);
+        SelectedConfigs.Remove(config);
+        config.IsSelected = false;
+        _mainWindowConfigs?.UpdateDataGridSelection();
     }
 
     [RelayCommand]
@@ -397,13 +403,53 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public ObservableCollection<ConfigInfo> SelectedConfigs { get; set; } = [];
 
+    public void SetSelectedConfigs(IEnumerable<ConfigInfo> configs, bool updateDataGridSelection = true)
+    {
+        var selectedConfigs = configs.Distinct().ToList();
+
+        SelectedConfigs.Clear();
+        foreach (var config in selectedConfigs)
+        {
+            SelectedConfigs.Add(config);
+        }
+
+        foreach (var config in Configs)
+        {
+            var isSelected = selectedConfigs.Contains(config);
+            if (config.IsSelected != isSelected)
+                config.IsSelected = isSelected;
+        }
+
+        if (updateDataGridSelection)
+            _mainWindowConfigs?.UpdateDataGridSelection();
+    }
+
+    public void SetConfigSelected(ConfigInfo config, bool isSelected)
+    {
+        if (isSelected)
+        {
+            AddSelectedConfig(config);
+            return;
+        }
+
+        SelectedConfigs.Remove(config);
+        if (config.IsSelected)
+            config.IsSelected = false;
+
+        _mainWindowConfigs?.UpdateDataGridSelection();
+    }
+
     private void AddSelectedConfig(ConfigInfo config)
     {
         if (!SelectedConfigs.Contains(config))
         {
             SelectedConfigs.Add(config);
-            _mainWindowConfigs?.UpdateDataGridSelection();
         }
+
+        if (!config.IsSelected)
+            config.IsSelected = true;
+
+        _mainWindowConfigs?.UpdateDataGridSelection();
     }
 
     [RelayCommand]
