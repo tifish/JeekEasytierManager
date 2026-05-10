@@ -8,10 +8,18 @@
     <Border Classes="Card">
         <StackPanel Orientation="Vertical" Spacing="10">
 
-            <StackPanel Grid.Column="0" Orientation="Horizontal">
-                <TextBlock Classes="Title" Text="📝" />
-                <Label Classes="Title" Content="EasyTier 配置" />
-            </StackPanel>
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Classes="Title" Text="📝" />
+                    <Label Classes="Title" Content="EasyTier 配置" />
+                </StackPanel>
+
+                <Button
+                    Grid.Column="2"
+                    Command="{Binding OpenSettingsCommand}"
+                    Content="⚙️"
+                    ToolTip.Tip="设置" />
+            </Grid>
 
             <DataGrid
                 x:Name="ConfigsDataGrid"

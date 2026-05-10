@@ -12,6 +12,21 @@ namespace JeekEasyTierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
+    [ObservableProperty]
+    public partial bool SettingsDialogIsOpen { get; set; }
+
+    [RelayCommand]
+    public void OpenSettings()
+    {
+        SettingsDialogIsOpen = true;
+    }
+
+    [RelayCommand]
+    public void CloseSettings()
+    {
+        SettingsDialogIsOpen = false;
+    }
+
     private async Task ApplySettings()
     {
         Application.Current!.RequestedThemeVariant = Settings.ThemeVariant;

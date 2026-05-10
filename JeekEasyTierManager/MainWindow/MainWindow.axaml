@@ -92,7 +92,31 @@
             </dialogHost:DialogHost.DialogContent>
             <!--  put the content over which the dialog is shown here (e.g. your main window grid)  -->
 
-            <local:MainWindowGrid />
+            <!--  Settings dialog  -->
+            <dialogHost:DialogHost
+                dialogHost:DialogHostStyle.CornerRadius="8"
+                DialogMargin="16"
+                IsOpen="{Binding SettingsDialogIsOpen}">
+
+                <dialogHost:DialogHost.DialogContent>
+                    <StackPanel Spacing="15">
+                        <local:MainWindowSettings />
+
+                        <StackPanel
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal"
+                            Spacing="10">
+                            <Button
+                                Classes="Primary"
+                                Command="{Binding CloseSettingsCommand}"
+                                Content="关闭" />
+                        </StackPanel>
+                    </StackPanel>
+                </dialogHost:DialogHost.DialogContent>
+
+                <local:MainWindowGrid />
+
+            </dialogHost:DialogHost>
 
         </dialogHost:DialogHost>
     </dialogHost:DialogHost>
