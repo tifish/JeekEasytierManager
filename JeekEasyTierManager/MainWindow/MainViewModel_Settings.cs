@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Avalonia;
-using Avalonia.Styling;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -29,7 +28,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private async Task ApplySettings()
     {
-        Application.Current!.RequestedThemeVariant = Settings.ThemeVariant;
+        await ApplyTheme(Settings.Theme, false);
 
         StartOnBoot = RegistryHelper.GetValue(RunKeyPath, RunValueName, "") == RunValue;
 
@@ -51,29 +50,57 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    public async Task SwitchTheme()
+    public async Task SetTheme(string theme)
     {
-        if (Application.Current is null)
-            return;
+        await ApplyTheme(theme, true);
+    }
 
-        string theme;
+    private string _selectedTheme = "Default";
 
-        // If the theme is default, switch to the opposite theme
-        var requestedTheme = Application.Current.RequestedThemeVariant;
-        if (requestedTheme == ThemeVariant.Default)
+    public string SelectedTheme
+    {
+        get => _selectedTheme;
+        private set
         {
-            var actualTheme = Application.Current.ActualThemeVariant;
-            theme = actualTheme == ThemeVariant.Dark ? "Light" : "Dark";
+            if (SetProperty(ref _selectedTheme, value))
+                RefreshThemeSelectionProperties();
         }
-        else // If the theme is not default, switch to default
-        {
-            theme = "Default";
-        }
+    }
+
+    public bool IsLightTheme => SelectedTheme == "Light";
+    public bool IsDarkTheme => SelectedTheme == "Dark";
+    public bool IsSystemTheme => SelectedTheme == "Default";
+
+    private async Task ApplyTheme(string theme, bool save)
+    {
+        theme = NormalizeTheme(theme);
 
         Settings.Theme = theme;
-        Application.Current.RequestedThemeVariant = Settings.ThemeVariant;
+        SelectedTheme = theme;
 
-        await AppSettings.Save();
+        Application.Current!.RequestedThemeVariant = Settings.ThemeVariant;
+        RefreshThemeSelectionProperties();
+
+        if (save)
+            await AppSettings.Save();
+    }
+
+    private static string NormalizeTheme(string theme)
+    {
+        return theme switch
+        {
+            "Light" => "Light",
+            "Dark" => "Dark",
+            "Default" => "Default",
+            _ => "Default",
+        };
+    }
+
+    private void RefreshThemeSelectionProperties()
+    {
+        OnPropertyChanged(nameof(IsLightTheme));
+        OnPropertyChanged(nameof(IsDarkTheme));
+        OnPropertyChanged(nameof(IsSystemTheme));
     }
 
     private const string RunKeyPath =

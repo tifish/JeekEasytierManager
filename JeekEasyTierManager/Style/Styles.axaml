@@ -91,6 +91,21 @@
         <Setter Property="Foreground" Value="White" />
     </Style>
 
+    <!--  Theme selector segment  -->
+    <Style Selector="ToggleButton.ThemeSegment">
+        <Setter Property="MinWidth" Value="90" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ToggleButton.ThemeSegment:checked /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource Gray}" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="ToggleButton.ThemeSegment:checked:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource GrayDark1}" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
     <!--  Card border  -->
     <Style Selector="Border.Card">
         <Setter Property="Padding" Value="15" />
