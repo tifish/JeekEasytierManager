@@ -83,6 +83,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public partial bool UseSmoltcp { get; set; }
 
     [ObservableProperty]
+    public partial bool DisableIpv6 { get; set; }
+
+    [ObservableProperty]
+    public partial bool Ipv6PublicAddrAuto { get; set; }
+
+    [ObservableProperty]
     public partial bool EnableKcpProxy { get; set; }
 
     [ObservableProperty]
@@ -98,6 +104,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public partial bool DisableP2p { get; set; }
 
     [ObservableProperty]
+    public partial bool P2pOnly { get; set; }
+
+    [ObservableProperty]
+    public partial bool LazyP2p { get; set; }
+
+    [ObservableProperty]
     public partial bool BindDevice { get; set; } = true;
 
     [ObservableProperty]
@@ -110,6 +122,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public partial bool RelayAllPeerRpc { get; set; }
 
     [ObservableProperty]
+    public partial bool NeedP2p { get; set; }
+
+    [ObservableProperty]
     public partial bool MultiThread { get; set; } = true;
 
     [ObservableProperty]
@@ -119,7 +134,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public partial bool DisableEncryption { get; set; }
 
     [ObservableProperty]
+    public partial bool DisableTcpHolePunching { get; set; }
+
+    [ObservableProperty]
     public partial bool DisableUdpHolePunching { get; set; }
+
+    [ObservableProperty]
+    public partial bool EnableUdpBroadcastRelay { get; set; }
+
+    [ObservableProperty]
+    public partial bool DisableUpnp { get; set; }
+
+    [ObservableProperty]
+    public partial bool DisableSymHolePunching { get; set; }
 
     [ObservableProperty]
     public partial bool AcceptDns { get; set; }
@@ -157,19 +184,28 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         LatencyFirst = flags.Get("latency_first", false);
         UseSmoltcp = flags.Get("use_smoltcp", false);
+        DisableIpv6 = !flags.Get("enable_ipv6", true);
+        Ipv6PublicAddrAuto = configData.Get("ipv6_public_addr_auto", false);
         EnableKcpProxy = flags.Get("enable_kcp_proxy", false);
         DisableKcpInput = flags.Get("disable_kcp_input", false);
         EnableQuicProxy = flags.Get("enable_quic_proxy", false);
         DisableQuicInput = flags.Get("disable_quic_input", false);
         DisableP2p = flags.Get("disable_p2p", false);
+        P2pOnly = flags.Get("p2p_only", false);
+        LazyP2p = flags.Get("lazy_p2p", false);
         BindDevice = flags.Get("bind_device", true);
         NoTun = flags.Get("no_tun", false);
         EnableExitNode = flags.Get("enable_exit_node", false);
         RelayAllPeerRpc = flags.Get("relay_all_peer_rpc", false);
+        NeedP2p = flags.Get("need_p2p", false);
         MultiThread = flags.Get("multi_thread", true);
         ProxyForwardBySystem = flags.Get("proxy_forward_by_system", false);
         DisableEncryption = !flags.Get("enable_encryption", true);
+        DisableTcpHolePunching = flags.Get("disable_tcp_hole_punching", false);
         DisableUdpHolePunching = flags.Get("disable_udp_hole_punching", false);
+        EnableUdpBroadcastRelay = flags.Get("enable_udp_broadcast_relay", false);
+        DisableUpnp = flags.Get("disable_upnp", false);
+        DisableSymHolePunching = flags.Get("disable_sym_hole_punching", false);
         AcceptDns = flags.Get("accept_dns", false);
         PrivateMode = flags.Get("private_mode", false);
     }
@@ -272,21 +308,31 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         flags.Set("dev_name", configName);
 
+        configData.Set("ipv6_public_addr_auto", Ipv6PublicAddrAuto, false);
+
         flags.Set("latency_first", LatencyFirst, false);
         flags.Set("use_smoltcp", UseSmoltcp, false);
+        flags.Set("enable_ipv6", !DisableIpv6, true);
         flags.Set("enable_kcp_proxy", EnableKcpProxy, false);
         flags.Set("disable_kcp_input", DisableKcpInput, false);
         flags.Set("enable_quic_proxy", EnableQuicProxy, false);
         flags.Set("disable_quic_input", DisableQuicInput, false);
         flags.Set("disable_p2p", DisableP2p, false);
+        flags.Set("p2p_only", P2pOnly, false);
+        flags.Set("lazy_p2p", LazyP2p, false);
         flags.Set("bind_device", BindDevice, true);
         flags.Set("no_tun", NoTun, false);
         flags.Set("enable_exit_node", EnableExitNode, false);
         flags.Set("relay_all_peer_rpc", RelayAllPeerRpc, false);
+        flags.Set("need_p2p", NeedP2p, false);
         flags.Set("multi_thread", MultiThread, true);
         flags.Set("proxy_forward_by_system", ProxyForwardBySystem, false);
         flags.Set("enable_encryption", !DisableEncryption, true);
+        flags.Set("disable_tcp_hole_punching", DisableTcpHolePunching, false);
         flags.Set("disable_udp_hole_punching", DisableUdpHolePunching, false);
+        flags.Set("enable_udp_broadcast_relay", EnableUdpBroadcastRelay, false);
+        flags.Set("disable_upnp", DisableUpnp, false);
+        flags.Set("disable_sym_hole_punching", DisableSymHolePunching, false);
         flags.Set("accept_dns", AcceptDns, false);
         flags.Set("private_mode", PrivateMode, false);
 
