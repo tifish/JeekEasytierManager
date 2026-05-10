@@ -128,67 +128,82 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <StackPanel
-                HorizontalAlignment="Right"
-                Orientation="Horizontal"
-                Spacing="10">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel
+                    Grid.Column="0"
+                    Orientation="Horizontal"
+                    Spacing="10">
 
-                <ToggleSwitch
-                    IsChecked="{Binding DeleteExtraConfigsOnOtherNodesWhenNextSync}"
-                    OffContent="同步删除"
-                    OnContent="同步删除"
-                    ToolTip.Tip="同步时删除其他节点的多余配置" />
-                <Button
-                    Classes="Red"
-                    Command="{Binding SyncConfigsCommand}"
-                    Content="同步"
-                    ToolTip.Tip="同步配置到其他节点" />
-                <Button
-                    Command="{Binding RefreshConfigsCommand}"
-                    Content="🔄"
-                    ToolTip.Tip="刷新列表" />
-                <Button
-                    Command="{Binding AddConfigCommand}"
-                    Content="➕"
-                    ToolTip.Tip="新增配置" />
-                <Button
-                    Command="{Binding RestartSelectedServicesCommand}"
-                    Content="▶️"
-                    ToolTip.Tip="重启服务" />
-                <Button
-                    Command="{Binding StopSelectedServicesCommand}"
-                    Content="⏹️"
-                    ToolTip.Tip="停止服务" />
-                <Button
-                    Command="{Binding EditSelectedConfigsCommand}"
-                    Content="✏️"
-                    ToolTip.Tip="编辑配置" />
-                <Button
-                    Content="..."
-                    ToolTip.Tip="更多功能...">
-                    <Button.Flyout>
-                        <MenuFlyout>
-                            <MenuItem
-                                Command="{Binding InstallSelectedServicesCommand}"
-                                Header="安装服务"
-                                Icon="📌" />
-                            <MenuItem
-                                Command="{Binding UninstallSelectedServicesCommand}"
-                                Header="卸载服务"
-                                Icon="✂️" />
-                            <MenuItem
-                                Command="{Binding EditSelectedConfigsCommand}"
-                                Header="编辑原始配置文件"
-                                Icon="📄" />
-                            <MenuItem
-                                Command="{Binding DeleteSelectedConfigsCommand}"
-                                Header="删除配置"
-                                Icon="🗑️" />
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
+                    <ToggleSwitch
+                        IsChecked="{Binding DeleteExtraConfigsOnOtherNodesWhenNextSync}"
+                        OffContent="同步删除"
+                        OnContent="同步删除"
+                        ToolTip.Tip="同步时删除其他节点的多余配置" />
+                    <Button
+                        Classes="Red"
+                        Command="{Binding SyncConfigsCommand}"
+                        Content="同步"
+                        ToolTip.Tip="同步配置到其他节点" />
+                    <Button
+                        Command="{Binding RefreshConfigsCommand}"
+                        Content="🔄"
+                        ToolTip.Tip="刷新列表" />
+                    <Button
+                        Command="{Binding AddConfigCommand}"
+                        Content="➕"
+                        ToolTip.Tip="新增配置" />
+                </StackPanel>
 
-            </StackPanel>
+                <StackPanel
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    IsVisible="{Binding HasMultipleSelectedConfigs}"
+                    Margin="20,0,0,0"
+                    Orientation="Horizontal"
+                    Spacing="10">
+
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding SelectedConfigsSummary}" />
+                    <Button
+                        Command="{Binding RestartSelectedServicesCommand}"
+                        Content="▶️"
+                        ToolTip.Tip="重启选中的服务" />
+                    <Button
+                        Command="{Binding StopSelectedServicesCommand}"
+                        Content="⏹️"
+                        ToolTip.Tip="停止选中的服务" />
+                    <Button
+                        Command="{Binding EditSelectedConfigsCommand}"
+                        Content="✏️"
+                        ToolTip.Tip="编辑选中的配置" />
+                    <Button
+                        Content="..."
+                        ToolTip.Tip="更多功能...">
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuItem
+                                    Command="{Binding InstallSelectedServicesCommand}"
+                                    Header="安装选中的服务"
+                                    Icon="📌" />
+                                <MenuItem
+                                    Command="{Binding UninstallSelectedServicesCommand}"
+                                    Header="卸载选中的服务"
+                                    Icon="✂️" />
+                                <MenuItem
+                                    Command="{Binding EditSelectedConfigsCommand}"
+                                    Header="编辑选中的原始配置文件"
+                                    Icon="📄" />
+                                <MenuItem
+                                    Command="{Binding DeleteSelectedConfigsCommand}"
+                                    Header="删除选中的配置"
+                                    Icon="🗑️" />
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+
+                </StackPanel>
+            </Grid>
 
         </StackPanel>
 

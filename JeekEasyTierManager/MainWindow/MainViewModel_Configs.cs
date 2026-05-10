@@ -380,6 +380,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Configs.Remove(config);
         SelectedConfigs.Remove(config);
         config.IsSelected = false;
+        UpdateSelectedConfigsState();
         _mainWindowConfigs?.UpdateDataGridSelection();
     }
 
@@ -403,6 +404,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public ObservableCollection<ConfigInfo> SelectedConfigs { get; set; } = [];
 
+    [ObservableProperty]
+    public partial bool HasMultipleSelectedConfigs { get; set; } = false;
+
+    [ObservableProperty]
+    public partial string SelectedConfigsSummary { get; set; } = "";
+
     public void SetSelectedConfigs(IEnumerable<ConfigInfo> configs, bool updateDataGridSelection = true)
     {
         var selectedConfigs = configs.Distinct().ToList();
@@ -420,6 +427,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 config.IsSelected = isSelected;
         }
 
+        UpdateSelectedConfigsState();
+
         if (updateDataGridSelection)
             _mainWindowConfigs?.UpdateDataGridSelection();
     }
@@ -436,6 +445,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (config.IsSelected)
             config.IsSelected = false;
 
+        UpdateSelectedConfigsState();
         _mainWindowConfigs?.UpdateDataGridSelection();
     }
 
@@ -449,7 +459,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!config.IsSelected)
             config.IsSelected = true;
 
+        UpdateSelectedConfigsState();
         _mainWindowConfigs?.UpdateDataGridSelection();
+    }
+
+    private void UpdateSelectedConfigsState()
+    {
+        HasMultipleSelectedConfigs = SelectedConfigs.Count >= 2;
+        SelectedConfigsSummary = $"已选 {SelectedConfigs.Count} 个配置";
     }
 
     [RelayCommand]
