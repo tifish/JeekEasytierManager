@@ -23,13 +23,13 @@ public partial class MainWindow : Window
 
     private async void OnLoaded(object? sender, RoutedEventArgs e)
     {
-        if (Program.StartHidden)
-        {
-            Hide();
-        }
-
         try
         {
+            if (Program.StartHidden)
+            {
+                Hide();
+            }
+
             await MainViewModel.Instance.Init();
         }
         catch (Exception ex)
@@ -48,9 +48,16 @@ public partial class MainWindow : Window
 
     private async void OnActivated(object? sender, EventArgs e)
     {
-        if (Settings.AutoRefreshInfo)
+        try
         {
-            await MainViewModel.Instance.ShowInfo();
+            if (Settings.AutoRefreshInfo)
+            {
+                await MainViewModel.Instance.ShowInfo();
+            }
+        }
+        catch (Exception ex)
+        {
+            MainViewModel.Instance.Messages = $"Auto refresh error: {ex.Message}";
         }
     }
 
