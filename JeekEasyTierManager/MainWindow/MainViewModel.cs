@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using JeekTools;
-using Microsoft.Extensions.Logging;
 
 namespace JeekEasyTierManager;
 
