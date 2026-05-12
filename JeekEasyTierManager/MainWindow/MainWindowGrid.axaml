@@ -15,11 +15,38 @@
         Margin="20"
         ColumnDefinitions="*"
         ColumnSpacing="20"
-        RowDefinitions="Auto,*">
+        RowDefinitions="Auto,Auto"
+        RowSpacing="10">
 
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
             <local:MainWindowConfigs Grid.Column="0" Margin="0,0,20,0" />
             <local:MainWindowEditConfigs Grid.Column="1" IsVisible="{Binding IsEditingConfigs}" />
+
+            <Border
+                Grid.Column="1"
+                Classes="Card"
+                IsVisible="{Binding !IsEditingConfigs}">
+                <Grid RowDefinitions="Auto,Auto" RowSpacing="10">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <TextBlock Classes="Title" Text="📜" />
+                        <Label Classes="Title" Content="日志" />
+                    </StackPanel>
+
+                    <ScrollViewer
+                        x:Name="LogScrollViewer"
+                        Grid.Row="1"
+                        MaxHeight="360"
+                        MinHeight="160"
+                        HorizontalScrollBarVisibility="Visible">
+                        <TextBlock
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            FontFamily="Consolas, 'Courier New', monospace"
+                            Text="{Binding Messages}"
+                            TextWrapping="Wrap" />
+                    </ScrollViewer>
+                </Grid>
+            </Border>
         </Grid>
 
         <local:MainWindowInfo Grid.Row="1" IsVisible="{Binding !IsEditingConfigs}" />

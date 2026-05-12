@@ -54,79 +54,110 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     public async Task ShowPeers()
     {
+        _showPeersOrRoute = true;
+        IsShowingPeers = true;
+        IsShowingRoutes = false;
+
         if (!HasEasyTier)
         {
-            Messages = "EasyTier is not installed";
+            PeerInfoRows = [];
+            AddMessage("EasyTier is not installed");
             return;
         }
 
-        var messages = new StringBuilder();
+        var peerInfoRows = new ObservableCollection<PeerInfoRow>();
+        var hasRunningService = false;
 
         foreach (var config in Configs.ToArray()) // Solve problem of modifying collection while iterating
         {
             if (config.Status != ServiceStatus.Running)
                 continue;
 
-            var rpcSocket = GetRpcSocket(config.Name);
-            var peers = await Executor.RunWithOutput(
-                AppSettings.EasyTierCliPath,
-                $"-p {rpcSocket} peer",
-                Encoding.UTF8
-            );
-            messages.AppendLine($"{config.Name}:");
-            messages.AppendLine(peers);
-            messages.AppendLine();
+            hasRunningService = true;
+
+            try
+            {
+                var rpcSocket = GetRpcSocket(config.Name);
+                var peersJson = await Executor.RunWithOutput(
+                    AppSettings.EasyTierCliPath,
+                    $"-p {rpcSocket} -o json peer",
+                    Encoding.UTF8
+                );
+                var peers = JsonFile.FromJson<List<PeerInfo>>(peersJson) ?? [];
+                foreach (var peer in peers)
+                    peerInfoRows.Add(new PeerInfoRow(config.Name, peer));
+            }
+            catch (Exception ex)
+            {
+                AddMessage($"Failed to load peers from {config.Name}: {ex.Message}");
+            }
         }
 
-        Messages = messages.ToString();
+        if (!hasRunningService)
+            AddMessage("No running EasyTier services found");
 
-        _showPeersOrRoute = true;
+        PeerInfoRows = peerInfoRows;
     }
 
     [RelayCommand]
     public async Task ShowRoute()
     {
+        _showPeersOrRoute = false;
+        IsShowingPeers = false;
+        IsShowingRoutes = true;
+
         if (!HasEasyTier)
         {
-            Messages = "EasyTier is not installed";
+            RouteInfoRows = [];
+            AddMessage("EasyTier is not installed");
             return;
         }
 
-        var messages = new StringBuilder();
+        var routeInfoRows = new ObservableCollection<RouteInfoRow>();
+        var hasRunningService = false;
 
         foreach (var config in Configs.ToArray()) // Solve problem of modifying collection while iterating
         {
             if (config.Status != ServiceStatus.Running)
                 continue;
 
-            var rpcSocket = GetRpcSocket(config.Name);
-            var route = await Executor.RunWithOutput(
-                AppSettings.EasyTierCliPath,
-                $"-p {rpcSocket} route",
-                Encoding.UTF8
-            );
-            messages.AppendLine($"{config.Name}:");
-            messages.AppendLine(route);
-            messages.AppendLine();
+            hasRunningService = true;
+
+            try
+            {
+                var rpcSocket = GetRpcSocket(config.Name);
+                var routeJson = await Executor.RunWithOutput(
+                    AppSettings.EasyTierCliPath,
+                    $"-p {rpcSocket} -o json route",
+                    Encoding.UTF8
+                );
+                var routes = JsonFile.FromJson<List<RouteInfo>>(routeJson) ?? [];
+                foreach (var route in routes)
+                    routeInfoRows.Add(new RouteInfoRow(config.Name, route));
+            }
+            catch (Exception ex)
+            {
+                AddMessage($"Failed to load routes from {config.Name}: {ex.Message}");
+            }
         }
 
-        Messages = messages.ToString();
+        if (!hasRunningService)
+            AddMessage("No running EasyTier services found");
 
-        _showPeersOrRoute = false;
+        RouteInfoRows = routeInfoRows;
     }
 
     [ObservableProperty]
-    public partial ObservableCollection<PeerInfo> PeerInfos { get; set; } = [];
+    public partial ObservableCollection<PeerInfoRow> PeerInfoRows { get; set; } = [];
 
-    private async Task GetPeersInfo(string rpcSocket)
-    {
-        var peers = await Executor.RunWithOutput(
-            AppSettings.EasyTierCliPath,
-            $"-p {rpcSocket} peer",
-            Encoding.UTF8
-        );
-        var peerInfos = JsonFile.FromJson<List<PeerInfo>>(peers) ?? [];
-    }
+    [ObservableProperty]
+    public partial ObservableCollection<RouteInfoRow> RouteInfoRows { get; set; } = [];
+
+    [ObservableProperty]
+    public partial bool IsShowingPeers { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool IsShowingRoutes { get; set; } = false;
 
     public async Task ShowInfo()
     {
@@ -143,4 +174,54 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         Messages += message + "\n";
     }
+}
+
+public class PeerInfoRow : PeerInfo
+{
+    public PeerInfoRow(string configName, PeerInfo peer)
+    {
+        ConfigName = configName;
+        Cidr = peer.Cidr;
+        Ipv4 = peer.Ipv4;
+        Hostname = peer.Hostname;
+        Cost = peer.Cost;
+        LatMs = peer.LatMs;
+        LossRate = peer.LossRate;
+        RxBytes = peer.RxBytes;
+        TxBytes = peer.TxBytes;
+        TunnelProto = peer.TunnelProto;
+        NatType = peer.NatType;
+        Id = peer.Id;
+        Version = peer.Version;
+    }
+
+    public string ConfigName { get; set; } = "";
+}
+
+public class RouteInfoRow : RouteInfo
+{
+    public RouteInfoRow(string configName, RouteInfo route)
+    {
+        ConfigName = configName;
+        Ipv4 = route.Ipv4;
+        Hostname = route.Hostname;
+        ProxyCidrs = route.ProxyCidrs;
+        NextHopIpv4 = route.NextHopIpv4;
+        NextHopHostname = route.NextHopHostname;
+        NextHopLat = route.NextHopLat;
+        PathLen = route.PathLen;
+        PathLatency = route.PathLatency;
+        NextHopIpv4LatFirst = route.NextHopIpv4LatFirst;
+        NextHopHostnameLatFirst = route.NextHopHostnameLatFirst;
+        PathLenLatFirst = route.PathLenLatFirst;
+        PathLatencyLatFirst = route.PathLatencyLatFirst;
+        Version = route.Version;
+    }
+
+    public string ConfigName { get; set; } = "";
+
+    public string NextHop =>
+        string.IsNullOrWhiteSpace(NextHopHostname)
+            ? NextHopIpv4
+            : $"{NextHopIpv4} ({NextHopHostname})";
 }

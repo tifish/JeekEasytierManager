@@ -20,10 +20,10 @@ public class PeerInfo
     public string Cost { get; set; } = "";
 
     [JsonPropertyName("lat_ms")]
-    public double LatMs { get; set; }
+    public string LatMs { get; set; } = "";
 
     [JsonPropertyName("loss_rate")]
-    public double LossRate { get; set; }
+    public string LossRate { get; set; } = "";
 
     [JsonPropertyName("rx_bytes")]
     public string RxBytes { get; set; } = "";
