@@ -39,7 +39,6 @@
 
             <DataGrid
                 Grid.Row="1"
-                MaxHeight="280"
                 AutoGenerateColumns="False"
                 BorderBrush="Gray"
                 BorderThickness="1"
@@ -68,7 +67,6 @@
 
             <DataGrid
                 Grid.Row="1"
-                MaxHeight="280"
                 AutoGenerateColumns="False"
                 BorderBrush="Gray"
                 BorderThickness="1"

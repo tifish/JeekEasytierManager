@@ -10,7 +10,7 @@
     Width="1260"
     MinWidth="680"
     MinHeight="480"
-    SizeToContent="Height"
+    SizeToContent="WidthAndHeight"
     d:DesignHeight="480"
     d:DesignWidth="680"
     x:DataType="local:MainViewModel"
