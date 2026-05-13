@@ -26,15 +26,27 @@
                 Grid.Column="1"
                 Classes="Card"
                 IsVisible="{Binding !IsEditingConfigs}">
-                <Grid RowDefinitions="Auto,Auto" RowSpacing="10">
+                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
                         <TextBlock Classes="Title" Text="📜" />
                         <Label Classes="Title" Content="日志" />
                     </StackPanel>
 
+                    <StackPanel
+                        Grid.Row="1"
+                        IsVisible="{Binding IsDownloading}"
+                        Orientation="Vertical"
+                        Spacing="4">
+                        <TextBlock Text="{Binding DownloadStatus}" />
+                        <ProgressBar
+                            Maximum="100"
+                            Minimum="0"
+                            Value="{Binding DownloadProgress}" />
+                    </StackPanel>
+
                     <ScrollViewer
                         x:Name="LogScrollViewer"
-                        Grid.Row="1"
+                        Grid.Row="2"
                         MaxHeight="360"
                         MinHeight="160"
                         HorizontalScrollBarVisibility="Visible">

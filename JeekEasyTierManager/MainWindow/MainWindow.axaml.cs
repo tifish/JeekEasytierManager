@@ -57,7 +57,8 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MainViewModel.Instance.Messages = $"Auto refresh error: {ex.Message}";
+            MainViewModel.Instance.ClearMessages();
+            MainViewModel.Instance.AddMessage($"Auto refresh error: {ex.Message}");
         }
     }
 

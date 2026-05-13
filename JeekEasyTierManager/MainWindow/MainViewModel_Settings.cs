@@ -127,7 +127,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            Messages = $"Failed to set start on boot: {ex.Message}";
+            ClearMessages();
+            AddMessage($"Failed to set start on boot: {ex.Message}");
         }
     }
 
@@ -181,7 +182,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            Messages = $"Auto update error: {ex.Message}";
+            ClearMessages();
+            AddMessage($"Auto update error: {ex.Message}");
         }
     }
 

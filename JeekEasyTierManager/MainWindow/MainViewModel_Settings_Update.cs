@@ -14,7 +14,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public async Task UpdateEasyTier(bool clearMessages)
     {
         if (clearMessages)
-            Messages = "";
+            ClearMessages();
 
         var hasUpdate = await EasyTierUpdate.HasUpdate();
 
@@ -40,21 +40,32 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             AddMessage($"Updating EasyTier to {EasyTierUpdate.RemoteVersion}...");
             await StopAllServices();
-            if (
-                !await EasyTierUpdate.Update(
-                    (progress) =>
-                    {
-                        AddMessage(
-                            $"\nStart downloading EasyTier from {EasyTierUpdate.DownloadUrl}"
-                        );
-                        AddMessage($"Downloading EasyTier: {progress:F2}%");
-                    }
-                )
-            )
+
+            AddMessage($"Start downloading EasyTier from {EasyTierUpdate.DownloadUrl}");
+            DownloadProgress = 0;
+            DownloadStatus = "Downloading EasyTier... 0.00%";
+            IsDownloading = true;
+
+            bool updateOk;
+            try
+            {
+                updateOk = await EasyTierUpdate.Update(progress =>
+                {
+                    DownloadProgress = progress;
+                    DownloadStatus = $"Downloading EasyTier... {progress:F2}%";
+                });
+            }
+            finally
+            {
+                IsDownloading = false;
+            }
+
+            if (!updateOk)
             {
                 AddMessage($"Update EasyTier failed: {EasyTierUpdate.LastError}");
                 return;
             }
+
             CheckHasEasyTier();
             await RestoreAllServices();
             AddMessage($"Update EasyTier to {EasyTierUpdate.RemoteVersion} completed.");
@@ -69,7 +80,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public async Task UpdateMe(bool clearMessages)
     {
         if (clearMessages)
-            Messages = "";
+            ClearMessages();
 
         var hasUpdate = await AutoUpdate.HasUpdate();
 

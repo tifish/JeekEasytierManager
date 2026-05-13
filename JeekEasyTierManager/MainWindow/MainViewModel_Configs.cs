@@ -172,14 +172,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         using var process = Executor.Run(cmdFile);
         if (process is null)
         {
-            Messages = $"Failed to test config: {config.Name}";
+            ClearMessages();
+            AddMessage($"Failed to test config: {config.Name}");
             return;
         }
 
         await process.WaitForExitAsync();
         if (process.ExitCode != 0)
         {
-            Messages = $"Failed to test config: {config.Name}";
+            ClearMessages();
+            AddMessage($"Failed to test config: {config.Name}");
         }
     }
 
@@ -275,7 +277,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         if (File.Exists(newConfigFile))
         {
-            Messages = $"Config file '{newName}.toml' already exists.";
+            ClearMessages();
+            AddMessage($"Config file '{newName}.toml' already exists.");
             return;
         }
 
@@ -288,7 +291,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            Messages = $"Failed to rename config: {ex.Message}";
+            ClearMessages();
+            AddMessage($"Failed to rename config: {ex.Message}");
         }
     }
 

@@ -42,7 +42,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (!HasEasyTier)
         {
-            Messages = "EasyTier is not installed";
+            ClearMessages();
+            AddMessage("EasyTier is not installed");
             return;
         }
 
@@ -72,7 +73,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (!HasEasyTier)
         {
-            Messages = "EasyTier is not installed";
+            ClearMessages();
+            AddMessage("EasyTier is not installed");
             return;
         }
 
@@ -97,7 +99,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             )
         )
         {
-            Messages = $"Failed to install service {ServicePrefix + config.Name}\n{Nssm.LastError}";
+            ClearMessages();
+            AddMessage($"Failed to install service {ServicePrefix + config.Name}\n{Nssm.LastError}");
             return;
         }
     }
@@ -119,7 +122,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (!HasEasyTier)
         {
-            Messages = "EasyTier is not installed";
+            ClearMessages();
+            AddMessage("EasyTier is not installed");
             return;
         }
 
@@ -143,7 +147,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (!HasEasyTier)
         {
-            Messages = "EasyTier is not installed";
+            ClearMessages();
+            AddMessage("EasyTier is not installed");
             return;
         }
 
@@ -168,8 +173,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         else
         {
-            Messages =
-                $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}";
+            ClearMessages();
+            AddMessage(
+                $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}"
+            );
         }
     }
 
@@ -178,7 +185,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (!HasEasyTier)
         {
-            Messages = "EasyTier is not installed";
+            ClearMessages();
+            AddMessage("EasyTier is not installed");
             return;
         }
 
@@ -240,7 +248,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         if (!HasEasyTier)
         {
-            Messages = "EasyTier is not installed";
+            ClearMessages();
+            AddMessage("EasyTier is not installed");
             return;
         }
 

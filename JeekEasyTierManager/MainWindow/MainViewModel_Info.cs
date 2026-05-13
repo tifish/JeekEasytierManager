@@ -167,13 +167,33 @@ public partial class MainViewModel : ObservableObject, IDisposable
             await ShowRoute();
     }
 
-    [ObservableProperty]
-    public partial string Messages { get; set; } = "";
+    private readonly StringBuilder _messagesBuilder = new();
+
+    public string Messages => _messagesBuilder.ToString();
 
     public void AddMessage(string message)
     {
-        Messages += message + "\n";
+        _messagesBuilder.AppendLine(message);
+        OnPropertyChanged(nameof(Messages));
     }
+
+    public void ClearMessages()
+    {
+        if (_messagesBuilder.Length == 0)
+            return;
+
+        _messagesBuilder.Clear();
+        OnPropertyChanged(nameof(Messages));
+    }
+
+    [ObservableProperty]
+    public partial double DownloadProgress { get; set; } = 0;
+
+    [ObservableProperty]
+    public partial string DownloadStatus { get; set; } = "";
+
+    [ObservableProperty]
+    public partial bool IsDownloading { get; set; } = false;
 }
 
 public class PeerInfoRow : PeerInfo
