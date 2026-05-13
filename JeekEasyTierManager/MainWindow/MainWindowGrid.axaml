@@ -47,6 +47,7 @@
                     <ScrollViewer
                         x:Name="LogScrollViewer"
                         Grid.Row="2"
+                        HorizontalScrollBarVisibility="Disabled"
                         VerticalScrollBarVisibility="Visible">
                         <TextBlock
                             HorizontalAlignment="Stretch"
