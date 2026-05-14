@@ -45,7 +45,7 @@ public static class AutoUpdate
 
             LocalTime = File.GetLastWriteTime(AppSettings.ExePath);
 
-            return RemoteTime - LocalTime > TimeSpan.FromMinutes(1);
+            return RemoteTime - LocalTime > TimeSpan.FromMinutes(3);
         }
         catch
         {
