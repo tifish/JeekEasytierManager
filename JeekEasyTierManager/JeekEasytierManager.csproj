@@ -16,6 +16,7 @@
     <CETCompat>false</CETCompat>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishDir>$(OutDir)</PublishDir>
+    <Version>0</Version>
   </PropertyGroup>
 
   <ItemGroup>

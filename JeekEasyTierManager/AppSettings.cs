@@ -27,6 +27,8 @@ public class AppSettings
 
     public static readonly string JeekEasyTierManagerZipUrl =
         "https://github.com/tifish/JeekEasyTierManager/releases/download/latest_release/JeekEasyTierManager.7z";
+    public static readonly string JeekEasyTierManagerVersionTxtUrl =
+        "https://github.com/tifish/JeekEasyTierManager/releases/download/latest_release/version.txt";
     public static readonly string EasyTierLatestReleasePageUrl =
         "https://github.com/EasyTier/EasyTier/releases/latest";
 

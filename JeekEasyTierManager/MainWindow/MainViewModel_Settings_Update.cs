@@ -82,21 +82,22 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (clearMessages)
             ClearMessages();
 
-        var hasUpdate = await AutoUpdate.HasUpdate();
+        var checkResult = await AutoUpdate.CheckForUpdate();
 
-        AddMessage($"Checking update from {AutoUpdate.DownloadUrl}");
+        if (!string.IsNullOrEmpty(AutoUpdate.DownloadUrl))
+            AddMessage($"Checking update from {AutoUpdate.DownloadUrl}");
         AddMessage(
-            $"My local version is {AutoUpdate.LocalTime}, remote version is {AutoUpdate.RemoteTime}"
+            $"My local build is {FormatBuildVersion(AutoUpdate.LocalCommitCount)}, remote build is {FormatBuildVersion(AutoUpdate.RemoteCommitCount)}"
         );
 
-        if (hasUpdate)
+        if (checkResult == AutoUpdateCheckResult.Available)
         {
             if (_mainWindow!.IsVisible)
             {
                 var result = await MessageBoxManager
                     .GetMessageBoxStandard(
                         "Update Me",
-                        $"Do you want to update me to {AutoUpdate.RemoteTime}?",
+                        $"Do you want to update me to build {AutoUpdate.RemoteCommitCount}?",
                         ButtonEnum.YesNo,
                         Icon.Question
                     )
@@ -106,7 +107,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
 
             AddMessage("Updating me...");
-            AutoUpdate.Update(!_mainWindow!.IsVisible);
+            if (!AutoUpdate.Update(!_mainWindow!.IsVisible))
+                AddMessage("Update me failed: failed to launch updater.");
+        }
+        else if (checkResult == AutoUpdateCheckResult.Failed)
+        {
+            AddMessage($"Check update of me failed: {AutoUpdate.FailureReason}");
         }
         else
         {
@@ -121,5 +127,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         HasEasyTier =
             File.Exists(AppSettings.EasyTierCorePath) && File.Exists(AppSettings.EasyTierCliPath);
+    }
+
+    private static string FormatBuildVersion(int build)
+    {
+        return build > 0 ? build.ToString() : "unknown";
     }
 }

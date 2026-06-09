@@ -13,5 +13,6 @@ obj
 /bin/*.runtimeconfig.json
 /bin/Settings
 /bin/Logs
+/version.txt
 /BuildAndDeploy.cmd
 /Deploy.cmd

@@ -25,8 +25,17 @@ jobs:
                   fetch-depth: 0
                   submodules: true
 
+            - name: Compute commit count
+              id: ver
+              shell: pwsh
+              run: |
+                  $count = (git rev-list --count HEAD).Trim()
+                  "count=$count" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+                  Set-Content -Path version.txt -Value $count -NoNewline -Encoding ascii
+                  Write-Host "commit count = $count"
+
             - name: Build
-              run: dotnet publish --configuration Release ${{ env.PROJECT_NAME }}.sln
+              run: dotnet publish --configuration Release ${{ env.PROJECT_NAME }}.sln /p:Version=${{ steps.ver.outputs.count }}
 
             - name: Pack files
               run: |
@@ -35,11 +44,16 @@ jobs:
                   cd ..
 
             - name: Delete release and tag
+              if: github.event_name == 'push' && github.ref == 'refs/heads/main'
               run: gh release delete ${{ env.RELEASE_TAG }} --cleanup-tag -y
               continue-on-error: true
 
             - name: Create a new tag and release
+              if: github.event_name == 'push' && github.ref == 'refs/heads/main'
               run: gh release create ${{ env.RELEASE_TAG }} --generate-notes
 
-            - name: Upload pack
-              run: gh release upload ${{ env.RELEASE_TAG }} ${{ env.PROJECT_NAME }}.7z --clobber
+            - name: Upload artifacts
+              if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+              run: |
+                  gh release upload ${{ env.RELEASE_TAG }} ${{ env.PROJECT_NAME }}.7z --clobber
+                  gh release upload ${{ env.RELEASE_TAG }} version.txt --clobber
