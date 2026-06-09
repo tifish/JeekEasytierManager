@@ -14,6 +14,7 @@ public partial class MainWindowGrid : UserControl
         DataContext = MainViewModel.Instance;
 
         MainViewModel.Instance.MainGrid = MainGrid;
+        LogViewport.FallbackWidthSource = ConfigsPanel;
 
         MainViewModel.Instance.PropertyChanged += MainViewModel_PropertyChanged;
         DetachedFromVisualTree += (_, _) =>

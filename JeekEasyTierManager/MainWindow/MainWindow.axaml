@@ -7,7 +7,6 @@
     xmlns:local="clr-namespace:JeekEasyTierManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Jeek EasyTier 管理器"
-    Width="1260"
     MinWidth="680"
     MinHeight="480"
     SizeToContent="WidthAndHeight"

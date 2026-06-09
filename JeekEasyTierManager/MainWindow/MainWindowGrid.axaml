@@ -18,13 +18,21 @@
         RowDefinitions="*,Auto"
         RowSpacing="10">
 
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
-            <local:MainWindowConfigs Grid.Column="0" Margin="0,0,20,0" />
+        <Grid
+            Grid.Row="0"
+            ClipToBounds="True"
+            ColumnDefinitions="Auto,*"
+            HorizontalAlignment="Left">
+            <local:MainWindowConfigs
+                x:Name="ConfigsPanel"
+                Grid.Column="0"
+                Margin="0,0,20,0" />
             <local:MainWindowEditConfigs Grid.Column="1" IsVisible="{Binding IsEditingConfigs}" />
 
             <Border
                 Grid.Column="1"
                 Classes="Card"
+                ClipToBounds="True"
                 IsVisible="{Binding !IsEditingConfigs}">
                 <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
@@ -44,18 +52,26 @@
                             Value="{Binding DownloadProgress}" />
                     </StackPanel>
 
-                    <ScrollViewer
-                        x:Name="LogScrollViewer"
+                    <local:SizeToContentSafePanel
+                        x:Name="LogViewport"
                         Grid.Row="2"
-                        HorizontalScrollBarVisibility="Disabled"
-                        VerticalScrollBarVisibility="Visible">
-                        <TextBlock
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            FontFamily="Consolas, 'Courier New', monospace"
-                            Text="{Binding Messages}"
-                            TextWrapping="Wrap" />
-                    </ScrollViewer>
+                        ClipToBounds="True"
+                        FallbackWidth="420"
+                        FallbackWidthAdjustment="-30"
+                        FallbackHeight="320">
+                        <ScrollViewer
+                            x:Name="LogScrollViewer"
+                            ClipToBounds="True"
+                            HorizontalScrollBarVisibility="Disabled"
+                            VerticalScrollBarVisibility="Visible">
+                            <TextBlock
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                FontFamily="Consolas, 'Courier New', monospace"
+                                Text="{Binding Messages}"
+                                TextWrapping="Wrap" />
+                        </ScrollViewer>
+                    </local:SizeToContentSafePanel>
                 </Grid>
             </Border>
         </Grid>
