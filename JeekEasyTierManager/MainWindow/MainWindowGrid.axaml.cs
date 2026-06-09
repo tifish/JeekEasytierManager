@@ -11,6 +11,9 @@ public partial class MainWindowGrid : UserControl
 {
     private Window? _hostWindow;
     private double _hostWindowWidth;
+    private double _hostWindowHeight;
+    private bool _topContentStretchesWithWidth;
+    private bool _mainGridStretchesWithHeight;
 
     public MainWindowGrid()
     {
@@ -32,20 +35,37 @@ public partial class MainWindowGrid : UserControl
             return;
 
         _hostWindowWidth = _hostWindow.Bounds.Width;
+        _hostWindowHeight = _hostWindow.Bounds.Height;
         _hostWindow.SizeChanged -= HostWindow_SizeChanged;
         _hostWindow.SizeChanged += HostWindow_SizeChanged;
     }
 
     private void HostWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        if (Math.Abs(e.NewSize.Width - _hostWindowWidth) < 1)
-            return;
+        if (!_topContentStretchesWithWidth && Math.Abs(e.NewSize.Width - _hostWindowWidth) >= 1)
+        {
+            TopContentGrid.HorizontalAlignment = HorizontalAlignment.Stretch;
+            _topContentStretchesWithWidth = true;
+        }
 
-        TopContentGrid.HorizontalAlignment = HorizontalAlignment.Stretch;
-        if (_hostWindow != null)
-            _hostWindow.SizeChanged -= HostWindow_SizeChanged;
+        if (!_mainGridStretchesWithHeight && Math.Abs(e.NewSize.Height - _hostWindowHeight) >= 1)
+        {
+            MainGrid
+                .RowDefinitions[0]
+                .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
+            MainGrid
+                .RowDefinitions[1]
+                .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
+            _mainGridStretchesWithHeight = true;
+        }
 
-        _hostWindow = null;
+        if (_topContentStretchesWithWidth && _mainGridStretchesWithHeight)
+        {
+            if (_hostWindow != null)
+                _hostWindow.SizeChanged -= HostWindow_SizeChanged;
+
+            _hostWindow = null;
+        }
     }
 
     private void DetachEvents()

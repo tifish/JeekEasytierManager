@@ -15,7 +15,7 @@
         Margin="20"
         ColumnDefinitions="*"
         ColumnSpacing="20"
-        RowDefinitions="*,Auto"
+        RowDefinitions="Auto,Auto"
         RowSpacing="10">
 
         <Grid
