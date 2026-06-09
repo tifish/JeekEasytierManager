@@ -345,10 +345,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         IsEditingConfigs = false;
         MainGrid
             .RowDefinitions[0]
-            .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
+            .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
         MainGrid
             .RowDefinitions[1]
-            .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Star));
+            .SetCurrentValue(RowDefinition.HeightProperty, new GridLength(1, GridUnitType.Auto));
     }
 
     [RelayCommand]
