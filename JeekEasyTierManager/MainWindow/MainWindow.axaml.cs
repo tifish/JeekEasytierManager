@@ -31,6 +31,7 @@ public partial class MainWindow : Window
             }
 
             await MainViewModel.Instance.Init();
+            MainWindowGrid.EnableTopContentStretchOnWindowResize();
         }
         catch (Exception ex)
         {

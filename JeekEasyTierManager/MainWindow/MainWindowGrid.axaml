@@ -19,6 +19,7 @@
         RowSpacing="10">
 
         <Grid
+            x:Name="TopContentGrid"
             Grid.Row="0"
             ClipToBounds="True"
             ColumnDefinitions="Auto,*"

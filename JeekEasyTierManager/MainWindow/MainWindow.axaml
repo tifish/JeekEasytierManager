@@ -113,7 +113,7 @@
                     </StackPanel>
                 </dialogHost:DialogHost.DialogContent>
 
-                <local:MainWindowGrid />
+                <local:MainWindowGrid x:Name="MainWindowGrid" />
 
             </dialogHost:DialogHost>
 
