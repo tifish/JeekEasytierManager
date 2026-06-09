@@ -173,9 +173,44 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public void AddMessage(string message)
     {
-        _messagesBuilder.AppendLine(message);
+        _messagesBuilder.AppendLine(AddLogBreakOpportunities(message));
         OnPropertyChanged(nameof(Messages));
     }
+
+    private const int MaxLogTokenLength = 64;
+
+    private static string AddLogBreakOpportunities(string message)
+    {
+        if (string.IsNullOrEmpty(message))
+            return message;
+
+        var result = new StringBuilder(message.Length);
+        var tokenLength = 0;
+
+        foreach (var c in message)
+        {
+            result.Append(c);
+
+            if (char.IsWhiteSpace(c))
+            {
+                tokenLength = 0;
+                continue;
+            }
+
+            tokenLength++;
+
+            if (IsPreferredLogBreakChar(c) || tokenLength >= MaxLogTokenLength)
+            {
+                result.Append('\u200B');
+                tokenLength = 0;
+            }
+        }
+
+        return result.ToString();
+    }
+
+    private static bool IsPreferredLogBreakChar(char c) =>
+        c is ':' or '/' or '?' or '&' or '=' or '#' or '.' or '-' or '_' or '%';
 
     public void ClearMessages()
     {
