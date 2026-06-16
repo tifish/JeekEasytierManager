@@ -62,15 +62,16 @@
                         FallbackHeight="320">
                         <ScrollViewer
                             x:Name="LogScrollViewer"
+                            AllowAutoHide="False"
                             ClipToBounds="True"
-                            HorizontalScrollBarVisibility="Disabled"
+                            HorizontalScrollBarVisibility="Auto"
                             VerticalScrollBarVisibility="Visible">
                             <TextBlock
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
                                 FontFamily="Consolas, 'Courier New', monospace"
                                 Text="{Binding Messages}"
-                                TextWrapping="Wrap" />
+                                TextWrapping="NoWrap" />
                         </ScrollViewer>
                     </local:SizeToContentSafePanel>
                 </Grid>
