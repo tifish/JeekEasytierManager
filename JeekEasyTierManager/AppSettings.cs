@@ -8,6 +8,14 @@ using Json.Easy;
 
 namespace JeekEasyTierManager;
 
+public enum UpdateCheckInterval
+{
+    Never,
+    EverySixHours,
+    Daily,
+    Weekly,
+}
+
 public class AppSettings
 {
     public static readonly string AppDirectory = AppContext.BaseDirectory;
@@ -31,6 +39,8 @@ public class AppSettings
         "https://github.com/tifish/JeekEasyTierManager/releases/download/latest_release/version.txt";
     public static readonly string EasyTierLatestReleasePageUrl =
         "https://github.com/EasyTier/EasyTier/releases/latest";
+    public static readonly string HomePageUrl =
+        "https://github.com/tifish/JeekEasyTierManager";
 
     public static readonly string SettingsDirectory = Path.Combine(AppDirectory, "Settings");
     public static readonly string SettingsFile = Path.Combine(SettingsDirectory, "Settings.json");
@@ -75,6 +85,8 @@ public class AppSettings
 
     public bool AutoUpdateMe { get; set; } = true;
     public bool AutoUpdateEasyTier { get; set; } = false;
+
+    public UpdateCheckInterval UpdateCheckInterval { get; set; } = UpdateCheckInterval.Daily;
 
     public string SyncPassword { get; set; } = "";
 

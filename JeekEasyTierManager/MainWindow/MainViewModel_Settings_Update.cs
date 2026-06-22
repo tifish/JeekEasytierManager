@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -132,5 +133,30 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private static string FormatBuildVersion(int build)
     {
         return build > 0 ? build.ToString() : "unknown";
+    }
+
+    public string AppVersionText
+    {
+        get
+        {
+            var build = AutoUpdate.GetLocalCommitCount();
+            return build > 0 ? $"Build {build}" : "Development build";
+        }
+    }
+
+    [RelayCommand]
+    public void OpenHomePage()
+    {
+        try
+        {
+            Process.Start(
+                new ProcessStartInfo { FileName = AppSettings.HomePageUrl, UseShellExecute = true }
+            );
+        }
+        catch (Exception ex)
+        {
+            ClearMessages();
+            AddMessage($"Failed to open home page: {ex.Message}");
+        }
     }
 }

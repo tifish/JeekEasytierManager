@@ -1,6 +1,7 @@
-# AGENTS.md
+## Rules
 
-- This is an open-source project. Commit messages and code comments should be written in English.
-- If you need to compile and validate, but the program is running, just kill the process directly.
-- After implementing a feature or fixing a bug, if the compilation passes, run the program directly for manual testing.
+- After finishing a feature or fixing a bug, automatically build and launch the program for me to test. If the program is already running, kill the process and run it again.
+- Always use rebase and fast-forward for Git, never merge.
+- This is an open-source project: use English for commit messages and code comments. Keep commit messages to a brief sentence or two stating the purpose without elaborating on implementation details.
+- Do not copy runtime files from the source directory; keep and version-control them directly under the bin directory.
 - async void methods must handle exceptions.

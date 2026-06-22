@@ -71,6 +71,36 @@
 
                 <Separator />
 
+                <TextBlock Text="检查更新频率" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SetUpdateIntervalCommand}"
+                        CommandParameter="EverySixHours"
+                        Content="每 6 小时"
+                        IsChecked="{Binding IsUpdateSixHours, Mode=OneWay}" />
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SetUpdateIntervalCommand}"
+                        CommandParameter="Daily"
+                        Content="每天"
+                        IsChecked="{Binding IsUpdateDaily, Mode=OneWay}" />
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SetUpdateIntervalCommand}"
+                        CommandParameter="Weekly"
+                        Content="每周"
+                        IsChecked="{Binding IsUpdateWeekly, Mode=OneWay}" />
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SetUpdateIntervalCommand}"
+                        CommandParameter="Never"
+                        Content="无"
+                        IsChecked="{Binding IsUpdateNever, Mode=OneWay}" />
+                </StackPanel>
+
+                <Separator />
+
                 <Label
                     Content="EasyTier 未安装"
                     Foreground="Red"
@@ -103,6 +133,16 @@
                         IsVisible="{Binding ShowSyncPassword}"
                         Text="{Binding SyncPassword}" />
                     <ToggleButton Content="👁️" IsChecked="{Binding ShowSyncPassword}" />
+                </StackPanel>
+
+                <Separator />
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock VerticalAlignment="Center" Text="{Binding AppVersionText}" />
+                    <Button
+                        Classes="Gray MinWidth"
+                        Command="{Binding OpenHomePageCommand}"
+                        Content="项目主页" />
                 </StackPanel>
 
             </StackPanel>

@@ -10,7 +10,7 @@ if not defined VERSION set VERSION=0
 <nul set /p "=!VERSION!" > version.txt
 echo commit count = !VERSION!
 
-dotnet publish --configuration Release JeekEasytierManager.sln /p:Version=!VERSION!
+dotnet publish --configuration Release JeekEasyTierManager.sln /p:Version=!VERSION!
 if errorlevel 1 pause
 
 del /q /s bin\*.pdb 2>nul

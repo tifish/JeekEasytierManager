@@ -33,12 +33,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         DisableMirrorDownload = Settings.DisableMirrorDownload;
 
-        _autoUpdateTimer = new DispatcherTimer { Interval = TimeSpan.FromHours(1) };
+        _autoUpdateTimer = new DispatcherTimer();
         _autoUpdateTimer.Tick += OnAutoUpdateMeTimerElapsed;
 
-        // The timer will be updated
         AutoUpdateMe = Settings.AutoUpdateMe;
         AutoUpdateEasyTier = Settings.AutoUpdateEasyTier;
+
+        // Apply the periodic update-check interval and start the timer accordingly.
+        UpdateInterval = Settings.UpdateCheckInterval;
+        ApplyUpdateCheckInterval();
+        RefreshUpdateIntervalSelectionProperties();
 
         SyncPassword = Settings.SyncPassword;
 
@@ -148,8 +152,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         Settings.AutoUpdateMe = value;
         _ = AppSettings.Save(); // Save settings asynchronously
-
-        RefreshAutoUpdateTimer();
     }
 
     [ObservableProperty]
@@ -159,15 +161,61 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         Settings.AutoUpdateEasyTier = value;
         _ = AppSettings.Save(); // Save settings asynchronously
-
-        RefreshAutoUpdateTimer();
     }
 
     private DispatcherTimer _autoUpdateTimer = null!;
 
-    private void RefreshAutoUpdateTimer()
+    [ObservableProperty]
+    public partial UpdateCheckInterval UpdateInterval { get; set; }
+
+    partial void OnUpdateIntervalChanged(UpdateCheckInterval value)
     {
-        _autoUpdateTimer.IsEnabled = AutoUpdateMe || AutoUpdateEasyTier;
+        Settings.UpdateCheckInterval = value;
+        _ = AppSettings.Save();
+
+        ApplyUpdateCheckInterval();
+        RefreshUpdateIntervalSelectionProperties();
+    }
+
+    public bool IsUpdateSixHours => UpdateInterval == UpdateCheckInterval.EverySixHours;
+    public bool IsUpdateDaily => UpdateInterval == UpdateCheckInterval.Daily;
+    public bool IsUpdateWeekly => UpdateInterval == UpdateCheckInterval.Weekly;
+    public bool IsUpdateNever => UpdateInterval == UpdateCheckInterval.Never;
+
+    [RelayCommand]
+    public void SetUpdateInterval(string interval)
+    {
+        if (Enum.TryParse<UpdateCheckInterval>(interval, out var parsed))
+            UpdateInterval = parsed;
+    }
+
+    private void RefreshUpdateIntervalSelectionProperties()
+    {
+        OnPropertyChanged(nameof(IsUpdateSixHours));
+        OnPropertyChanged(nameof(IsUpdateDaily));
+        OnPropertyChanged(nameof(IsUpdateWeekly));
+        OnPropertyChanged(nameof(IsUpdateNever));
+    }
+
+    private void ApplyUpdateCheckInterval()
+    {
+        var span = UpdateInterval switch
+        {
+            UpdateCheckInterval.EverySixHours => TimeSpan.FromHours(6),
+            UpdateCheckInterval.Daily => TimeSpan.FromDays(1),
+            UpdateCheckInterval.Weekly => TimeSpan.FromDays(7),
+            _ => TimeSpan.Zero,
+        };
+
+        if (span == TimeSpan.Zero)
+        {
+            _autoUpdateTimer.IsEnabled = false;
+        }
+        else
+        {
+            _autoUpdateTimer.Interval = span;
+            _autoUpdateTimer.IsEnabled = true;
+        }
     }
 
     private async void OnAutoUpdateMeTimerElapsed(object? sender, EventArgs e)
