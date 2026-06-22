@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jeek.Avalonia.Localization;
 using JeekTools;
 using Json.Easy;
 
@@ -30,7 +31,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var (rpcClients, rpcClientIps) = await GetAllRpcClients();
         if (rpcClients.Count == 0)
         {
-            AddMessage("No rpc clients found");
+            AddMessage(Localizer.Get("Configs_NoRpcClientsFound"));
             return;
         }
 
@@ -50,7 +51,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var rpcClient = rpcClients[i];
             var rpcClientIp = rpcClientIps[i];
 
-            AddMessage($"Syncing configs with {rpcClientIp}");
+            AddMessage(string.Format(Localizer.Get("Configs_SyncingConfigsWith"), rpcClientIp));
 
             var remoteFileInfoList = await rpcClient.GetConfigFileInfoList();
             var remoteFileNameIndexDict = new Dictionary<string, int>();
@@ -108,7 +109,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 await rpcClient.SendConfigFileContent(fileContentList);
                 remoteNeedRefresh = localOnlyFileInfos.Count > 0;
 
-                AddMessage($"Sent {fileNames.Count} files to {rpcClientIp}");
+                AddMessage(
+                    string.Format(Localizer.Get("Configs_SentFilesTo"), fileNames.Count, rpcClientIp)
+                );
             }
 
             if (DeleteExtraConfigsOnOtherNodesWhenNextSync)
@@ -122,7 +125,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     var remoteFileContentList = await rpcClient.GetConfigFileContent(fileNames);
                     await WriteConfigFileContent(remoteFileContentList);
 
-                    AddMessage($"Received {fileNames.Count} files from {rpcClientIp}");
+                    AddMessage(
+                        string.Format(
+                            Localizer.Get("Configs_ReceivedFilesFrom"),
+                            fileNames.Count,
+                            rpcClientIp
+                        )
+                    );
                 }
 
                 // Delete remote only files on other nodes
@@ -134,7 +143,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     await rpcClient.DeleteExtraConfigs(fileNames);
                     remoteNeedRefresh = true;
 
-                    AddMessage($"Deleted {fileNames.Count} files in {rpcClientIp}");
+                    AddMessage(
+                        string.Format(
+                            Localizer.Get("Configs_DeletedFilesIn"),
+                            fileNames.Count,
+                            rpcClientIp
+                        )
+                    );
                 }
             }
             else
@@ -150,7 +165,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     await WriteConfigFileContent(remoteFileContentList);
                     localNeedRefresh = remoteOnlyFileInfos.Count > 0;
 
-                    AddMessage($"Received {fileNames.Count} files from {rpcClientIp}");
+                    AddMessage(
+                        string.Format(
+                            Localizer.Get("Configs_ReceivedFilesFrom"),
+                            fileNames.Count,
+                            rpcClientIp
+                        )
+                    );
                 }
             }
 
@@ -158,7 +179,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             if (remoteNeedRefresh)
                 await rpcClient.RefreshConfigs();
 
-            AddMessage($"Synced configs with {rpcClientIp}");
+            AddMessage(string.Format(Localizer.Get("Configs_SyncedConfigsWith"), rpcClientIp));
         }
 
         DeleteExtraConfigsOnOtherNodesWhenNextSync = false;

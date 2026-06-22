@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jeek.Avalonia.Localization;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 
@@ -20,7 +21,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var hasUpdate = await EasyTierUpdate.HasUpdate();
 
         AddMessage(
-            $"EasyTier local version is {EasyTierUpdate.LocalVersion}, remote version is {EasyTierUpdate.RemoteVersion}"
+            string.Format(
+                Localizer.Get("Update_EasyTierVersionStatus"),
+                EasyTierUpdate.LocalVersion,
+                EasyTierUpdate.RemoteVersion
+            )
         );
 
         if (hasUpdate)
@@ -29,8 +34,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             {
                 var result = await MessageBoxManager
                     .GetMessageBoxStandard(
-                        "Update EasyTier",
-                        $"Do you want to update easytier to {EasyTierUpdate.RemoteVersion}?",
+                        Localizer.Get("Update_EasyTierTitle"),
+                        string.Format(
+                            Localizer.Get("Update_ConfirmEasyTier"),
+                            EasyTierUpdate.RemoteVersion
+                        ),
                         ButtonEnum.YesNo,
                         Icon.Question
                     )
@@ -39,12 +47,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     return;
             }
 
-            AddMessage($"Updating EasyTier to {EasyTierUpdate.RemoteVersion}...");
+            AddMessage(
+                string.Format(Localizer.Get("Update_UpdatingEasyTier"), EasyTierUpdate.RemoteVersion)
+            );
             await StopAllServices();
 
-            AddMessage($"Start downloading EasyTier from {EasyTierUpdate.DownloadUrl}");
+            AddMessage(
+                string.Format(Localizer.Get("Update_StartDownloading"), EasyTierUpdate.DownloadUrl)
+            );
             DownloadProgress = 0;
-            DownloadStatus = "Downloading EasyTier... 0.00%";
+            DownloadStatus = string.Format(Localizer.Get("Update_DownloadingProgress"), 0.00);
             IsDownloading = true;
 
             bool updateOk;
@@ -53,7 +65,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 updateOk = await EasyTierUpdate.Update(progress =>
                 {
                     DownloadProgress = progress;
-                    DownloadStatus = $"Downloading EasyTier... {progress:F2}%";
+                    DownloadStatus = string.Format(
+                        Localizer.Get("Update_DownloadingProgress"),
+                        progress
+                    );
                 });
             }
             finally
@@ -63,17 +78,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             if (!updateOk)
             {
-                AddMessage($"Update EasyTier failed: {EasyTierUpdate.LastError}");
+                AddMessage(
+                    string.Format(Localizer.Get("Update_EasyTierFailed"), EasyTierUpdate.LastError)
+                );
                 return;
             }
 
             CheckHasEasyTier();
             await RestoreAllServices();
-            AddMessage($"Update EasyTier to {EasyTierUpdate.RemoteVersion} completed.");
+            AddMessage(
+                string.Format(Localizer.Get("Update_EasyTierCompleted"), EasyTierUpdate.RemoteVersion)
+            );
         }
         else
         {
-            AddMessage("No update of EasyTier found.");
+            AddMessage(Localizer.Get("Update_NoEasyTierUpdate"));
         }
     }
 
@@ -86,9 +105,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var checkResult = await AutoUpdate.CheckForUpdate();
 
         if (!string.IsNullOrEmpty(AutoUpdate.DownloadUrl))
-            AddMessage($"Checking update from {AutoUpdate.DownloadUrl}");
+            AddMessage(string.Format(Localizer.Get("Update_CheckingUpdate"), AutoUpdate.DownloadUrl));
         AddMessage(
-            $"My local build is {FormatBuildVersion(AutoUpdate.LocalCommitCount)}, remote build is {FormatBuildVersion(AutoUpdate.RemoteCommitCount)}"
+            string.Format(
+                Localizer.Get("Update_MeBuildStatus"),
+                FormatBuildVersion(AutoUpdate.LocalCommitCount),
+                FormatBuildVersion(AutoUpdate.RemoteCommitCount)
+            )
         );
 
         if (checkResult == AutoUpdateCheckResult.Available)
@@ -97,8 +120,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             {
                 var result = await MessageBoxManager
                     .GetMessageBoxStandard(
-                        "Update Me",
-                        $"Do you want to update me to build {AutoUpdate.RemoteCommitCount}?",
+                        Localizer.Get("Update_MeTitle"),
+                        string.Format(
+                            Localizer.Get("Update_ConfirmMe"),
+                            AutoUpdate.RemoteCommitCount
+                        ),
                         ButtonEnum.YesNo,
                         Icon.Question
                     )
@@ -107,17 +133,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     return;
             }
 
-            AddMessage("Updating me...");
+            AddMessage(Localizer.Get("Update_UpdatingMe"));
             if (!AutoUpdate.Update(!_mainWindow!.IsVisible))
-                AddMessage("Update me failed: failed to launch updater.");
+                AddMessage(Localizer.Get("Update_MeFailedLaunchUpdater"));
         }
         else if (checkResult == AutoUpdateCheckResult.Failed)
         {
-            AddMessage($"Check update of me failed: {AutoUpdate.FailureReason}");
+            AddMessage(string.Format(Localizer.Get("Update_MeCheckFailed"), AutoUpdate.FailureReason));
         }
         else
         {
-            AddMessage("No update of me found.");
+            AddMessage(Localizer.Get("Update_NoMeUpdate"));
         }
     }
 
@@ -132,7 +158,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private static string FormatBuildVersion(int build)
     {
-        return build > 0 ? build.ToString() : "unknown";
+        return build > 0 ? build.ToString() : Localizer.Get("Update_UnknownBuild");
     }
 
     public string AppVersionText
@@ -140,7 +166,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         get
         {
             var build = AutoUpdate.GetLocalCommitCount();
-            return build > 0 ? $"Build {build}" : "Development build";
+            return build > 0
+                ? string.Format(Localizer.Get("Update_BuildLabel"), build)
+                : Localizer.Get("Update_DevBuild");
         }
     }
 
@@ -156,7 +184,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         catch (Exception ex)
         {
             ClearMessages();
-            AddMessage($"Failed to open home page: {ex.Message}");
+            AddMessage(string.Format(Localizer.Get("Update_OpenHomePageFailed"), ex.Message));
         }
     }
 }

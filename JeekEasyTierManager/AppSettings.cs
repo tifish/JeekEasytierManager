@@ -21,7 +21,6 @@ public class AppSettings
     public static readonly string AppDirectory = AppContext.BaseDirectory;
     public static readonly string ExePath = Path.Join(AppDirectory, "JeekEasyTierManager.exe");
     public static readonly string EasyTierDirectory = Path.Join(AppDirectory, "EasyTier");
-    public static readonly string ConfigDirectory = Path.Join(AppDirectory, "Config");
 
     public static readonly string EasyTierCorePath = Path.Join(
         EasyTierDirectory,
@@ -42,14 +41,15 @@ public class AppSettings
     public static readonly string HomePageUrl =
         "https://github.com/tifish/JeekEasyTierManager";
 
-    public static readonly string SettingsDirectory = Path.Combine(AppDirectory, "Settings");
-    public static readonly string SettingsFile = Path.Combine(SettingsDirectory, "Settings.json");
-
-    private static readonly JsonFile _settingsFile = new(SettingsFile);
+    // The roaming Config/Settings locations are resolved at runtime by StorageManager so they follow
+    // the active storage mode (Default / Portable / Custom).
+    public static string ConfigDirectory => StorageManager.ActiveConfigDirectory;
+    public static string SettingsDirectory => StorageManager.ActiveSettingsDirectory;
+    public static string SettingsFile => StorageManager.ActiveSettingsFile;
 
     public static async Task Load()
     {
-        var settings = await _settingsFile.Load<AppSettings>();
+        var settings = await new JsonFile(SettingsFile).Load<AppSettings>();
         if (settings != null)
             Settings = settings;
     }
@@ -59,11 +59,12 @@ public class AppSettings
         if (Design.IsDesignMode)
             return;
 
-        if (!Directory.Exists(SettingsDirectory))
-            Directory.CreateDirectory(SettingsDirectory);
+        Directory.CreateDirectory(SettingsDirectory);
 
-        await _settingsFile.Save(Settings);
+        await new JsonFile(SettingsFile).Save(Settings);
     }
+
+    public string Language { get; set; } = "en";
 
     public string Theme { get; set; } = "Default";
 

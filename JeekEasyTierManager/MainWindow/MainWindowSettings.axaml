@@ -2,6 +2,7 @@
     x:Class="JeekEasyTierManager.MainWindowSettings"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Jeek.Avalonia.Localization"
     xmlns:local="clr-namespace:JeekEasyTierManager"
     x:DataType="local:MainViewModel">
 
@@ -14,7 +15,7 @@
 
             <StackPanel Orientation="Horizontal">
                 <TextBlock Classes="Title" Text="⚙️" />
-                <Label Classes="Title" Content="设置" />
+                <Label Classes="Title" Content="{l:Localize Settings_Title}" />
             </StackPanel>
 
             <StackPanel Orientation="Vertical" Spacing="10">
@@ -24,21 +25,77 @@
                         Classes="ThemeSegment"
                         Command="{Binding SetThemeCommand}"
                         CommandParameter="Light"
-                        Content="浅色"
+                        Content="{l:Localize Settings_ThemeLight}"
                         IsChecked="{Binding IsLightTheme, Mode=OneWay}" />
                     <ToggleButton
                         Classes="ThemeSegment"
                         Command="{Binding SetThemeCommand}"
                         CommandParameter="Dark"
-                        Content="深色"
+                        Content="{l:Localize Settings_ThemeDark}"
                         IsChecked="{Binding IsDarkTheme, Mode=OneWay}" />
                     <ToggleButton
                         Classes="ThemeSegment"
                         Command="{Binding SetThemeCommand}"
                         CommandParameter="Default"
-                        Content="跟随系统"
+                        Content="{l:Localize Settings_ThemeSystem}"
                         IsChecked="{Binding IsSystemTheme, Mode=OneWay}" />
                 </StackPanel>
+
+                <Separator />
+
+                <TextBlock Text="{l:Localize Settings_Language}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SetLanguageCommand}"
+                        CommandParameter="system"
+                        Content="{l:Localize Settings_LanguageSystem}"
+                        IsChecked="{Binding IsLanguageSystem, Mode=OneWay}" />
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SetLanguageCommand}"
+                        CommandParameter="en"
+                        Content="English"
+                        IsChecked="{Binding IsLanguageEnglish, Mode=OneWay}" />
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SetLanguageCommand}"
+                        CommandParameter="zh"
+                        Content="中文"
+                        IsChecked="{Binding IsLanguageChinese, Mode=OneWay}" />
+                </StackPanel>
+
+                <Separator />
+
+                <TextBlock Text="{l:Localize Settings_StorageLocation}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SwitchStorageModeFromStringCommand}"
+                        CommandParameter="Default"
+                        Content="{l:Localize Settings_StorageDefault}"
+                        IsChecked="{Binding IsDefaultStorage, Mode=OneWay}" />
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SwitchStorageModeFromStringCommand}"
+                        CommandParameter="Portable"
+                        Content="{l:Localize Settings_StoragePortable}"
+                        IsChecked="{Binding IsPortableStorage, Mode=OneWay}" />
+                    <ToggleButton
+                        Classes="ThemeSegment"
+                        Command="{Binding SwitchStorageModeFromStringCommand}"
+                        CommandParameter="Custom"
+                        Content="{l:Localize Settings_StorageCustom}"
+                        IsChecked="{Binding IsCustomStorage, Mode=OneWay}" />
+                    <Button
+                        Classes="Gray MinWidth"
+                        Command="{Binding BrowseCustomDirectoryCommand}"
+                        Content="{l:Localize Settings_Browse}" />
+                </StackPanel>
+                <TextBlock
+                    Foreground="Gray"
+                    Text="{Binding StorageLocationText}"
+                    TextWrapping="Wrap" />
 
                 <Separator />
 
@@ -50,59 +107,59 @@
                     <ToggleSwitch
                         Grid.Row="0"
                         Grid.Column="0"
-                        Content="开机启动"
+                        Content="{l:Localize Settings_StartOnBoot}"
                         IsChecked="{Binding StartOnBoot}" />
                     <ToggleSwitch
                         Grid.Row="0"
                         Grid.Column="1"
-                        Content="禁止镜像下载"
+                        Content="{l:Localize Settings_DisableMirror}"
                         IsChecked="{Binding DisableMirrorDownload}" />
                     <ToggleSwitch
                         Grid.Row="1"
                         Grid.Column="0"
-                        Content="自动更新 EasyTier"
+                        Content="{l:Localize Settings_AutoUpdateEasyTier}"
                         IsChecked="{Binding AutoUpdateEasyTier}" />
                     <ToggleSwitch
                         Grid.Row="1"
                         Grid.Column="1"
-                        Content="自动更新我"
+                        Content="{l:Localize Settings_AutoUpdateMe}"
                         IsChecked="{Binding AutoUpdateMe}" />
                 </Grid>
 
                 <Separator />
 
-                <TextBlock Text="检查更新频率" />
+                <TextBlock Text="{l:Localize Settings_UpdateInterval}" />
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <ToggleButton
                         Classes="ThemeSegment"
                         Command="{Binding SetUpdateIntervalCommand}"
                         CommandParameter="EverySixHours"
-                        Content="每 6 小时"
+                        Content="{l:Localize Settings_Every6Hours}"
                         IsChecked="{Binding IsUpdateSixHours, Mode=OneWay}" />
                     <ToggleButton
                         Classes="ThemeSegment"
                         Command="{Binding SetUpdateIntervalCommand}"
                         CommandParameter="Daily"
-                        Content="每天"
+                        Content="{l:Localize Settings_Daily}"
                         IsChecked="{Binding IsUpdateDaily, Mode=OneWay}" />
                     <ToggleButton
                         Classes="ThemeSegment"
                         Command="{Binding SetUpdateIntervalCommand}"
                         CommandParameter="Weekly"
-                        Content="每周"
+                        Content="{l:Localize Settings_Weekly}"
                         IsChecked="{Binding IsUpdateWeekly, Mode=OneWay}" />
                     <ToggleButton
                         Classes="ThemeSegment"
                         Command="{Binding SetUpdateIntervalCommand}"
                         CommandParameter="Never"
-                        Content="无"
+                        Content="{l:Localize Settings_Never}"
                         IsChecked="{Binding IsUpdateNever, Mode=OneWay}" />
                 </StackPanel>
 
                 <Separator />
 
                 <Label
-                    Content="EasyTier 未安装"
+                    Content="{l:Localize Settings_EasyTierNotInstalled}"
                     Foreground="Red"
                     IsVisible="{Binding !HasEasyTier}" />
 
@@ -111,17 +168,17 @@
                         Classes="Gray MinWidth"
                         Command="{Binding UpdateEasyTierCommand}"
                         CommandParameter="{x:True}"
-                        Content="更新 EasyTier" />
+                        Content="{l:Localize Settings_UpdateEasyTier}" />
                     <Button
                         Classes="Gray MinWidth"
                         Command="{Binding UpdateMeCommand}"
                         CommandParameter="{x:True}"
-                        Content="更新我" />
+                        Content="{l:Localize Settings_UpdateMe}" />
                 </StackPanel>
 
                 <Separator />
 
-                <TextBlock Text="同步密码" />
+                <TextBlock Text="{l:Localize Settings_SyncPassword}" />
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <TextBox
                         MinWidth="100"
@@ -142,7 +199,7 @@
                     <Button
                         Classes="Gray MinWidth"
                         Command="{Binding OpenHomePageCommand}"
-                        Content="项目主页" />
+                        Content="{l:Localize Settings_HomePage}" />
                 </StackPanel>
 
             </StackPanel>

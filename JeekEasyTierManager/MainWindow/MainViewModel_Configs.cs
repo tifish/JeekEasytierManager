@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jeek.Avalonia.Localization;
 using JeekTools;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -173,7 +174,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (process is null)
         {
             ClearMessages();
-            AddMessage($"Failed to test config: {config.Name}");
+            AddMessage(string.Format(Localizer.Get("Configs_TestConfigFailed"), config.Name));
             return;
         }
 
@@ -181,7 +182,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (process.ExitCode != 0)
         {
             ClearMessages();
-            AddMessage($"Failed to test config: {config.Name}");
+            AddMessage(string.Format(Localizer.Get("Configs_TestConfigFailed"), config.Name));
         }
     }
 
@@ -195,7 +196,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Executor.Open(configFile);
     }
 
-    const string MultipleConfigInstanceName = "（选中的配置）";
+    private static string MultipleConfigInstanceName =>
+        Localizer.Get("Configs_MultipleConfigInstanceName");
 
     [RelayCommand]
     public void EditSelectedConfigs()
@@ -278,7 +280,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (File.Exists(newConfigFile))
         {
             ClearMessages();
-            AddMessage($"Config file '{newName}.toml' already exists.");
+            AddMessage(string.Format(Localizer.Get("Configs_ConfigFileAlreadyExists"), newName));
             return;
         }
 
@@ -292,7 +294,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         catch (Exception ex)
         {
             ClearMessages();
-            AddMessage($"Failed to rename config: {ex.Message}");
+            AddMessage(string.Format(Localizer.Get("Configs_RenameConfigFailed"), ex.Message));
         }
     }
 
@@ -331,8 +333,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         var result = await MessageBoxManager
             .GetMessageBoxStandard(
-                "Delete Config",
-                "Are you sure you want to delete this config?",
+                Localizer.Get("Configs_DeleteConfigTitle"),
+                Localizer.Get("Configs_DeleteConfigConfirm"),
                 ButtonEnum.YesNo,
                 Icon.Question
             )
@@ -351,8 +353,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         var result = await MessageBoxManager
             .GetMessageBoxStandard(
-                "Delete Selected Configs",
-                "Are you sure you want to delete selected configs?",
+                Localizer.Get("Configs_DeleteSelectedConfigsTitle"),
+                Localizer.Get("Configs_DeleteSelectedConfigsConfirm"),
                 ButtonEnum.YesNo,
                 Icon.Question
             )
@@ -470,7 +472,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void UpdateSelectedConfigsState()
     {
         HasMultipleSelectedConfigs = SelectedConfigs.Count >= 2;
-        SelectedConfigsSummary = $"已选 {SelectedConfigs.Count} 个配置";
+        SelectedConfigsSummary = string.Format(
+            Localizer.Get("Configs_SelectedConfigsSummary"),
+            SelectedConfigs.Count
+        );
     }
 
     [RelayCommand]

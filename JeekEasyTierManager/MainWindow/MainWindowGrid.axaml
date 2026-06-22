@@ -3,6 +3,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:Jeek.Avalonia.Localization"
     xmlns:local="clr-namespace:JeekEasyTierManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
@@ -38,7 +39,7 @@
                 <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
                         <TextBlock Classes="Title" Text="📜" />
-                        <Label Classes="Title" Content="日志" />
+                        <Label Classes="Title" Content="{l:Localize Configs_Log}" />
                     </StackPanel>
 
                     <StackPanel

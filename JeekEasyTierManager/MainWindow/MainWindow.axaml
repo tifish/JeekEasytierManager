@@ -4,9 +4,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+    xmlns:l="using:Jeek.Avalonia.Localization"
     xmlns:local="clr-namespace:JeekEasyTierManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Jeek EasyTier 管理器"
+    Title="{l:Localize Main_WindowTitle}"
     MinWidth="680"
     MinHeight="480"
     SizeToContent="WidthAndHeight"
@@ -25,12 +26,12 @@
 
         <dialogHost:DialogHost.DialogContent>
             <StackPanel Width="250" Spacing="15">
-                <TextBlock FontSize="18" Text="重命名配置:" />
+                <TextBlock FontSize="18" Text="{l:Localize Main_RenameConfig}" />
 
                 <TextBox
                     Loaded="DialogTextBox_Loaded"
                     Text="{Binding RenameConfigDialogText}"
-                    PlaceholderText="输入新名称...">
+                    PlaceholderText="{l:Localize Main_EnterNewName}">
                     <TextBox.KeyBindings>
                         <KeyBinding Command="{Binding RenameConfigDialogSaveCommand}" Gesture="Enter" />
                         <KeyBinding Command="{Binding RenameConfigDialogCancelCommand}" Gesture="Escape" />
@@ -44,11 +45,11 @@
                     <Button
                         Classes="Secondary"
                         Command="{Binding RenameConfigDialogCancelCommand}"
-                        Content="取消" />
+                        Content="{l:Localize Main_Cancel}" />
                     <Button
                         Classes="Primary"
                         Command="{Binding RenameConfigDialogSaveCommand}"
-                        Content="保存" />
+                        Content="{l:Localize Main_Save}" />
                 </StackPanel>
             </StackPanel>
         </dialogHost:DialogHost.DialogContent>
@@ -62,12 +63,12 @@
 
             <dialogHost:DialogHost.DialogContent>
                 <StackPanel Width="250" Spacing="15">
-                    <TextBlock FontSize="18" Text="新增配置:" />
+                    <TextBlock FontSize="18" Text="{l:Localize Main_AddConfig}" />
 
                     <TextBox
                         Loaded="DialogTextBox_Loaded"
                         Text="{Binding AddConfigDialogText}"
-                        PlaceholderText="输入新名称...">
+                        PlaceholderText="{l:Localize Main_EnterNewName}">
                         <TextBox.KeyBindings>
                             <KeyBinding Command="{Binding AddConfigDialogAddCommand}" Gesture="Enter" />
                             <KeyBinding Command="{Binding AddConfigDialogCancelCommand}" Gesture="Escape" />
@@ -81,11 +82,11 @@
                         <Button
                             Classes="Secondary"
                             Command="{Binding AddConfigDialogCancelCommand}"
-                            Content="取消" />
+                            Content="{l:Localize Main_Cancel}" />
                         <Button
                             Classes="Primary"
                             Command="{Binding AddConfigDialogAddCommand}"
-                            Content="保存" />
+                            Content="{l:Localize Main_Save}" />
                     </StackPanel>
                 </StackPanel>
             </dialogHost:DialogHost.DialogContent>
@@ -108,7 +109,7 @@
                             <Button
                                 Classes="Primary"
                                 Command="{Binding CloseSettingsCommand}"
-                                Content="关闭" />
+                                Content="{l:Localize Main_Close}" />
                         </StackPanel>
                     </StackPanel>
                 </dialogHost:DialogHost.DialogContent>

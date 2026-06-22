@@ -2,6 +2,7 @@
     x:Class="JeekEasyTierManager.MainWindowConfigs"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Jeek.Avalonia.Localization"
     xmlns:local="using:JeekEasyTierManager"
     x:DataType="local:MainViewModel">
 
@@ -11,14 +12,14 @@
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <TextBlock Classes="Title" Text="📝" />
-                    <Label Classes="Title" Content="EasyTier 配置" />
+                    <Label Classes="Title" Content="{l:Localize Configs_EasyTierConfig}" />
                 </StackPanel>
 
                 <Button
                     Grid.Column="2"
                     Command="{Binding OpenSettingsCommand}"
                     Content="⚙️"
-                    ToolTip.Tip="设置" />
+                    ToolTip.Tip="{l:Localize Configs_Settings}" />
             </Grid>
 
             <DataGrid
@@ -43,7 +44,7 @@
                                     VerticalAlignment="Center"
                                     IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                     IsCheckedChanged="ConfigSelectionCheckBoxChanged"
-                                    ToolTip.Tip="选择配置" />
+                                    ToolTip.Tip="{l:Localize Configs_SelectConfig}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -72,51 +73,51 @@
                                         Command="{Binding RestartSingleServiceCommand, Source={x:Static local:MainViewModel.Instance}}"
                                         CommandParameter="{Binding}"
                                         Content="▶️"
-                                        ToolTip.Tip="重启服务" />
+                                        ToolTip.Tip="{l:Localize Configs_RestartService}" />
                                     <Button
                                         Command="{Binding StopSingleServiceCommand, Source={x:Static local:MainViewModel.Instance}}"
                                         CommandParameter="{Binding}"
                                         Content="⏹️"
-                                        ToolTip.Tip="停止服务" />
+                                        ToolTip.Tip="{l:Localize Configs_StopService}" />
                                     <Button
                                         Command="{Binding EditSingleConfigCommand, Source={x:Static local:MainViewModel.Instance}}"
                                         CommandParameter="{Binding}"
                                         Content="✏️"
-                                        ToolTip.Tip="编辑配置" />
+                                        ToolTip.Tip="{l:Localize Configs_EditConfig}" />
                                     <Button
                                         Command="{Binding TestSingleConfigCommand, Source={x:Static local:MainViewModel.Instance}}"
                                         CommandParameter="{Binding}"
                                         Content="🏃"
-                                        ToolTip.Tip="测试配置" />
+                                        ToolTip.Tip="{l:Localize Configs_TestConfig}" />
                                     <Button
                                         Content="..."
-                                        ToolTip.Tip="更多功能...">
+                                        ToolTip.Tip="{l:Localize Configs_MoreActions}">
                                         <Button.Flyout>
                                             <MenuFlyout>
                                                 <MenuItem
                                                     Command="{Binding InstallSingleServiceCommand, Source={x:Static local:MainViewModel.Instance}}"
                                                     CommandParameter="{Binding}"
-                                                    Header="安装服务"
+                                                    Header="{l:Localize Configs_InstallService}"
                                                     Icon="📌" />
                                                 <MenuItem
                                                     Command="{Binding UninstallSingleServiceCommand, Source={x:Static local:MainViewModel.Instance}}"
                                                     CommandParameter="{Binding}"
-                                                    Header="卸载服务"
+                                                    Header="{l:Localize Configs_UninstallService}"
                                                     Icon="✂️" />
                                                 <MenuItem
                                                     Command="{Binding EditSingleConfigFileCommand, Source={x:Static local:MainViewModel.Instance}}"
                                                     CommandParameter="{Binding}"
-                                                    Header="编辑原始配置文件"
+                                                    Header="{l:Localize Configs_EditRawConfigFile}"
                                                     Icon="📄" />
                                                 <MenuItem
                                                     Command="{Binding RenameSingleConfigCommand, Source={x:Static local:MainViewModel.Instance}}"
                                                     CommandParameter="{Binding}"
-                                                    Header="重命名配置"
+                                                    Header="{l:Localize Configs_RenameConfig}"
                                                     Icon="⛏️" />
                                                 <MenuItem
                                                     Command="{Binding DeleteSingleConfigCommand, Source={x:Static local:MainViewModel.Instance}}"
                                                     CommandParameter="{Binding}"
-                                                    Header="删除配置"
+                                                    Header="{l:Localize Configs_DeleteConfig}"
                                                     Icon="🗑️" />
                                             </MenuFlyout>
                                         </Button.Flyout>
@@ -137,22 +138,22 @@
 
                     <ToggleSwitch
                         IsChecked="{Binding DeleteExtraConfigsOnOtherNodesWhenNextSync}"
-                        OffContent="同步删除"
-                        OnContent="同步删除"
-                        ToolTip.Tip="同步时删除其他节点的多余配置" />
+                        OffContent="{l:Localize Configs_SyncDelete}"
+                        OnContent="{l:Localize Configs_SyncDelete}"
+                        ToolTip.Tip="{l:Localize Configs_SyncDeleteTip}" />
                     <Button
                         Classes="Red"
                         Command="{Binding SyncConfigsCommand}"
-                        Content="同步"
-                        ToolTip.Tip="同步配置到其他节点" />
+                        Content="{l:Localize Configs_Sync}"
+                        ToolTip.Tip="{l:Localize Configs_SyncTip}" />
                     <Button
                         Command="{Binding RefreshConfigsCommand}"
                         Content="🔄"
-                        ToolTip.Tip="刷新列表" />
+                        ToolTip.Tip="{l:Localize Configs_RefreshList}" />
                     <Button
                         Command="{Binding AddConfigCommand}"
                         Content="➕"
-                        ToolTip.Tip="新增配置" />
+                        ToolTip.Tip="{l:Localize Configs_AddConfig}" />
                 </StackPanel>
 
                 <StackPanel
@@ -169,35 +170,35 @@
                     <Button
                         Command="{Binding RestartSelectedServicesCommand}"
                         Content="▶️"
-                        ToolTip.Tip="重启选中的服务" />
+                        ToolTip.Tip="{l:Localize Configs_RestartSelectedServices}" />
                     <Button
                         Command="{Binding StopSelectedServicesCommand}"
                         Content="⏹️"
-                        ToolTip.Tip="停止选中的服务" />
+                        ToolTip.Tip="{l:Localize Configs_StopSelectedServices}" />
                     <Button
                         Command="{Binding EditSelectedConfigsCommand}"
                         Content="✏️"
-                        ToolTip.Tip="编辑选中的配置" />
+                        ToolTip.Tip="{l:Localize Configs_EditSelectedConfigs}" />
                     <Button
                         Content="..."
-                        ToolTip.Tip="更多功能...">
+                        ToolTip.Tip="{l:Localize Configs_MoreActions}">
                         <Button.Flyout>
                             <MenuFlyout>
                                 <MenuItem
                                     Command="{Binding InstallSelectedServicesCommand}"
-                                    Header="安装选中的服务"
+                                    Header="{l:Localize Configs_InstallSelectedServices}"
                                     Icon="📌" />
                                 <MenuItem
                                     Command="{Binding UninstallSelectedServicesCommand}"
-                                    Header="卸载选中的服务"
+                                    Header="{l:Localize Configs_UninstallSelectedServices}"
                                     Icon="✂️" />
                                 <MenuItem
                                     Command="{Binding EditSelectedConfigsCommand}"
-                                    Header="编辑选中的原始配置文件"
+                                    Header="{l:Localize Configs_EditSelectedRawConfigFiles}"
                                     Icon="📄" />
                                 <MenuItem
                                     Command="{Binding DeleteSelectedConfigsCommand}"
-                                    Header="删除选中的配置"
+                                    Header="{l:Localize Configs_DeleteSelectedConfigs}"
                                     Icon="🗑️" />
                             </MenuFlyout>
                         </Button.Flyout>

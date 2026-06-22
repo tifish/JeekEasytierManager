@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jeek.Avalonia.Localization;
 using JeekTools;
 
 namespace JeekEasyTierManager;
@@ -43,7 +44,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!HasEasyTier)
         {
             ClearMessages();
-            AddMessage("EasyTier is not installed");
+            AddMessage(Localizer.Get("Configs_EasyTierNotInstalled"));
             return;
         }
 
@@ -74,7 +75,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!HasEasyTier)
         {
             ClearMessages();
-            AddMessage("EasyTier is not installed");
+            AddMessage(Localizer.Get("Configs_EasyTierNotInstalled"));
             return;
         }
 
@@ -100,7 +101,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         )
         {
             ClearMessages();
-            AddMessage($"Failed to install service {ServicePrefix + config.Name}\n{Nssm.LastError}");
+            AddMessage(
+                string.Format(
+                    Localizer.Get("Configs_InstallServiceFailed"),
+                    ServicePrefix + config.Name,
+                    Nssm.LastError
+                )
+            );
             return;
         }
     }
@@ -123,7 +130,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!HasEasyTier)
         {
             ClearMessages();
-            AddMessage("EasyTier is not installed");
+            AddMessage(Localizer.Get("Configs_EasyTierNotInstalled"));
             return;
         }
 
@@ -148,7 +155,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!HasEasyTier)
         {
             ClearMessages();
-            AddMessage("EasyTier is not installed");
+            AddMessage(Localizer.Get("Configs_EasyTierNotInstalled"));
             return;
         }
 
@@ -175,7 +182,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             ClearMessages();
             AddMessage(
-                $"Failed to uninstall service {ServicePrefix + config.Name}\n{Nssm.LastOutput}\n{Nssm.LastError}"
+                string.Format(
+                    Localizer.Get("Configs_UninstallServiceFailed"),
+                    ServicePrefix + config.Name,
+                    Nssm.LastOutput,
+                    Nssm.LastError
+                )
             );
         }
     }
@@ -186,7 +198,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!HasEasyTier)
         {
             ClearMessages();
-            AddMessage("EasyTier is not installed");
+            AddMessage(Localizer.Get("Configs_EasyTierNotInstalled"));
             return;
         }
 
@@ -249,7 +261,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!HasEasyTier)
         {
             ClearMessages();
-            AddMessage("EasyTier is not installed");
+            AddMessage(Localizer.Get("Configs_EasyTierNotInstalled"));
             return;
         }
 

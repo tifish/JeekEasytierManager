@@ -6,6 +6,7 @@ using System.Linq;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jeek.Avalonia.Localization;
 using Nett;
 
 namespace JeekEasyTierManager;
@@ -426,7 +427,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            AddMessage($"Failed to get current proxy networks: {ex.Message}");
+            AddMessage(string.Format(Localizer.Get("EditConfigs_GetCurrentProxyNetworksFailed"), ex.Message));
         }
     }
 

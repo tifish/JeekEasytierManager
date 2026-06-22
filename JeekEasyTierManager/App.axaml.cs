@@ -5,6 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Jeek.Avalonia.Localization;
 
 namespace JeekEasyTierManager;
 
@@ -13,6 +14,10 @@ public partial class App : Application
     private static MainWindow? _mainWindow;
     private static TrayIcons? _trayIcons;
     private static TrayIcon? _trayIcon;
+    private static NativeMenuItem? _showHideMenuItem;
+    private static NativeMenuItem? _restartServiceMenuItem;
+    private static NativeMenuItem? _stopServiceMenuItem;
+    private static NativeMenuItem? _exitMenuItem;
 
     public static MainWindow? MainWindow => _mainWindow;
 
@@ -25,6 +30,10 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            Localizer.SetLocalizer(new TabLocalizer());
+            // Default to English; the saved language preference is applied after settings load.
+            Localizer.Language = "en";
+
             _mainWindow = new MainWindow();
             desktop.MainWindow = _mainWindow;
 
@@ -45,7 +54,6 @@ public partial class App : Application
             Icon = new WindowIcon(
                 new Bitmap(AssetLoader.Open(new Uri("avares://JeekEasyTierManager/App.ico")))
             ),
-            ToolTipText = "Jeek EasyTier 管理器",
             IsVisible = true,
         };
 
@@ -53,36 +61,34 @@ public partial class App : Application
         var menu = new NativeMenu();
 
         // Show/Hide main window
-        var showHideMenuItem = new NativeMenuItem("显示/隐藏 Jeek EasyTier 管理器");
-        showHideMenuItem.Click += (sender, e) => ToggleMainWindow();
-        menu.Add(showHideMenuItem);
+        _showHideMenuItem = new NativeMenuItem();
+        _showHideMenuItem.Click += (sender, e) => ToggleMainWindow();
+        menu.Add(_showHideMenuItem);
 
         // Separator
         menu.Add(new NativeMenuItemSeparator());
 
-        // Start service
-        menu.Add(
-            new NativeMenuItem("重启服务")
-            {
-                Command = MainViewModel.Instance.RestartSelectedServicesCommand,
-            }
-        );
+        // Restart service
+        _restartServiceMenuItem = new NativeMenuItem
+        {
+            Command = MainViewModel.Instance.RestartSelectedServicesCommand,
+        };
+        menu.Add(_restartServiceMenuItem);
 
         // Stop service
-        menu.Add(
-            new NativeMenuItem("停止服务")
-            {
-                Command = MainViewModel.Instance.StopSelectedServicesCommand,
-            }
-        );
+        _stopServiceMenuItem = new NativeMenuItem
+        {
+            Command = MainViewModel.Instance.StopSelectedServicesCommand,
+        };
+        menu.Add(_stopServiceMenuItem);
 
         // Separator
         menu.Add(new NativeMenuItemSeparator());
 
         // Exit application
-        var exitMenuItem = new NativeMenuItem("退出");
-        exitMenuItem.Click += (sender, e) => ExitApplication();
-        menu.Add(exitMenuItem);
+        _exitMenuItem = new NativeMenuItem();
+        _exitMenuItem.Click += (sender, e) => ExitApplication();
+        menu.Add(_exitMenuItem);
 
         _trayIcon.Menu = menu;
 
@@ -92,6 +98,23 @@ public partial class App : Application
         };
 
         _trayIcons = [_trayIcon];
+
+        UpdateTrayTexts();
+        Localizer.LanguageChanged += (sender, e) => UpdateTrayTexts();
+    }
+
+    private static void UpdateTrayTexts()
+    {
+        if (_trayIcon != null)
+            _trayIcon.ToolTipText = Localizer.Get("Menu_AppTitle");
+        if (_showHideMenuItem != null)
+            _showHideMenuItem.Header = Localizer.Get("Menu_ShowHide");
+        if (_restartServiceMenuItem != null)
+            _restartServiceMenuItem.Header = Localizer.Get("Menu_RestartService");
+        if (_stopServiceMenuItem != null)
+            _stopServiceMenuItem.Header = Localizer.Get("Menu_StopService");
+        if (_exitMenuItem != null)
+            _exitMenuItem.Header = Localizer.Get("Menu_Exit");
     }
 
     public static void ToggleMainWindow()

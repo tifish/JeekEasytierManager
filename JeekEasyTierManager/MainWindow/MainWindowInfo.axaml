@@ -2,6 +2,7 @@
     x:Class="JeekEasyTierManager.MainWindowInfo"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="using:Jeek.Avalonia.Localization"
     xmlns:local="clr-namespace:JeekEasyTierManager"
     x:DataType="local:MainViewModel">
 
@@ -15,24 +16,24 @@
 
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Classes="Title" Text="📊" />
-                    <Label Classes="Title" Content="信息" />
+                    <Label Classes="Title" Content="{l:Localize Info_Info}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <Button
                         Classes="Brown MinWidth"
                         Command="{Binding ShowPeersCommand}"
-                        Content="显示节点"
+                        Content="{l:Localize Info_ShowNodes}"
                         IsEnabled="{Binding HasRunningService}" />
                     <Button
                         Classes="Yellow MinWidth"
                         Command="{Binding ShowRouteCommand}"
-                        Content="显示路由"
+                        Content="{l:Localize Info_ShowRoute}"
                         IsEnabled="{Binding HasRunningService}" />
                     <ToggleSwitch
                         IsChecked="{Binding AutoRefreshInfo}"
-                        OffContent="激活窗口时自动刷新"
-                        OnContent="激活窗口时自动刷新" />
+                        OffContent="{l:Localize Info_AutoRefreshOnActivate}"
+                        OnContent="{l:Localize Info_AutoRefreshOnActivate}" />
                 </StackPanel>
 
             </StackPanel>
@@ -51,17 +52,17 @@
                     <DataGridTextColumn
                         Width="Auto"
                         Binding="{Binding ConfigName}"
-                        Header="配置" />
+                        Header="{l:Localize Info_Config}" />
                     <DataGridTextColumn Binding="{Binding Ipv4}" Header="IPv4" />
-                    <DataGridTextColumn Binding="{Binding Hostname}" Header="主机名" />
+                    <DataGridTextColumn Binding="{Binding Hostname}" Header="{l:Localize Info_Hostname}" />
                     <DataGridTextColumn Binding="{Binding Cost}" Header="Cost" />
-                    <DataGridTextColumn Binding="{Binding LatMs}" Header="延迟" />
-                    <DataGridTextColumn Binding="{Binding LossRate}" Header="丢包" />
-                    <DataGridTextColumn Binding="{Binding RxBytes}" Header="接收" />
-                    <DataGridTextColumn Binding="{Binding TxBytes}" Header="发送" />
-                    <DataGridTextColumn Binding="{Binding TunnelProto}" Header="隧道" />
+                    <DataGridTextColumn Binding="{Binding LatMs}" Header="{l:Localize Info_Latency}" />
+                    <DataGridTextColumn Binding="{Binding LossRate}" Header="{l:Localize Info_LossRate}" />
+                    <DataGridTextColumn Binding="{Binding RxBytes}" Header="{l:Localize Info_Received}" />
+                    <DataGridTextColumn Binding="{Binding TxBytes}" Header="{l:Localize Info_Sent}" />
+                    <DataGridTextColumn Binding="{Binding TunnelProto}" Header="{l:Localize Info_Tunnel}" />
                     <DataGridTextColumn Binding="{Binding NatType}" Header="NAT" />
-                    <DataGridTextColumn Binding="{Binding Version}" Header="版本" />
+                    <DataGridTextColumn Binding="{Binding Version}" Header="{l:Localize Info_Version}" />
                 </DataGrid.Columns>
             </DataGrid>
 
@@ -79,15 +80,15 @@
                     <DataGridTextColumn
                         Width="Auto"
                         Binding="{Binding ConfigName}"
-                        Header="配置" />
+                        Header="{l:Localize Info_Config}" />
                     <DataGridTextColumn Binding="{Binding Ipv4}" Header="IPv4" />
-                    <DataGridTextColumn Binding="{Binding Hostname}" Header="主机名" />
-                    <DataGridTextColumn Binding="{Binding ProxyCidrs}" Header="代理网段" />
-                    <DataGridTextColumn Binding="{Binding NextHop}" Header="下一跳" />
-                    <DataGridTextColumn Binding="{Binding NextHopLat}" Header="下一跳延迟" />
-                    <DataGridTextColumn Binding="{Binding PathLen}" Header="路径长度" />
-                    <DataGridTextColumn Binding="{Binding PathLatency}" Header="路径延迟" />
-                    <DataGridTextColumn Binding="{Binding Version}" Header="版本" />
+                    <DataGridTextColumn Binding="{Binding Hostname}" Header="{l:Localize Info_Hostname}" />
+                    <DataGridTextColumn Binding="{Binding ProxyCidrs}" Header="{l:Localize Info_ProxyCidrs}" />
+                    <DataGridTextColumn Binding="{Binding NextHop}" Header="{l:Localize Info_NextHop}" />
+                    <DataGridTextColumn Binding="{Binding NextHopLat}" Header="{l:Localize Info_NextHopLatency}" />
+                    <DataGridTextColumn Binding="{Binding PathLen}" Header="{l:Localize Info_PathLength}" />
+                    <DataGridTextColumn Binding="{Binding PathLatency}" Header="{l:Localize Info_PathLatency}" />
+                    <DataGridTextColumn Binding="{Binding Version}" Header="{l:Localize Info_Version}" />
                 </DataGrid.Columns>
             </DataGrid>
 

@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jeek.Avalonia.Localization;
 using RegistryHelper = DotNetRun.Reg;
 
 namespace JeekEasyTierManager;
@@ -47,6 +48,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SyncPassword = Settings.SyncPassword;
 
         AutoRefreshInfo = Settings.AutoRefreshInfo;
+
+        RefreshStorageSelectionProperties();
 
         // Check for updates when start
         await CheckForUpdates();
@@ -132,7 +135,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         catch (Exception ex)
         {
             ClearMessages();
-            AddMessage($"Failed to set start on boot: {ex.Message}");
+            AddMessage(string.Format(Localizer.Get("Settings_SetStartOnBootFailed"), ex.Message));
         }
     }
 

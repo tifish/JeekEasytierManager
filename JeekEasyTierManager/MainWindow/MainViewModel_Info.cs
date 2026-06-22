@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jeek.Avalonia.Localization;
 using JeekTools;
 using Json.Easy;
 using Nett;
@@ -61,7 +62,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!HasEasyTier)
         {
             PeerInfoRows = [];
-            AddMessage("EasyTier is not installed");
+            AddMessage(Localizer.Get("Info_EasyTierNotInstalled"));
             return;
         }
 
@@ -89,12 +90,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
             catch (Exception ex)
             {
-                AddMessage($"Failed to load peers from {config.Name}: {ex.Message}");
+                AddMessage(string.Format(Localizer.Get("Info_FailedToLoadPeers"), config.Name, ex.Message));
             }
         }
 
         if (!hasRunningService)
-            AddMessage("No running EasyTier services found");
+            AddMessage(Localizer.Get("Info_NoRunningServices"));
 
         PeerInfoRows = peerInfoRows;
     }
@@ -109,7 +110,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (!HasEasyTier)
         {
             RouteInfoRows = [];
-            AddMessage("EasyTier is not installed");
+            AddMessage(Localizer.Get("Info_EasyTierNotInstalled"));
             return;
         }
 
@@ -137,12 +138,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
             catch (Exception ex)
             {
-                AddMessage($"Failed to load routes from {config.Name}: {ex.Message}");
+                AddMessage(string.Format(Localizer.Get("Info_FailedToLoadRoutes"), config.Name, ex.Message));
             }
         }
 
         if (!hasRunningService)
-            AddMessage("No running EasyTier services found");
+            AddMessage(Localizer.Get("Info_NoRunningServices"));
 
         RouteInfoRows = routeInfoRows;
     }
