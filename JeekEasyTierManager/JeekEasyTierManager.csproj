@@ -16,18 +16,16 @@
     <CETCompat>false</CETCompat>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishDir>$(OutDir)</PublishDir>
-    <Version>0</Version>
+    <!-- Dev builds are always 0.0.0.0; CI overrides with /p:Version=<commit count>. -->
+    <Version>0.0.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="12.0.4" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.0.4" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.4" />
-    <!--Condition
-    below is needed to remove Avalonia.Diagnostics package from build output in Release
-    configuration.-->
+    <PackageReference Include="Avalonia" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="DialogHost.Avalonia" Version="0.12.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />

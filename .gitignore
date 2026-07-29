@@ -3,6 +3,8 @@
 /.vscode
 /.cursor
 obj
+# Build output of the helper projects; only the root bin directory is version-controlled.
+/Tools/*/bin
 /bin/Config
 /bin/EasyTier
 /bin/Libs
