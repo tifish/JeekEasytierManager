@@ -7,12 +7,15 @@ on:
         branches: ["main"]
 
 permissions:
-    contents: write # This grants write permissions to the contents scope
+    contents: write
 
 env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     RELEASE_TAG: "latest_release"
     PROJECT_NAME: "JeekEasyTierManager"
+    DOTNET_NOLOGO: true
+    DOTNET_CLI_TELEMETRY_OPTOUT: 1
+    DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
 
 jobs:
     build_and_release:
@@ -20,10 +23,15 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   fetch-depth: 0
-                  submodules: true
+                  submodules: recursive
+
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: 10.0.x
 
             - name: Compute commit count
               id: ver
@@ -34,14 +42,16 @@ jobs:
                   Set-Content -Path version.txt -Value $count -NoNewline -Encoding ascii
                   Write-Host "commit count = $count"
 
-            - name: Build
-              run: dotnet publish --configuration Release ${{ env.PROJECT_NAME }}.sln /p:Version=${{ steps.ver.outputs.count }}
+            - name: Publish
+              # The solution publishes the app (NetBeauty into bin) and the MCP stdio
+              # adapter (single file into bin). Version major = commit count.
+              run: dotnet publish JeekEasyTierManager.sln -c Release /p:Version=${{ steps.ver.outputs.count }}
 
-            - name: Pack files
+            - name: Zip files
+              shell: pwsh
               run: |
-                  cd bin
-                  7Zip\7za.exe a -r ..\${{ env.PROJECT_NAME }}.7z *
-                  cd ..
+                  Get-ChildItem -Path bin -Filter *.pdb -Recurse -ErrorAction SilentlyContinue | Remove-Item -Force
+                  Compress-Archive -Path bin\* -DestinationPath ${{ env.PROJECT_NAME }}.zip -Force
 
             - name: Delete release and tag
               if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -55,5 +65,5 @@ jobs:
             - name: Upload artifacts
               if: github.event_name == 'push' && github.ref == 'refs/heads/main'
               run: |
-                  gh release upload ${{ env.RELEASE_TAG }} ${{ env.PROJECT_NAME }}.7z --clobber
+                  gh release upload ${{ env.RELEASE_TAG }} ${{ env.PROJECT_NAME }}.zip --clobber
                   gh release upload ${{ env.RELEASE_TAG }} version.txt --clobber
