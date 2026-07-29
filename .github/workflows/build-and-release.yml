@@ -52,6 +52,13 @@ jobs:
               run: |
                   Get-ChildItem -Path bin -Filter *.pdb -Recurse -ErrorAction SilentlyContinue | Remove-Item -Force
                   Compress-Archive -Path bin\* -DestinationPath ${{ env.PROJECT_NAME }}.zip -Force
+                  # Transitional: builds up to 155 shipped an updater that only knows the .7z
+                  # package. Keep publishing one, packed from inside bin so its entries have no
+                  # directory prefix, so those installs can still update themselves.
+                  # Drop this once they are gone.
+                  Push-Location bin
+                  7z a -r ..\${{ env.PROJECT_NAME }}.7z *
+                  Pop-Location
 
             - name: Delete release and tag
               if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -66,4 +73,5 @@ jobs:
               if: github.event_name == 'push' && github.ref == 'refs/heads/main'
               run: |
                   gh release upload ${{ env.RELEASE_TAG }} ${{ env.PROJECT_NAME }}.zip --clobber
+                  gh release upload ${{ env.RELEASE_TAG }} ${{ env.PROJECT_NAME }}.7z --clobber
                   gh release upload ${{ env.RELEASE_TAG }} version.txt --clobber
