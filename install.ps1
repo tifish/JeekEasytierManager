@@ -158,6 +158,16 @@ if ($LASTEXITCODE -ge 8) {
     exit 1
 }
 
+# nssm.exe hosts the installed services, so it stays locked while any of them run and is
+# kept out of the mirror above. It still ships in the package, so put it in place when the
+# install directory does not have it yet.
+$nssmSource = Join-Path $stageDir "Nssm"
+$nssmTarget = Join-Path $InstallDir "Nssm"
+if ((Test-Path $nssmSource) -and -not (Test-Path (Join-Path $nssmTarget "nssm.exe"))) {
+    New-Item -ItemType Directory -Force -Path $nssmTarget | Out-Null
+    Copy-Item -Path (Join-Path $nssmSource "*") -Destination $nssmTarget -Recurse -Force
+}
+
 Remove-Item -Recurse -Force $tempRoot
 
 # 5. Create the Start Menu shortcut.
