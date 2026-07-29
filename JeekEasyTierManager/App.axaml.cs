@@ -42,6 +42,9 @@ public partial class App : Application
 
             // Set shutdown mode to not exit when all windows are closed
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+            // Debug MCP surface (no-op in Release builds).
+            DebugMcpServer.Start();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -139,8 +142,13 @@ public partial class App : Application
         // Hide tray icon, or the icon will be more and more.
         _trayIcon?.IsVisible = false;
 
+        DebugMcpServer.Stop();
+
         // Clean up resources
         MainViewModel.Instance.Dispose();
+
+        // Flush buffered logs before the process exits.
+        JeekTools.LogManager.Shutdown();
 
         if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
