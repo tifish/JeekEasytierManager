@@ -28,11 +28,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
         CheckHasEasyTier();
         await ShowInfo();
         await ApplySettings();
+
+        StartWatchingStorage();
     }
 
     public void Dispose()
     {
         _autoUpdateTimer?.Stop();
+        StopWatchingStorage();
 
         GC.SuppressFinalize(this);
     }

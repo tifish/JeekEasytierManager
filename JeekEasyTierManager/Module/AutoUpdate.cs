@@ -1,145 +1,58 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using JeekTools;
 
 namespace JeekEasyTierManager;
 
-public enum AutoUpdateCheckResult
-{
-    Available,
-    UpToDate,
-    Failed,
-}
-
+/// <summary>
+/// App-specific configuration over the generic <see cref="AutoUpdater"/> in JeekTools. See that
+/// class for how checking, staging, and installing work.
+/// </summary>
 public static class AutoUpdate
 {
-    private const string UpdateScriptName = "AutoUpdate.ps1";
+    private static readonly AutoUpdater Updater = new(
+        new AutoUpdaterOptions
+        {
+            AppExeName = "JeekEasyTierManager.exe",
+            ReleaseZipUrl = AppSettings.JeekEasyTierManagerZipUrl,
+            VersionTxtUrl = AppSettings.JeekEasyTierManagerVersionTxtUrl,
+            UserAgent = "JeekEasyTierManager-Updater/1.0",
+#if DEBUG
+            // Debug builds never self-update.
+            Disabled = true,
+#endif
+        }
+    );
 
-    public static string DownloadUrl { get; private set; } = "";
-    public static int LocalCommitCount { get; private set; }
-    public static int RemoteCommitCount { get; private set; }
-    public static string FailureReason { get; private set; } = "";
+    public static string DownloadUrl => Updater.DownloadUrl;
+    public static int LocalCommitCount => Updater.LocalVersion;
+    public static int RemoteCommitCount => Updater.RemoteVersion;
+    public static string FailureReason => Updater.FailureReason;
 
-    public static async Task<AutoUpdateCheckResult> CheckForUpdate()
+    public static int GetLocalCommitCount() => Updater.GetLocalVersion();
+
+    public static Task<UpdateCheckOutcome> CheckForUpdate() => Updater.HasUpdateAsync();
+
+    public static Task<string?> DownloadAndStage(
+        IProgress<UpdateDownloadProgress>? progress = null,
+        CancellationToken cancellationToken = default
+    )
     {
-        try
-        {
-            DownloadUrl = "";
-            LocalCommitCount = GetLocalCommitCount();
-            RemoteCommitCount = 0;
-            FailureReason = "";
-
-            string versionUrl;
-            if (Settings.DisableMirrorDownload)
-            {
-                DownloadUrl = AppSettings.JeekEasyTierManagerZipUrl;
-                versionUrl = AppSettings.JeekEasyTierManagerVersionTxtUrl;
-            }
-            else
-            {
-                var mirror = await GitHubMirrors.GetFastestMirror(
-                    AppSettings.JeekEasyTierManagerZipUrl
-                );
-                if (mirror == "")
-                    return Fail("no reachable mirror");
-
-                DownloadUrl = mirror;
-                versionUrl = await GitHubMirrors.GetFastestMirror(
-                    AppSettings.JeekEasyTierManagerVersionTxtUrl
-                );
-                if (versionUrl == "")
-                    versionUrl = AppSettings.JeekEasyTierManagerVersionTxtUrl;
-            }
-
-            var remote = await DownloadTextAsync(versionUrl);
-            if (string.IsNullOrWhiteSpace(remote))
-                return Fail($"empty version.txt from {versionUrl}");
-
-            if (!int.TryParse(remote.Trim(), out var remoteCount) || remoteCount <= 0)
-                return Fail($"version.txt did not contain a positive integer: '{remote.Trim()}'");
-            RemoteCommitCount = remoteCount;
-
-            if (LocalCommitCount <= 0)
-                return Fail("local version unavailable (development build)");
-
-            return RemoteCommitCount > LocalCommitCount
-                ? AutoUpdateCheckResult.Available
-                : AutoUpdateCheckResult.UpToDate;
-        }
-        catch (Exception ex)
-        {
-            return Fail($"exception: {ex.Message}");
-        }
+        // Honor the "disable mirror download" option by downloading directly from GitHub.
+        IReadOnlyList<string>? urls = Settings.DisableMirrorDownload
+            ? [AppSettings.JeekEasyTierManagerZipUrl]
+            : null;
+        return Updater.DownloadAndStageAsync(urls, progress, cancellationToken);
     }
 
-    public static bool Update(bool hideMainWindow)
+    /// <summary>Hands the staged package to the updater script and exits the app.</summary>
+    public static bool Install(string stagedPackageDir)
     {
-        try
-        {
-            if (DownloadUrl == "")
-                return false;
-
-            var scriptPath = Path.Join(AppSettings.AppDirectory, UpdateScriptName);
-            if (!File.Exists(scriptPath))
-                return false;
-            var restartArgument = hideMainWindow ? " /hide" : "";
-
-            Process.Start(
-                new ProcessStartInfo
-                {
-                    FileName = "powershell.exe",
-                    Arguments =
-                        $"-NoProfile -ExecutionPolicy Bypass -File \"{scriptPath}\" \"{DownloadUrl}\"{restartArgument}",
-                    WorkingDirectory = AppSettings.AppDirectory,
-                    UseShellExecute = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                }
-            );
-
-            App.ExitApplication();
-            return true;
-        }
-        catch
-        {
+        if (!Updater.LaunchInstall(stagedPackageDir))
             return false;
-        }
-    }
 
-    private static AutoUpdateCheckResult Fail(string reason)
-    {
-        FailureReason = reason;
-        return AutoUpdateCheckResult.Failed;
-    }
-
-    private static async Task<string?> DownloadTextAsync(string url)
-    {
-        try
-        {
-            using var client = HttpHelper.GetHttpClient();
-            using var response = await client.GetAsync(url);
-            if (!response.IsSuccessStatusCode)
-                return null;
-
-            return await response.Content.ReadAsStringAsync();
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    public static int GetLocalCommitCount()
-    {
-        try
-        {
-            return Assembly.GetExecutingAssembly().GetName().Version?.Major ?? 0;
-        }
-        catch
-        {
-            return 0;
-        }
+        App.ExitApplication();
+        return true;
     }
 }

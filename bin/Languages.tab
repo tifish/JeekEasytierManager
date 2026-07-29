@@ -219,3 +219,5 @@ Update_UnknownBuild	unknown	未知
 Update_BuildLabel	Build {0}	构建 {0}
 Update_DevBuild	Development build	开发版构建
 Update_OpenHomePageFailed	Failed to open home page: {0}	打开主页失败：{0}
+Storage_AskMoveFiles	Move the existing files to the new location?\nYes: move the Config and Settings folders there.\nNo: keep the files where they are and use the new location as is.	是否将现有文件移动到新位置？\n是：把 Config 和 Settings 目录整体移动过去。\n否：不移动任何文件，直接使用新位置。
+Storage_LeavePortableMustMove	Leaving portable mode requires moving the files, otherwise portable mode will be detected again on next startup. Move and continue?	离开便携模式必须移动文件，否则下次启动会再次检测为便携模式。是否移动并继续？

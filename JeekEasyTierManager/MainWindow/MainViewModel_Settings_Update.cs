@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jeek.Avalonia.Localization;
+using JeekTools;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 
@@ -114,7 +115,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             )
         );
 
-        if (checkResult == AutoUpdateCheckResult.Available)
+        if (checkResult == UpdateCheckOutcome.Available)
         {
             if (_mainWindow!.IsVisible)
             {
@@ -134,10 +135,44 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
 
             AddMessage(Localizer.Get("Update_UpdatingMe"));
-            if (!AutoUpdate.Update(!_mainWindow!.IsVisible))
+
+            // Download and stage in-app, so a failed download never leaves the user without a
+            // running app; only the final swap happens in the updater script.
+            DownloadProgress = 0;
+            DownloadStatus = string.Format(Localizer.Get("Update_DownloadingProgress"), 0.00);
+            IsDownloading = true;
+            string? stageDir;
+            try
+            {
+                var progress = new Progress<UpdateDownloadProgress>(p =>
+                {
+                    var percent =
+                        p.TotalBytes is > 0 ? p.ReceivedBytes * 100.0 / p.TotalBytes.Value : 0;
+                    DownloadProgress = percent;
+                    DownloadStatus = string.Format(
+                        Localizer.Get("Update_DownloadingProgress"),
+                        percent
+                    );
+                });
+                stageDir = await AutoUpdate.DownloadAndStage(progress);
+            }
+            finally
+            {
+                IsDownloading = false;
+            }
+
+            if (stageDir == null)
+            {
+                AddMessage(
+                    string.Format(Localizer.Get("Update_MeCheckFailed"), AutoUpdate.FailureReason)
+                );
+                return;
+            }
+
+            if (!AutoUpdate.Install(stageDir))
                 AddMessage(Localizer.Get("Update_MeFailedLaunchUpdater"));
         }
-        else if (checkResult == AutoUpdateCheckResult.Failed)
+        else if (checkResult == UpdateCheckOutcome.Failed)
         {
             AddMessage(string.Format(Localizer.Get("Update_MeCheckFailed"), AutoUpdate.FailureReason));
         }

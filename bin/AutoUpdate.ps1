@@ -1,80 +1,77 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 $appName = "JeekEasyTierManager"
+
+# The app has already downloaded, extracted, and verified the update package
+# into a staging folder before launching this script. All that remains here is
+# the short critical window: wait for the app to exit, swap the files, restart.
 
 if ($args.Count -eq 0) {
     Exit 1
 }
 
-$downloadUrl = $args[0]
-$restartArgs = @()
-if ($args.Count -gt 1) {
-    $restartArgs = $args[1..($args.Count - 1)]
-}
+$stageDir = $args[0]
+$installDir = $PSScriptRoot
+$exePath = Join-Path $installDir "$appName.exe"
 
-$packPath = Join-Path $env:TEMP "$appName-update.7z"
-$stageRoot = Join-Path $env:TEMP "$appName-update"
-$stageDir = Join-Path $stageRoot "package"
-$sevenZipTmp = Join-Path $env:TEMP "$appName-7za.exe"
+$Host.UI.RawUI.WindowTitle = "$appName Updater"
+
+Write-Host "================================================================"
+Write-Host " $appName - Auto Update"
+Write-Host "================================================================"
+Write-Host ""
+Write-Host "Please keep this window open. The app will restart automatically"
+Write-Host "when the update is finished."
+Write-Host ""
 
 try {
+    if (-not (Test-Path -LiteralPath (Join-Path $stageDir "$appName.exe"))) {
+        throw "Staged update package is missing $appName.exe: $stageDir"
+    }
+
+    Write-Host "[1/3] Waiting for $appName to exit..."
     Get-Process -Name $appName -ErrorAction SilentlyContinue | ForEach-Object {
         try {
             $_.WaitForExit()
         } catch {}
     }
 
-    Remove-Item -Recurse -Force -LiteralPath $stageRoot -ErrorAction SilentlyContinue
-    Remove-Item -Force -LiteralPath $packPath -ErrorAction SilentlyContinue
-    Remove-Item -Force -LiteralPath $sevenZipTmp -ErrorAction SilentlyContinue
-    New-Item -ItemType Directory -Force -Path $stageDir | Out-Null
+    Write-Host "[2/3] Installing files..."
+    # Preserve user data (portable Config/Settings, logs), files the running
+    # EasyTier services keep locked (EasyTier, Nssm), and the updater itself.
+    $preserveNames = @("Config", "Settings", "Logs", "EasyTier", "Nssm", "AutoUpdate.ps1")
+    Get-ChildItem -LiteralPath $installDir -Force -ErrorAction SilentlyContinue |
+        Where-Object { $preserveNames -notcontains $_.Name } |
+        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
-    $client = New-Object System.Net.WebClient
-    $client.Headers.Add("User-Agent", "$appName-Updater/1.0")
-    $client.DownloadFile($downloadUrl, $packPath)
+    # Skip the preserved names when copying too: nssm.exe may be locked by running services,
+    # and the staged package must never clobber user data.
+    Get-ChildItem -LiteralPath $stageDir -Force |
+        Where-Object { $preserveNames -notcontains $_.Name } |
+        Copy-Item -Destination $installDir -Recurse -Force
 
-    if (-not (Test-Path -LiteralPath $packPath)) {
-        Exit 1
+    # Remove the staging folder the app created (...\JeekEasyTierManager-update\package).
+    $stageRoot = Split-Path -Parent $stageDir
+    if ((Split-Path -Leaf $stageRoot) -eq "$appName-update") {
+        Remove-Item -Recurse -Force -LiteralPath $stageRoot -ErrorAction SilentlyContinue
+    } else {
+        Remove-Item -Recurse -Force -LiteralPath $stageDir -ErrorAction SilentlyContinue
     }
 
-    $sevenZipPath = Join-Path $PSScriptRoot "7Zip\7za.exe"
-    if (-not (Test-Path -LiteralPath $sevenZipPath)) {
-        Exit 1
-    }
-
-    Copy-Item -LiteralPath $sevenZipPath -Destination $sevenZipTmp -Force
-    & $sevenZipTmp x $packPath "-o$stageDir" "-x!Nssm" -y | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        Exit 1
-    }
-
-    $stagedExe = Join-Path $stageDir "$appName.exe"
-    if (-not (Test-Path -LiteralPath $stagedExe)) {
-        Exit 1
-    }
-
-    Remove-Item -Recurse -Force -LiteralPath (Join-Path $PSScriptRoot "Libs") -ErrorAction SilentlyContinue
-    Remove-Item -Force -Path (Join-Path $PSScriptRoot "*.dll") -ErrorAction SilentlyContinue
-    Remove-Item -Force -Path (Join-Path $PSScriptRoot "*.pdb") -ErrorAction SilentlyContinue
-    Remove-Item -Force -Path (Join-Path $PSScriptRoot "*.deps.json") -ErrorAction SilentlyContinue
-    Remove-Item -Force -Path (Join-Path $PSScriptRoot "*.runtimeconfig.json") -ErrorAction SilentlyContinue
-
-    Copy-Item -Path (Join-Path $stageDir "*") -Destination $PSScriptRoot -Recurse -Force
-
-    Remove-Item -Force -LiteralPath $sevenZipTmp -ErrorAction SilentlyContinue
-    Remove-Item -Recurse -Force -LiteralPath $stageRoot -ErrorAction SilentlyContinue
-    Remove-Item -Force -LiteralPath $packPath -ErrorAction SilentlyContinue
-}
-catch {
-    Start-Sleep -Seconds 5
-    Exit 1
-}
-
-$exePath = Join-Path $PSScriptRoot "$appName.exe"
-if (Test-Path -LiteralPath $exePath) {
-    if ($restartArgs.Count -gt 0) {
-        Start-Process -FilePath $exePath -ArgumentList $restartArgs
-    }
-    else {
+    Write-Host "[3/3] Restarting $appName..."
+    if (Test-Path -LiteralPath $exePath) {
         Start-Process -FilePath $exePath
     }
+
+    Write-Host ""
+    Write-Host "Update completed." -ForegroundColor Green
+}
+catch {
+    Write-Host ""
+    Write-Host "Update failed: $($_.Exception.Message)" -ForegroundColor Red
+    # Best effort: bring the app back even if the install failed.
+    if (Test-Path -LiteralPath $exePath) {
+        Start-Process -FilePath $exePath
+    }
+    Start-Sleep -Seconds 5
+    Exit 1
 }

@@ -286,6 +286,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         try
         {
+            StorageManager.TouchSelfWrite();
             File.Move(oldConfigFile, newConfigFile);
 
             _renameConfigDialogOldConfig.Name = newName;
@@ -323,6 +324,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (File.Exists(configFile))
             return;
 
+        StorageManager.TouchSelfWrite();
         File.Create(configFile).Close();
         var config = new ConfigInfo { Name = newName };
         Configs.Add(config);
@@ -381,7 +383,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         var configFile = Path.Combine(AppSettings.ConfigDirectory, config.Name + ".toml");
         if (File.Exists(configFile))
+        {
+            StorageManager.TouchSelfWrite();
             File.Delete(configFile);
+        }
 
         Configs.Remove(config);
         SelectedConfigs.Remove(config);

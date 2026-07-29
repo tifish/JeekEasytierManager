@@ -1,10 +1,11 @@
 ﻿global using static JeekEasyTierManager.SettingsContainer;
 using System;
 using System.IO;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Styling;
-using Json.Easy;
+using JeekTools;
 
 namespace JeekEasyTierManager;
 
@@ -33,7 +34,7 @@ public class AppSettings
     public static readonly string NssmPath = Path.Join(AppDirectory, "Nssm", "nssm.exe");
 
     public static readonly string JeekEasyTierManagerZipUrl =
-        "https://github.com/tifish/JeekEasyTierManager/releases/download/latest_release/JeekEasyTierManager.7z";
+        "https://github.com/tifish/JeekEasyTierManager/releases/download/latest_release/JeekEasyTierManager.zip";
     public static readonly string JeekEasyTierManagerVersionTxtUrl =
         "https://github.com/tifish/JeekEasyTierManager/releases/download/latest_release/version.txt";
     public static readonly string EasyTierLatestReleasePageUrl =
@@ -47,11 +48,18 @@ public class AppSettings
     public static string SettingsDirectory => StorageManager.ActiveSettingsDirectory;
     public static string SettingsFile => StorageManager.ActiveSettingsFile;
 
+    private static AppSettings _baseline = new();
+
     public static async Task Load()
     {
-        var settings = await new JsonFile(SettingsFile).Load<AppSettings>();
-        if (settings != null)
-            Settings = settings;
+        await Task.Run(() =>
+        {
+            if (JsonSettingsFile.TryLoad(SettingsFile, out AppSettings settings))
+            {
+                Settings = settings;
+                _baseline = JsonSettingsFile.Clone(settings);
+            }
+        });
     }
 
     public static async Task Save()
@@ -59,15 +67,34 @@ public class AppSettings
         if (Design.IsDesignMode)
             return;
 
-        Directory.CreateDirectory(SettingsDirectory);
-
-        await new JsonFile(SettingsFile).Save(Settings);
+        var path = SettingsFile;
+        await Task.Run(() =>
+        {
+            Directory.CreateDirectory(SettingsDirectory);
+            StorageManager.TouchSelfWrite();
+            if (
+                JsonSettingsFile.TryMergeAndWrite(
+                    path,
+                    _baseline,
+                    Settings,
+                    static _ => { },
+                    forceAllLocal: false,
+                    out var merged
+                )
+            )
+            {
+                Settings = merged;
+                _baseline = JsonSettingsFile.Clone(merged);
+                StorageManager.TouchSelfWrite();
+            }
+        });
     }
 
     public string Language { get; set; } = "en";
 
     public string Theme { get; set; } = "Default";
 
+    [JsonIgnore]
     public ThemeVariant ThemeVariant
     {
         get

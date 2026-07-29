@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jeek.Avalonia.Localization;
+using JeekTools;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 
@@ -14,9 +16,10 @@ namespace JeekEasyTierManager;
 
 public partial class MainViewModel : ObservableObject, IDisposable
 {
-    public bool IsDefaultStorage => StorageManager.ActiveMode == StorageMode.Default;
-    public bool IsPortableStorage => StorageManager.ActiveMode == StorageMode.Portable;
-    public bool IsCustomStorage => StorageManager.ActiveMode == StorageMode.Custom;
+    public bool IsDefaultStorage => StorageManager.ActiveLocation == StorageLocation.UserDirectory;
+    public bool IsPortableStorage =>
+        StorageManager.ActiveLocation == StorageLocation.ProgramDirectory;
+    public bool IsCustomStorage => StorageManager.ActiveLocation == StorageLocation.CustomDirectory;
     public string StorageLocationText => StorageManager.ActiveRoamingRoot;
 
     private void RefreshStorageSelectionProperties()
@@ -33,10 +36,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         switch (mode)
         {
             case "Default":
-                await SwitchStorageMode(StorageMode.Default, null);
+                await SwitchStorageMode(StorageLocation.UserDirectory, null);
                 break;
             case "Portable":
-                await SwitchStorageMode(StorageMode.Portable, null);
+                await SwitchStorageMode(StorageLocation.ProgramDirectory, null);
                 break;
             case "Custom":
                 await BrowseCustomDirectory();
@@ -80,7 +83,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 return;
             }
 
-            await SwitchStorageMode(StorageMode.Custom, path);
+            await SwitchStorageMode(StorageLocation.CustomDirectory, path);
         }
         catch (Exception ex)
         {
@@ -90,9 +93,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    public async Task SwitchStorageMode(StorageMode newMode, string? customDirectory)
+    public async Task SwitchStorageMode(StorageLocation newMode, string? customDirectory)
     {
-        var oldMode = StorageManager.ActiveMode;
+        var oldMode = StorageManager.ActiveLocation;
         var oldRoot = StorageManager.ActiveRoamingRoot;
         var newRoot = StorageManager.GetRoamingRoot(newMode, customDirectory);
 
@@ -104,7 +107,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
 
         // Validate a custom target before touching anything.
-        if (newMode == StorageMode.Custom
+        if (newMode == StorageLocation.CustomDirectory
             && (string.IsNullOrWhiteSpace(newRoot) || !StorageManager.IsUsableDirectory(newRoot)))
         {
             ClearMessages();
@@ -131,38 +134,84 @@ public partial class MainViewModel : ObservableObject, IDisposable
             }
         }
 
+        // Ask whether to move the existing files. Leaving portable mode must move them, otherwise
+        // the program-dir data would force portable mode again on next startup.
+        var moveFiles = true;
+        if (_mainWindow != null && _mainWindow.IsVisible)
+        {
+            if (oldMode == StorageLocation.ProgramDirectory)
+            {
+                var result = await MessageBoxManager
+                    .GetMessageBoxStandard(
+                        Localizer.Get("Storage_SwitchTitle"),
+                        Localizer.Get("Storage_LeavePortableMustMove"),
+                        ButtonEnum.YesNo,
+                        Icon.Warning
+                    )
+                    .ShowWindowDialogAsync(_mainWindow);
+                if (result == ButtonResult.No)
+                {
+                    RefreshStorageSelectionProperties();
+                    return;
+                }
+            }
+            else
+            {
+                var result = await MessageBoxManager
+                    .GetMessageBoxStandard(
+                        Localizer.Get("Storage_SwitchTitle"),
+                        Localizer.Get("Storage_AskMoveFiles"),
+                        ButtonEnum.YesNo,
+                        Icon.Question
+                    )
+                    .ShowWindowDialogAsync(_mainWindow);
+                moveFiles = result == ButtonResult.Yes;
+            }
+        }
+
         ClearMessages();
-        AddMessage(string.Format(Localizer.Get("Storage_Migrating"), oldRoot, newRoot));
+        if (moveFiles)
+            AddMessage(string.Format(Localizer.Get("Storage_Migrating"), oldRoot, newRoot));
 
         // Remember the installed services (running ones are tracked by StopAllServices).
         var installedConfigs = Configs.Where(c => c.Service != null).ToList();
         await StopAllServices();
+        StopWatchingStorage();
 
         // Migrate roaming data (both Config and Settings) to the new location.
-        try
+        if (moveFiles)
         {
-            DirectoryMigrator.MoveMerge(
-                Path.Combine(oldRoot, "Config"),
-                Path.Combine(newRoot, "Config")
-            );
-            DirectoryMigrator.MoveMerge(
-                Path.Combine(oldRoot, "Settings"),
-                Path.Combine(newRoot, "Settings")
-            );
-        }
-        catch (Exception ex)
-        {
-            AddMessage(string.Format(Localizer.Get("Storage_MigrationFailed"), ex.Message));
-            await RestoreAllServices();
-            RefreshStorageSelectionProperties();
-            return;
+            try
+            {
+                MoveRoamingDirectory(
+                    Path.Combine(oldRoot, "Config"),
+                    Path.Combine(newRoot, "Config")
+                );
+                MoveRoamingDirectory(
+                    Path.Combine(oldRoot, "Settings"),
+                    Path.Combine(newRoot, "Settings")
+                );
+            }
+            catch (Exception ex)
+            {
+                AddMessage(string.Format(Localizer.Get("Storage_MigrationFailed"), ex.Message));
+                StartWatchingStorage();
+                await RestoreAllServices();
+                RefreshStorageSelectionProperties();
+                return;
+            }
         }
 
         // Activate the new location, then persist the mode so it matches where the files now live.
         StorageManager.SetActive(newMode, newRoot);
         LocalSettings.Current.StorageMode = newMode;
-        LocalSettings.Current.CustomDirectory = newMode == StorageMode.Custom ? newRoot : "";
+        LocalSettings.Current.CustomDirectory =
+            newMode == StorageLocation.CustomDirectory ? newRoot : "";
         await LocalSettings.Save();
+
+        // When the files were not moved, the new location may hold different data; load it.
+        if (!moveFiles)
+            await ReloadRoamingSettings();
 
         // Reinstall each installed service so the baked NSSM "-c" path points at the new location.
         foreach (var config in installedConfigs)
@@ -176,12 +225,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         await RestoreAllServices();
 
         // Leaving portable: make sure the program-dir folders are gone so startup won't force portable.
-        if (oldMode == StorageMode.Portable && newMode != StorageMode.Portable)
+        if (
+            oldMode == StorageLocation.ProgramDirectory
+            && newMode != StorageLocation.ProgramDirectory
+        )
         {
-            TryDeleteDirectory(StorageManager.PortableConfigDirectory);
+            StorageManager.Storage.TryDeleteProgramConfig(out _);
             TryDeleteDirectory(StorageManager.PortableSettingsDirectory);
         }
 
+        StartWatchingStorage();
         RefreshStorageSelectionProperties();
         await ShowInfo();
 
@@ -198,6 +251,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
         catch
         {
             // Best effort; a leftover folder only means portable may be re-detected next start.
+        }
+    }
+
+    /// <summary>
+    /// Moves one roaming data directory via <see cref="SettingsStorage.MoveConfigRoot"/>, retrying
+    /// transient errors: EasyTier service processes can briefly keep a file handle open right
+    /// after being stopped.
+    /// </summary>
+    private static void MoveRoamingDirectory(string source, string target)
+    {
+        const int maxAttempts = 5;
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                SettingsStorage.MoveConfigRoot(source, target);
+                return;
+            }
+            catch (Exception ex)
+                when ((ex is IOException or UnauthorizedAccessException) && attempt < maxAttempts)
+            {
+                Thread.Sleep(200);
+            }
         }
     }
 }

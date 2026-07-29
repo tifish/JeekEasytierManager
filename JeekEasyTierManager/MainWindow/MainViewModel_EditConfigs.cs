@@ -337,6 +337,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         flags.Set("accept_dns", AcceptDns, false);
         flags.Set("private_mode", PrivateMode, false);
 
+        StorageManager.TouchSelfWrite();
         Toml.WriteFile(configData, configPath);
     }
 

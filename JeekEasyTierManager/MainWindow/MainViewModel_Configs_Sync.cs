@@ -314,6 +314,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         foreach (var fileContent in fileContentList)
         {
             var filePath = Path.Join(AppSettings.ConfigDirectory, fileContent.FileName);
+            StorageManager.TouchSelfWrite();
             await File.WriteAllTextAsync(filePath, fileContent.Content);
             File.SetLastWriteTimeUtc(filePath, fileContent.FileTimeUtc);
         }
