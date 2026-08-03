@@ -42,10 +42,12 @@ jobs:
                   Set-Content -Path version.txt -Value $count -NoNewline -Encoding ascii
                   Write-Host "commit count = $count"
 
-            - name: Publish
-              # The solution publishes the app (NetBeauty into bin) and the MCP stdio
-              # adapter (single file into bin). Version major = commit count.
-              run: dotnet publish JeekEasyTierManager.sln -c Release /p:Version=${{ steps.ver.outputs.count }}
+            - name: Build Release
+              # Solution build (NetBeauty into bin) + MCP adapter is published from Build.cmd locally.
+              # CI builds the app; also publish MCP single-file into bin.
+              run: |
+                  dotnet build JeekEasyTierManager.sln -c Release /p:Version=${{ steps.ver.outputs.count }}
+                  dotnet publish Tools/JeekEasyTierManagerMcp/JeekEasyTierManagerMcp.csproj -c Release
 
             - name: Zip files
               shell: pwsh
